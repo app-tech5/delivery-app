@@ -10,22 +10,9 @@ const CACHE_KEYS = {
 
 // Cache configuration pour delivery-app
 const CACHE_CONFIG = {
-  SETTINGS_EXPIRY: 60 * 60 * 1000, // 1 heure en millisecondes (les settings changent moins souvent)
-  DELIVERIES_EXPIRY: 5 * 60 * 1000, // 5 minutes pour les livraisons (plus fréquentes)
   VERSION: '1.0'
 };
 
-/**
- * Vérifie si le cache est expiré
- * @param {number} timestamp - Timestamp du cache
- * @param {number} expiryTime - Temps d'expiration en ms (défaut: 1h pour settings)
- * @returns {boolean} True si expiré
- */
-export const isCacheExpired = (timestamp, expiryTime = CACHE_CONFIG.SETTINGS_EXPIRY) => {
-  if (!timestamp) return true;
-  const now = Date.now();
-  return (now - timestamp) > expiryTime;
-};
 
 /**
  * Compare deux objets settings pour voir s'ils sont différents
@@ -148,12 +135,7 @@ export const getSettingsFromCache = async () => {
       return null;
     }
 
-    // Vérifier l'expiration
-    if (isCacheExpired(parsedData.timestamp)) {
-      console.log(`⏰ Cache des settings expiré, suppression`);
-      await clearSettingsCache();
-      return null;
-    }
+    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
 
     console.log(`📖 Settings chargés depuis le cache: ${parsedData.settings.appName || 'App'}`);
     return {
@@ -200,12 +182,7 @@ export const getDeliveriesFromCache = async (driverId) => {
       return null;
     }
 
-    // Vérifier l'expiration (utiliser la durée spécifique aux livraisons)
-    if (isCacheExpired(parsedData.timestamp, CACHE_CONFIG.DELIVERIES_EXPIRY)) {
-      console.log(`⏰ Cache des livraisons expiré pour driver ${driverId}, suppression`);
-      await clearDeliveriesCache(driverId);
-      return null;
-    }
+    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
 
     console.log(`📖 Livraisons chargées depuis le cache pour driver ${driverId}: ${parsedData.deliveries.length} livraisons`);
     return {
@@ -451,37 +428,3 @@ export const loadDeliveriesWithSmartCache = async (
   }
 };
 
-/**
- * Nettoie les caches expirés (fonction de maintenance)
- */
-export const cleanupExpiredCache = async () => {
-  try {
-    console.log('🧹 Nettoyage des caches expirés...');
-
-    const keys = await AsyncStorage.getAllKeys();
-    const timestampKeys = keys.filter(key => key.includes(CACHE_KEYS.CACHE_TIMESTAMP));
-
-    let cleanedCount = 0;
-
-    for (const timestampKey of timestampKeys) {
-      const timestamp = await AsyncStorage.getItem(timestampKey);
-
-      if (isCacheExpired(parseInt(timestamp))) {
-        // Nettoyer le cache des settings
-        if (timestampKey === CACHE_KEYS.SETTINGS + CACHE_KEYS.CACHE_TIMESTAMP) {
-          await clearSettingsCache();
-          cleanedCount++;
-        }
-      }
-    }
-
-    if (cleanedCount > 0) {
-      console.log(`🗑️ ${cleanedCount} caches expirés supprimés`);
-    } else {
-      console.log('✨ Aucun cache expiré trouvé');
-    }
-
-  } catch (error) {
-    console.error('❌ Erreur lors du nettoyage du cache:', error);
-  }
-};

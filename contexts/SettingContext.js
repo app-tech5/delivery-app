@@ -12,11 +12,6 @@ export function SettingProvider({ children }) {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // Nettoyer automatiquement les caches expirés au démarrage
-    import('../utils/cacheUtils').then(({ cleanupExpiredCache }) => {
-      cleanupExpiredCache()
-    })
-
     // Charger les settings avec le système de cache intelligent
     loadSettingsWithSmartCache(
       getSettings, // apiFetcher
