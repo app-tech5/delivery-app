@@ -13,12 +13,13 @@ import {
   Image
 } from 'react-native';
 import { Icon, Card, Button } from 'react-native-elements';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 import Loader from './Loader';
 import { colors } from '../global';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { getNearbyRestaurants } from '../api';
+import { loadNearbyRestaurantsWithSmartCache } from '../utils/cacheUtils';
 import i18n from '../i18n';
 
 const { width, height } = Dimensions.get('window');
@@ -109,22 +110,40 @@ export default function HomeScreen() {
     }
   };
 
-  // Charger les restaurants proches
+  // Charger les restaurants proches avec cache intelligent
   const loadNearbyRestaurants = async () => {
     if (!driverLocation) return;
 
     try {
-      setRestaurantsLoading(true);
-      const restaurants = await getNearbyRestaurants(
+      // Utiliser le cache intelligent pour les restaurants proches
+      await loadNearbyRestaurantsWithSmartCache(
         driverLocation.latitude,
         driverLocation.longitude,
-        10 // rayon de 10km
+        10, // rayon de 10km
+        getNearbyRestaurants, // apiFetcher
+        (data, fromCache) => {
+          // onDataLoaded - appelé quand les données sont prêtes (cache ou API)
+          setNearbyRestaurants(data);
+          if (fromCache) {
+            console.log('🔄 Restaurants proches chargés depuis le cache dans HomeScreen');
+          }
+        },
+        (data) => {
+          // onDataUpdated - appelé quand les données sont mises à jour depuis l'API
+          setNearbyRestaurants(data);
+          console.log('🔄 Restaurants proches mis à jour depuis l\'API dans HomeScreen');
+        },
+        (loading) => {
+          // onLoadingStateChange
+          setRestaurantsLoading(loading);
+        },
+        (errorMsg) => {
+          // onError
+          console.error('Erreur chargement restaurants proches:', errorMsg);
+        }
       );
-      setNearbyRestaurants(restaurants);
     } catch (error) {
-      console.error('Error loading nearby restaurants:', error);
-    } finally {
-      setRestaurantsLoading(false);
+      console.error('Error loading nearby restaurants with smart cache:', error);
     }
   };
 
@@ -359,6 +378,9 @@ export default function HomeScreen() {
 
                   if (isNaN(lat) || isNaN(lng)) return null;
 
+                  const isAvailable = restaurant.isAvailableForDelivery;
+                  const rating = restaurant.rating || 0;
+
                   return (
                     <Marker
                       key={restaurant._id || restaurant.id}
@@ -366,10 +388,70 @@ export default function HomeScreen() {
                         latitude: lat,
                         longitude: lng,
                       }}
-                      title={restaurant.name}
-                      description={`${restaurant.distance?.toFixed(1) || 'N/A'} km - ${restaurant.address || ''}`}
-                      pinColor={restaurant.isAvailableForDelivery ? colors.success : colors.warning}
-                    />
+                      pinColor="transparent"
+                    >
+                      {/* Icône personnalisée pour le marker */}
+                      <View style={[
+                        styles.markerContainer,
+                        { backgroundColor: isAvailable ? colors.success : colors.warning }
+                      ]}>
+                        <Icon
+                          name={isAvailable ? "restaurant" : "restaurant-menu"}
+                          type="material"
+                          size={20}
+                          color={colors.white}
+                        />
+                      </View>
+
+                      {/* Callout avec informations détaillées */}
+                      <Callout style={styles.calloutContainer}>
+                        <View style={styles.calloutContent}>
+                          <Text style={styles.calloutTitle}>{restaurant.name}</Text>
+
+                          {/* Rating avec étoiles */}
+                          <View style={styles.ratingContainer}>
+                            <Icon name="star" type="material" size={14} color={colors.rating} />
+                            <Text style={styles.ratingText}>
+                              {rating > 0 ? rating.toFixed(1) : 'N/A'}
+                            </Text>
+                          </View>
+
+                          {/* Distance */}
+                          <View style={styles.distanceContainer}>
+                            <Icon name="location-on" type="material" size={12} color={colors.text.secondary} />
+                            <Text style={styles.distanceText}>
+                              {restaurant.distance?.toFixed(1) || 'N/A'} km
+                            </Text>
+                          </View>
+
+                          {/* Statut de livraison */}
+                          <View style={styles.statusContainer}>
+                            <Icon
+                              name={isAvailable ? "check-circle" : "cancel"}
+                              type="material"
+                              size={12}
+                              color={isAvailable ? colors.success : colors.error}
+                            />
+                            <Text style={[
+                              styles.statusText,
+                              { color: isAvailable ? colors.success : colors.error }
+                            ]}>
+                              {isAvailable ? 'Livraison disponible' : 'Livraison indisponible'}
+                            </Text>
+                          </View>
+
+                          {/* Adresse (tronquée si trop longue) */}
+                          {restaurant.address && (
+                            <Text style={styles.addressText} numberOfLines={2}>
+                              📍 {restaurant.address.length > 50
+                                ? `${restaurant.address.substring(0, 50)}...`
+                                : restaurant.address
+                              }
+                            </Text>
+                          )}
+                        </View>
+                      </Callout>
+                    </Marker>
                   );
                 })}
               </MapView>
@@ -656,5 +738,70 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: 30,
     borderRadius: 8,
+  },
+  markerContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
+  calloutContainer: {
+    width: 250,
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    padding: 0,
+  },
+  calloutContent: {
+    padding: 12,
+  },
+  calloutTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.text.primary,
+    marginBottom: 8,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  ratingText: {
+    fontSize: 14,
+    color: colors.rating,
+    marginLeft: 4,
+    fontWeight: '600',
+  },
+  distanceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  distanceText: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    marginLeft: 4,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statusText: {
+    fontSize: 12,
+    marginLeft: 4,
+    fontWeight: '500',
+  },
+  addressText: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    lineHeight: 16,
   },
 });

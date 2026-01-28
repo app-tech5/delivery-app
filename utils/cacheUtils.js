@@ -5,6 +5,7 @@ const CACHE_KEYS = {
   SETTINGS: 'app_settings',
   DRIVER_DELIVERIES: 'driver_deliveries',
   DRIVER_STATS: 'driver_stats',
+  NEARBY_RESTAURANTS: 'nearby_restaurants',
   CACHE_TIMESTAMP: '_timestamp',
   CACHE_VERSION: 'cache_version'
 };
@@ -64,6 +65,23 @@ export const hasDriverStatsChanged = (oldStats, newStats) => {
   const newValues = `${newStats.todayDeliveries || 0}_${newStats.totalEarnings || 0}_${newStats.rating || 0}_${newStats.completedOrders || 0}`;
 
   return oldValues !== newValues;
+};
+
+/**
+ * Compare deux listes de restaurants proches pour voir s'ils sont différents
+ * @param {Array} oldRestaurants - Anciens restaurants
+ * @param {Array} newRestaurants - Nouveaux restaurants
+ * @returns {boolean} True si les restaurants ont changé
+ */
+export const hasNearbyRestaurantsChanged = (oldRestaurants, newRestaurants) => {
+  if (!oldRestaurants || !newRestaurants) return true;
+  if (oldRestaurants.length !== newRestaurants.length) return true;
+
+  // Comparaison basée sur les IDs et distances
+  const oldIds = oldRestaurants.map(r => `${r._id || r.id}_${r.distance?.toFixed(1) || 'N/A'}`);
+  const newIds = newRestaurants.map(r => `${r._id || r.id}_${r.distance?.toFixed(1) || 'N/A'}`);
+
+  return JSON.stringify(oldIds.sort()) !== JSON.stringify(newIds.sort());
 };
 
 /**
@@ -154,6 +172,40 @@ export const saveDriverStatsToCache = async (stats, driverId) => {
     console.log(`💾 Stats sauvegardées en cache pour driver ${driverId}: ${stats.todayDeliveries || 0} livraisons aujourd'hui`);
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde des stats en cache:', error);
+  }
+};
+
+/**
+ * Sauvegarde les restaurants proches en cache
+ * @param {Array} restaurants - Restaurants proches à sauvegarder
+ * @param {number} latitude - Latitude du centre de recherche
+ * @param {number} longitude - Longitude du centre de recherche
+ * @param {number} radius - Rayon de recherche en km
+ */
+export const saveNearbyRestaurantsToCache = async (restaurants, latitude, longitude, radius = 10) => {
+  try {
+    if (!restaurants || !Array.isArray(restaurants)) {
+      console.warn('⚠️ Tentative de sauvegarde de restaurants invalides en cache');
+      return;
+    }
+
+    const locationKey = `${latitude.toFixed(4)}_${longitude.toFixed(4)}_${radius}`;
+    const cacheKey = `${CACHE_KEYS.NEARBY_RESTAURANTS}_${locationKey}`;
+    const timestampKey = `${CACHE_KEYS.NEARBY_RESTAURANTS}_${locationKey}${CACHE_KEYS.CACHE_TIMESTAMP}`;
+
+    const cacheData = {
+      restaurants,
+      location: { latitude, longitude, radius },
+      version: CACHE_CONFIG.VERSION,
+      timestamp: Date.now()
+    };
+
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    await AsyncStorage.setItem(timestampKey, cacheData.timestamp.toString());
+
+    console.log(`💾 Restaurants proches sauvegardés en cache: ${restaurants.length} restaurants (${locationKey})`);
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde des restaurants proches en cache:', error);
   }
 };
 
@@ -292,6 +344,50 @@ export const getDriverStatsFromCache = async (driverId) => {
 };
 
 /**
+ * Récupère les restaurants proches depuis le cache
+ * @param {number} latitude - Latitude du centre de recherche
+ * @param {number} longitude - Longitude du centre de recherche
+ * @param {number} radius - Rayon de recherche en km
+ * @returns {Object|null} Données du cache ou null
+ */
+export const getNearbyRestaurantsFromCache = async (latitude, longitude, radius = 10) => {
+  try {
+    const locationKey = `${latitude.toFixed(4)}_${longitude.toFixed(4)}_${radius}`;
+    const cacheKey = `${CACHE_KEYS.NEARBY_RESTAURANTS}_${locationKey}`;
+    const timestampKey = `${CACHE_KEYS.NEARBY_RESTAURANTS}_${locationKey}${CACHE_KEYS.CACHE_TIMESTAMP}`;
+
+    const cachedData = await AsyncStorage.getItem(cacheKey);
+
+    if (!cachedData) {
+      console.log(`📭 Pas de restaurants proches en cache pour ${locationKey}`);
+      return null;
+    }
+
+    const parsedData = JSON.parse(cachedData);
+
+    // Vérifier la version du cache
+    if (parsedData.version !== CACHE_CONFIG.VERSION) {
+      console.log(`🔄 Version du cache des restaurants proches obsolète pour ${locationKey}, suppression`);
+      await clearNearbyRestaurantsCache(latitude, longitude, radius);
+      return null;
+    }
+
+    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
+
+    console.log(`📖 Restaurants proches chargés depuis le cache: ${parsedData.restaurants.length} restaurants (${locationKey})`);
+    return {
+      restaurants: parsedData.restaurants,
+      timestamp: parsedData.timestamp,
+      fromCache: true
+    };
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la lecture du cache des restaurants proches:', error);
+    return null;
+  }
+};
+
+/**
  * Supprime le cache des settings
  */
 export const clearSettingsCache = async () => {
@@ -351,6 +447,27 @@ export const clearDriverStatsCache = async (driverId) => {
     console.log(`🗑️ Cache des stats supprimé pour driver ${driverId}`);
   } catch (error) {
     console.error('❌ Erreur lors de la suppression du cache des stats:', error);
+  }
+};
+
+/**
+ * Supprime le cache des restaurants proches
+ * @param {number} latitude - Latitude du centre de recherche
+ * @param {number} longitude - Longitude du centre de recherche
+ * @param {number} radius - Rayon de recherche en km
+ */
+export const clearNearbyRestaurantsCache = async (latitude, longitude, radius = 10) => {
+  try {
+    const locationKey = `${latitude.toFixed(4)}_${longitude.toFixed(4)}_${radius}`;
+    const cacheKey = `${CACHE_KEYS.NEARBY_RESTAURANTS}_${locationKey}`;
+    const timestampKey = `${CACHE_KEYS.NEARBY_RESTAURANTS}_${locationKey}${CACHE_KEYS.CACHE_TIMESTAMP}`;
+
+    await AsyncStorage.removeItem(cacheKey);
+    await AsyncStorage.removeItem(timestampKey);
+
+    console.log(`🗑️ Cache des restaurants proches supprimé pour ${locationKey}`);
+  } catch (error) {
+    console.error('❌ Erreur lors de la suppression du cache des restaurants proches:', error);
   }
 };
 
@@ -638,6 +755,101 @@ export const loadDriverStatsWithSmartCache = async (
         completedOrders: 0
       };
       onDataLoaded(defaultStats, false);
+    }
+  }
+};
+
+/**
+ * Charge les restaurants proches avec un cache intelligent
+ * 1. Lit d'abord le cache AsyncStorage
+ * 2. Affiche immédiatement si disponible
+ * 3. Fetch l'API en arrière-plan
+ * 4. Met à jour si les données ont changé
+ *
+ * @param {number} latitude - Latitude du centre de recherche
+ * @param {number} longitude - Longitude du centre de recherche
+ * @param {number} radius - Rayon de recherche en km
+ * @param {Function} apiFetcher - Fonction pour fetch l'API (getNearbyRestaurants)
+ * @param {Function} onDataLoaded - Callback quand les données sont prêtes (cache ou API)
+ * @param {Function} onDataUpdated - Callback quand les données sont mises à jour depuis l'API
+ * @param {Function} onLoadingStateChange - Callback pour l'état de chargement
+ * @param {Function} onError - Callback en cas d'erreur
+ */
+export const loadNearbyRestaurantsWithSmartCache = async (
+  latitude,
+  longitude,
+  radius,
+  apiFetcher,
+  onDataLoaded,
+  onDataUpdated,
+  onLoadingStateChange,
+  onError
+) => {
+  if (!latitude || !longitude) {
+    console.error('❌ Latitude et longitude requises pour le chargement des restaurants proches');
+    onError?.('Coordonnées requises');
+    return;
+  }
+
+  try {
+    console.log(`🚀 Démarrage du chargement intelligent des restaurants proches (${latitude.toFixed(4)}, ${longitude.toFixed(4)}, ${radius}km)`);
+
+    // 1. Essayer de charger depuis le cache
+    onLoadingStateChange?.(true);
+    const cachedData = await getNearbyRestaurantsFromCache(latitude, longitude, radius);
+
+    if (cachedData && cachedData.restaurants) {
+      console.log('⚡ Restaurants proches affichés depuis le cache');
+      onDataLoaded(cachedData.restaurants, true); // true = fromCache
+      onLoadingStateChange?.(false);
+    } else {
+      console.log('📭 Pas de cache disponible, attente des données API');
+      onLoadingStateChange?.(true);
+    }
+
+    // 2. Fetch l'API en arrière-plan (toujours, même si cache disponible)
+    console.log('🌐 Fetch API en arrière-plan pour les restaurants proches...');
+    const freshData = await apiFetcher(latitude, longitude, radius);
+
+    if (freshData && Array.isArray(freshData)) {
+      console.log(`📡 Restaurants proches API reçus: ${freshData.length} restaurants`);
+
+      // 3. Vérifier si les données ont changé
+      const hasChanged = !cachedData || hasNearbyRestaurantsChanged(cachedData.restaurants, freshData);
+
+      if (hasChanged) {
+        console.log('🔄 Restaurants proches mis à jour, sauvegarde en cache et affichage');
+
+        // Sauvegarder en cache
+        await saveNearbyRestaurantsToCache(freshData, latitude, longitude, radius);
+
+        // Mettre à jour l'affichage
+        onDataUpdated(freshData);
+      } else {
+        console.log('✅ Restaurants proches identiques, pas de mise à jour nécessaire');
+      }
+    } else {
+      console.warn('⚠️ Données restaurants proches API invalides ou vides');
+      onError?.('Données restaurants invalides');
+    }
+
+    // Fin du chargement
+    onLoadingStateChange?.(false);
+
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement intelligent des restaurants proches:', error);
+    onLoadingStateChange?.(false);
+    onError?.(error.message);
+
+    // En cas d'erreur, essayer quand même d'utiliser le cache si disponible
+    const fallbackCache = await getNearbyRestaurantsFromCache(latitude, longitude, radius);
+    if (fallbackCache && fallbackCache.restaurants) {
+      console.log('🔄 Erreur API, utilisation du cache comme fallback');
+      onDataLoaded(fallbackCache.restaurants, true);
+    } else {
+      // Si pas de cache, retourner un tableau vide
+      console.log('🔄 Pas de cache disponible, utilisation d\'un tableau vide');
+      onDataLoaded([], false);
     }
   }
 };
