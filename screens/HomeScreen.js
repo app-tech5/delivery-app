@@ -12,44 +12,24 @@ import {
   Dimensions
 } from 'react-native';
 import { Icon, Card, Button } from 'react-native-elements';
+import Loader from './Loader';
 // import MapView, { Marker } from 'react-native-maps'; // Temporairement désactivé
 import { colors } from '../global';
+import { useDriver } from '../contexts/DriverContext';
 
 const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
-  // État séparé pour le statut pour forcer les re-renders
-  const [driverStatus, setDriverStatus] = useState('available');
-
-  // Données mockées pour démonstration
-  const driver = {
-    userId: { name: 'Jean Dupont', email: 'jean@example.com' },
-    licenseNumber: '123456789',
-    status: driverStatus, // Utilise l'état séparé
-    vehicle: {
-      type: 'scooter',
-      model: 'Honda PCX',
-      licensePlate: 'AB-123-CD'
-    }
-  };
-
-  const [stats] = useState({
-    todayDeliveries: 5,
-    totalEarnings: 45.50,
-    rating: 4.8,
-    completedOrders: 127
-  });
-
-  const [deliveries] = useState([
-    {
-      _id: '1',
-      orderId: 'ORD-001',
-      status: 'accepted',
-      deliveryAddress: '15 Rue de la Paix, Paris',
-      customerPhone: '+33123456789',
-      totalAmount: 25.90
-    }
-  ]);
+  const {
+    driver,
+    stats,
+    deliveries,
+    updateStatus,
+    loadDriverStats,
+    loadDriverOrders,
+    isAuthenticated,
+    isLoading: contextLoading
+  } = useDriver();
 
   const [currentLocation, setCurrentLocation] = useState({
     latitude: 48.8566,
@@ -58,35 +38,50 @@ export default function HomeScreen() {
     longitudeDelta: 0.01,
   });
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(false);
+  const isLoading = contextLoading || localLoading;
 
-  // Gestionnaire de changement de statut
-  // const handleStatusChange = (newStatus) => {
-  //   console.log('Changement de statut vers:', newStatus);
-  //   console.log('Statut actuel:', driverStatus);
+  // Charger les données au montage du composant
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadDriverStats();
+      loadDriverOrders();
+    }
+  }, [isAuthenticated]);
 
-  //   // Mettre à jour le statut
-  //   setDriverStatus(newStatus);
-
-  //   Alert.alert('Succès', `Statut mis à jour: ${getStatusLabel(newStatus)}`);
-  // };
-
-  // Changer le statut du driver
+  // Gestionnaire de changement de statut du driver
   const handleStatusChange = async (newStatus) => {
+    if (isLoading) return;
+
+    setLocalLoading(true);
+
     try {
-      setIsLoading(true);
-
-      // Simulation d'appel API
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Mettre à jour le statut localement
-      setDriverStatus(newStatus);
+      await updateStatus(newStatus, currentLocation ? {
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude
+      } : null);
 
       Alert.alert('Succès', `Statut mis à jour: ${getStatusLabel(newStatus)}`);
     } catch (error) {
       Alert.alert('Erreur', 'Impossible de mettre à jour le statut');
     } finally {
-      setIsLoading(false);
+      setLocalLoading(false);
+    }
+  };
+
+  // Gestionnaire de changement de statut d'une commande
+  const handleOrderStatusChange = async (orderId, newStatus) => {
+    if (isLoading) return;
+
+    setLocalLoading(true);
+
+    try {
+      await updateDeliveryStatus(orderId, newStatus);
+      Alert.alert('Succès', `Commande ${newStatus === 'delivered' ? 'livrée' : 'mise à jour'}`);
+    } catch (error) {
+      Alert.alert('Erreur', 'Impossible de mettre à jour la commande');
+    } finally {
+      setLocalLoading(false);
     }
   };
 
@@ -112,10 +107,26 @@ export default function HomeScreen() {
     }
   };
 
-  // Livraisons actives
+  // Commandes actives (en livraison)
   const activeDeliveries = deliveries.filter(delivery =>
-    delivery.status === 'accepted' || delivery.status === 'picked_up'
+    delivery.status === 'out_for_delivery'
   );
+
+  // Vérifier l'authentification
+  if (!isAuthenticated || !driver) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.centerContent}>
+          <Text style={styles.title}>Veuillez vous reconnecter</Text>
+          <Button
+            title="Se reconnecter"
+            onPress={() => navigation.navigate('Login')}
+            buttonStyle={styles.loginButton}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
 
   return (
@@ -225,26 +236,40 @@ export default function HomeScreen() {
         {activeDeliveries.length > 0 && (
           <View style={styles.deliveriesContainer}>
             <Text style={styles.sectionTitle}>Livraisons en cours</Text>
-            {activeDeliveries.slice(0, 2).map((delivery) => (
-              <Card key={delivery._id} containerStyle={styles.deliveryCard}>
+            {activeDeliveries.slice(0, 2).map((order) => (
+              <Card key={order._id} containerStyle={styles.deliveryCard}>
                 <View style={styles.deliveryHeader}>
-                  <Text style={styles.deliveryId}>Commande #{delivery.orderId}</Text>
+                  <Text style={styles.deliveryId}>Commande #{order._id.slice(-6)}</Text>
                   <Text style={[
                     styles.deliveryStatus,
-                    { color: getStatusColor(delivery.status) }
+                    { color: getStatusColor(order.status) }
                   ]}>
-                    {delivery.status === 'accepted' ? 'Acceptée' : 'Récupérée'}
+                    {order.status === 'out_for_delivery' ? 'En livraison' : order.status}
                   </Text>
                 </View>
                 <Text style={styles.deliveryAddress}>
-                  📍 {delivery.deliveryAddress}
+                  📍 {order.delivery?.address || 'Adresse non disponible'}
                 </Text>
+                {order.user && (
+                  <Text style={styles.customerInfo}>
+                    👤 {order.user.name} - {order.user.phone}
+                  </Text>
+                )}
+                {order.restaurant && (
+                  <Text style={styles.restaurantInfo}>
+                    🏪 {order.restaurant.name}
+                  </Text>
+                )}
+                <View style={styles.amountSection}>
+                  <Text style={styles.amountLabel}>Montant:</Text>
+                  <Text style={styles.amountValue}>{order.totalPrice}€</Text>
+                </View>
                 <View style={styles.deliveryActions}>
                   <Button
-                    title="Voir détails"
-                    type="outline"
-                    onPress={() => Alert.alert('Info', 'Voir les détails de la livraison')}
-                    buttonStyle={styles.detailButton}
+                    title="Marquer comme livré"
+                    onPress={() => handleOrderStatusChange(order._id, 'delivered')}
+                    loading={localLoading}
+                    buttonStyle={styles.deliverButton}
                   />
                 </View>
               </Card>
@@ -438,6 +463,39 @@ const styles = StyleSheet.create({
   detailButton: {
     borderColor: colors.primary,
   },
+  customerInfo: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    marginTop: 5,
+  },
+  restaurantInfo: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    marginTop: 5,
+  },
+  amountSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: colors.border.light,
+  },
+  amountLabel: {
+    fontSize: 14,
+    color: colors.text.secondary,
+  },
+  amountValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.success,
+  },
+  deliverButton: {
+    backgroundColor: colors.success,
+    borderRadius: 8,
+    paddingVertical: 10,
+  },
   mapContainer: {
     padding: 20,
   },
@@ -464,5 +522,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text.secondary,
     marginTop: 10,
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.text.primary,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  loginButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 30,
+    borderRadius: 8,
   },
 });

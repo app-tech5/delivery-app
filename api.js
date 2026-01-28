@@ -167,43 +167,70 @@ class ApiClient {
     });
   }
 
-  // Récupération des livraisons disponibles
-  async getAvailableDeliveries() {
-    return await this.apiCall('/deliveries/available');
+  // Récupération des commandes disponibles pour livraison
+  async getAvailableOrders() {
+    return await this.apiCall('/resource/orders?status=preparing');
   }
 
-  // Accepter une livraison
-  async acceptDelivery(deliveryId) {
-    return await this.apiCall(`/deliveries/${deliveryId}/accept`, {
-      method: 'POST',
+  // Accepter une commande pour livraison
+  async acceptOrder(orderId) {
+    return await this.apiCall(`/resource/orders/${orderId}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        driver: this.driver._id,
+        status: 'out_for_delivery'
+      }),
     });
   }
 
-  // Récupérer les livraisons du driver
-  async getDriverDeliveries(status = null) {
-    const endpoint = status ? `/deliveries/driver?status=${status}` : '/deliveries/driver';
-    return await this.apiCall(endpoint);
+  // Récupérer les commandes du driver
+  async getDriverOrders(status = null) {
+    let query = `driver=${this.driver._id}`;
+    if (status) {
+      query += `&status=${status}`;
+    }
+    return await this.apiCall(`/resource/orders?${query}`);
   }
 
-  // Mettre à jour le statut d'une livraison
-  async updateDeliveryStatus(deliveryId, status, location = null) {
-    const updateData = { status };
-    if (location) {
-      updateData.location = {
-        type: 'Point',
-        coordinates: [location.longitude, location.latitude]
-      };
-    }
-
-    return await this.apiCall(`/deliveries/${deliveryId}/status`, {
+  // Mettre à jour le statut d'une commande
+  async updateOrderStatus(orderId, status) {
+    return await this.apiCall(`/resource/orders/${orderId}`, {
       method: 'PUT',
-      body: JSON.stringify(updateData),
+      body: JSON.stringify({ status }),
     });
   }
 
   // Récupérer les statistiques du driver
   async getDriverStats() {
-    return await this.apiCall('/drivers/stats');
+    try {
+      // Pour l'instant, calculer les stats depuis les orders du driver
+      const orders = await this.getDriverOrders();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const todayOrders = orders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        orderDate.setHours(0, 0, 0, 0);
+        return orderDate.getTime() === today.getTime();
+      });
+
+      return {
+        todayDeliveries: todayOrders.filter(order => order.status === 'delivered').length,
+        totalEarnings: orders
+          .filter(order => order.status === 'delivered')
+          .reduce((total, order) => total + (order.delivery?.deliveryFee || 0), 0),
+        rating: this.driver?.rating || 0,
+        completedOrders: orders.filter(order => order.status === 'delivered').length
+      };
+    } catch (error) {
+      console.error('Error calculating driver stats:', error);
+      return {
+        todayDeliveries: 0,
+        totalEarnings: 0,
+        rating: 0,
+        completedOrders: 0
+      };
+    }
   }
 
   // Sauvegarder dans AsyncStorage (pour utilisateurs normaux)

@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Good Food Driver",
+    "icon": "./assets/images/logo512.png",
+    "splash": {
+      "image": "./assets/images/splash-screen.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "version": "1.0.0",
+    "slug": "good-food-driver",
+    "ios": {
+      "bundleIdentifier": "com.goodfood.driver",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "FOREGROUND_SERVICE"
+      ],
+      "package": "com.goodfood.driver",
+      "versionCode": 1
+    },
+    "plugins": [
+      "expo-font",
+      "expo-localization",
+      "expo-location"
+    ]
+  }
+}
