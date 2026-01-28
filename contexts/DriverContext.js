@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import apiClient from '../api';
 import { config } from '../config';
+import { loadDeliveriesWithSmartCache, clearDeliveriesCache } from '../utils/cacheUtils';
 
 const DriverContext = createContext();
 
@@ -90,17 +91,44 @@ export const DriverProvider = ({ children }) => {
     }
   };
 
-  // Charger les commandes du driver
+  // Charger les commandes du driver avec cache intelligent
   const loadDriverOrders = async (status = null) => {
+    if (!isAuthenticated || !driver?._id) {
+      console.log('❌ Driver non authentifié, impossible de charger les livraisons');
+      return;
+    }
+
     try {
-      if (isAuthenticated) {
-        const ordersData = await apiClient.getDriverOrders(status);
-        setDeliveries(ordersData); // On garde le même nom pour compatibilité
-      }
+      // Utiliser le cache intelligent pour les livraisons
+      await loadDeliveriesWithSmartCache(
+        driver._id, // driverId
+        () => apiClient.getDriverOrders(status), // apiFetcher
+        (data, fromCache) => {
+          // onDataLoaded - appelé quand les données sont prêtes (cache ou API)
+          setDeliveries(data);
+          if (fromCache) {
+            console.log('🔄 Livraisons chargées depuis le cache dans DriverContext');
+          }
+        },
+        (data) => {
+          // onDataUpdated - appelé quand les données sont mises à jour depuis l'API
+          setDeliveries(data);
+          console.log('🔄 Livraisons mises à jour depuis l\'API dans DriverContext');
+        },
+        (loading) => {
+          // onLoadingStateChange - on pourrait utiliser un état de chargement spécifique
+          console.log(`🔄 État de chargement des livraisons: ${loading}`);
+        },
+        (errorMsg) => {
+          // onError
+          console.error('Erreur chargement livraisons:', errorMsg);
+        }
+      );
     } catch (error) {
-      console.error('Error loading driver orders:', error);
+      console.error('Error loading driver orders with smart cache:', error);
     }
   };
+
 
   // Connexion du driver
   const login = async (email, password) => {
@@ -222,11 +250,28 @@ export const DriverProvider = ({ children }) => {
 
     try {
       const response = await apiClient.updateOrderStatus(orderId, status);
+      // Invalider le cache après mise à jour pour forcer un rechargement frais
+      if (driver?._id) {
+        await clearDeliveriesCache(driver._id);
+      }
       await loadDriverOrders(); // Recharger les commandes
       return response;
     } catch (error) {
       console.error('Update order status error:', error);
       throw error;
+    }
+  };
+
+  // Invalider le cache des livraisons (pour forcer un rechargement)
+  const invalidateDeliveriesCache = async () => {
+    if (driver?._id) {
+      try {
+        await clearDeliveriesCache(driver._id);
+        console.log('🗑️ Cache des livraisons invalidé');
+        await loadDriverOrders(); // Recharger immédiatement
+      } catch (error) {
+        console.error('Erreur lors de l\'invalidation du cache des livraisons:', error);
+      }
     }
   };
 
@@ -243,6 +288,7 @@ export const DriverProvider = ({ children }) => {
     updateDeliveryStatus,
     loadDriverStats,
     loadDriverOrders,
+    invalidateDeliveriesCache,
   };
 
   return (
