@@ -289,6 +289,55 @@ class ApiClient {
   async getSettings() {
     return await this.apiCall('/resource/settings');
   }
+
+  // Récupérer les restaurants proches
+  async getNearbyRestaurants(latitude, longitude, radius = 10) {
+    try {
+      // Pour l'instant, récupérer tous les restaurants et filtrer côté client
+      // TODO: Implémenter une route API côté serveur pour calculer la distance
+      const restaurants = await this.apiCall('/resource/restaurants');
+
+      // Filtrer les restaurants avec des coordonnées valides
+      const nearbyRestaurants = restaurants.filter(restaurant => {
+        if (!restaurant.latitude || !restaurant.longitude) return false;
+
+        const restaurantLat = parseFloat(restaurant.latitude);
+        const restaurantLng = parseFloat(restaurant.longitude);
+
+        if (isNaN(restaurantLat) || isNaN(restaurantLng)) return false;
+
+        // Calcul de distance simple (en km) - approximation
+        const distance = this.calculateDistance(latitude, longitude, restaurantLat, restaurantLng);
+
+        // Ajouter la distance calculée au restaurant
+        restaurant.distance = distance;
+
+        return distance <= radius && restaurant.isActivated;
+      });
+
+      return nearbyRestaurants.sort((a, b) => a.distance - b.distance);
+    } catch (error) {
+      console.error('Error fetching nearby restaurants:', error);
+      return [];
+    }
+  }
+
+  // Fonction utilitaire pour calculer la distance entre deux points (formule de Haversine)
+  calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Rayon de la Terre en km
+    const dLat = this.toRadians(lat2 - lat1);
+    const dLon = this.toRadians(lon2 - lon1);
+    const a =
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  toRadians(degrees) {
+    return degrees * (Math.PI / 180);
+  }
 }
 
 // Instance unique de l'API client
@@ -313,3 +362,4 @@ export const {
 
 // Export séparé pour getSettings (comme dans customer-app)
 export const getSettings = () => apiClient.getSettings();
+export const getNearbyRestaurants = (latitude, longitude, radius) => apiClient.getNearbyRestaurants(latitude, longitude, radius);

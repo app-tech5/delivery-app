@@ -13,11 +13,12 @@ import {
   Image
 } from 'react-native';
 import { Icon, Card, Button } from 'react-native-elements';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import Loader from './Loader';
-// import MapView, { Marker } from 'react-native-maps'; // Temporairement désactivé
 import { colors } from '../global';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
+import { getNearbyRestaurants } from '../api';
 import i18n from '../i18n';
 
 const { width, height } = Dimensions.get('window');
@@ -36,23 +37,41 @@ export default function HomeScreen() {
 
   const { currency } = useSettings();
 
-  const [currentLocation, setCurrentLocation] = useState({
-    latitude: 48.8566,
-    longitude: 2.3522,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  });
-
   const [localLoading, setLocalLoading] = useState(false);
   const isLoading = contextLoading || localLoading;
 
-  // Charger les données au montage du composant
+  // État pour la map et les restaurants proches
+  const [nearbyRestaurants, setNearbyRestaurants] = useState([]);
+  const [restaurantsLoading, setRestaurantsLoading] = useState(false);
+
+  // Position du driver depuis ses données
+  const driverLocation = driver?.location?.coordinates ? {
+    latitude: driver.location.coordinates[1], // latitude
+    longitude: driver.location.coordinates[0], // longitude
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  } : {
+    latitude: 48.8566, // Paris par défaut
+    longitude: 2.3522,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  };
+
+  // Charger les données du driver et les restaurants proches
   useEffect(() => {
-    if (isAuthenticated) {
-      loadDriverStats();
-      loadDriverOrders();
-    }
-  }, [isAuthenticated]);
+    const initializeData = async () => {
+      if (isAuthenticated) {
+        // Charger les données du driver
+        loadDriverStats();
+        loadDriverOrders();
+
+        // Charger les restaurants proches
+        loadNearbyRestaurants();
+      }
+    };
+
+    initializeData();
+  }, [isAuthenticated, driver]); // Recharger quand le driver change (nouvelle position)
 
   // Gestionnaire de changement de statut du driver
   const handleStatusChange = async (newStatus) => {
@@ -87,6 +106,25 @@ export default function HomeScreen() {
       Alert.alert(i18n.t('errors.networkError'), i18n.t('driver.statusUpdateError'));
     } finally {
       setLocalLoading(false);
+    }
+  };
+
+  // Charger les restaurants proches
+  const loadNearbyRestaurants = async () => {
+    if (!driverLocation) return;
+
+    try {
+      setRestaurantsLoading(true);
+      const restaurants = await getNearbyRestaurants(
+        driverLocation.latitude,
+        driverLocation.longitude,
+        10 // rayon de 10km
+      );
+      setNearbyRestaurants(restaurants);
+    } catch (error) {
+      console.error('Error loading nearby restaurants:', error);
+    } finally {
+      setRestaurantsLoading(false);
     }
   };
 
@@ -289,19 +327,60 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Position */}
+        {/* Position et Map */}
         <View style={styles.mapContainer}>
-          <Text style={styles.sectionTitle}>{i18n.t('home.currentLocation')}</Text>
+          <Text style={styles.sectionTitle}>
+            {i18n.t('home.currentLocation')} {nearbyRestaurants.length > 0 && `(${nearbyRestaurants.length} restaurants)`}
+          </Text>
           <View style={styles.mapWrapper}>
-            <View style={styles.mapPlaceholder}>
-              <Icon name="location-on" type="material" size={50} color={colors.primary} />
-              <Text style={styles.mapPlaceholderText}>
-                Position: {currentLocation ? `${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}` : i18n.t('errors.locationError')}
-              </Text>
-              <Text style={styles.mapPlaceholderSubtext}>
-                {i18n.t('home.realTimeUpdate')}
-              </Text>
-            </View>
+            <MapView
+              provider={PROVIDER_GOOGLE}
+              style={styles.map}
+              region={driverLocation}
+              showsUserLocation={false}
+              showsMyLocationButton={false}
+              followsUserLocation={false}
+            >
+              {/* Marker pour la position du driver */}
+              <Marker
+                coordinate={{
+                  latitude: driverLocation.latitude,
+                  longitude: driverLocation.longitude,
+                }}
+                title="Votre position"
+                description="Position du livreur"
+                pinColor={colors.primary}
+              />
+
+                {/* Markers pour les restaurants proches */}
+                {nearbyRestaurants.map((restaurant) => {
+                  const lat = parseFloat(restaurant.latitude);
+                  const lng = parseFloat(restaurant.longitude);
+
+                  if (isNaN(lat) || isNaN(lng)) return null;
+
+                  return (
+                    <Marker
+                      key={restaurant._id || restaurant.id}
+                      coordinate={{
+                        latitude: lat,
+                        longitude: lng,
+                      }}
+                      title={restaurant.name}
+                      description={`${restaurant.distance?.toFixed(1) || 'N/A'} km - ${restaurant.address || ''}`}
+                      pinColor={restaurant.isAvailableForDelivery ? colors.success : colors.warning}
+                    />
+                  );
+                })}
+              </MapView>
+
+            {/* Loader pour les restaurants */}
+            {restaurantsLoading && (
+              <View style={styles.mapOverlay}>
+                <Loader />
+                <Text style={styles.mapOverlayText}>Chargement des restaurants...</Text>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -520,7 +599,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   mapWrapper: {
-    height: 200,
+    height: 250,
     borderRadius: 12,
     overflow: 'hidden',
     elevation: 2,
@@ -531,6 +610,23 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  mapOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+  },
+  mapOverlayText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: colors.text.secondary,
+    textAlign: 'center',
   },
   mapPlaceholder: {
     flex: 1,
