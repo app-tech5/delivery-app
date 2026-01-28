@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Icon, Card, Button } from 'react-native-elements';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
+import * as Location from 'expo-location';
 import Loader from './Loader';
 import { colors } from '../global';
 import { useDriver } from '../contexts/DriverContext';
@@ -78,16 +79,20 @@ export default function HomeScreen() {
   const handleStatusChange = async (newStatus) => {
     if (isLoading) return;
 
+    console.log('🔄 Tentative de changement de statut vers:', newStatus);
+    console.log('🔄 Statut actuel du driver:', driver?.status);
+
     setLocalLoading(true);
 
     try {
-      await updateStatus(newStatus, currentLocation ? {
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude
-      } : null);
+      await updateStatus(newStatus, null); // Simplifié pour le debug
+
+      console.log('🔄 updateStatus terminé, statut devrait être mis à jour');
+      console.log('🔄 Nouveau statut du driver:', driver?.status);
 
       Alert.alert(i18n.t('common.ok'), `${i18n.t('driver.statusChanged')} ${getStatusLabel(newStatus)}`);
     } catch (error) {
+      console.error('❌ Erreur lors du changement de statut:', error);
       Alert.alert(i18n.t('errors.networkError'), i18n.t('driver.statusUpdateError'));
     } finally {
       setLocalLoading(false);
@@ -789,12 +794,12 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     marginLeft: 4,
   },
-  statusContainer: {
+  calloutStatusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
   },
-  statusText: {
+  calloutStatusText: {
     fontSize: 12,
     marginLeft: 4,
     fontWeight: '500',

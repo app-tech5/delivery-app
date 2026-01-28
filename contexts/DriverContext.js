@@ -214,18 +214,28 @@ export const DriverProvider = ({ children }) => {
   const updateStatus = async (status, location = null) => {
     if (config.DEMO_MODE) {
       // Mode démo : simulation locale uniquement
-      setDriver(prevDriver => ({
-        ...prevDriver,
-        status: status
-      }));
+      setDriver(prevDriver => {
+        const updatedDriver = prevDriver ? { ...prevDriver, status: status } : { status: status };
+        console.log('🔄 Mode DEMO - Driver mis à jour:', updatedDriver);
+        return updatedDriver;
+      });
+      // Forcer un re-render en attendant un peu
+      setTimeout(() => {
+        console.log('🔄 Vérification du statut après timeout:', driver?.status);
+      }, 100);
       Alert.alert('Mode Démo', `Statut changé à "${getStatusLabel(status)}" (simulation)`);
-      return { driver: { ...driver, status } };
+      return { driver: { ...(driver || {}), status } };
     }
 
     try {
       const response = await apiClient.updateDriverStatus(status, location);
       if (response.driver) {
+        console.log('🔄 API - Driver mis à jour:', response.driver);
         setDriver(response.driver);
+      } else {
+        console.warn('⚠️ API - Pas de driver dans la réponse:', response);
+        // En cas d'absence de driver dans la réponse, mettre à jour localement
+        setDriver(prevDriver => prevDriver ? { ...prevDriver, status: status } : { status: status });
       }
       return response;
     } catch (error) {
