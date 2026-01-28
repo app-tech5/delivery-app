@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import apiClient from '../api';
 import { config } from '../config';
-import { loadDeliveriesWithSmartCache, clearDeliveriesCache } from '../utils/cacheUtils';
+import { loadDeliveriesWithSmartCache, clearDeliveriesCache, loadDriverStatsWithSmartCache, clearDriverStatsCache } from '../utils/cacheUtils';
 
 const DriverContext = createContext();
 
@@ -79,15 +79,41 @@ export const DriverProvider = ({ children }) => {
     initializeDriver();
   }, []);
 
-  // Charger les statistiques du driver
+  // Charger les statistiques du driver avec cache intelligent
   const loadDriverStats = async () => {
+    if (!isAuthenticated || !driver?._id) {
+      console.log('❌ Driver non authentifié, impossible de charger les stats');
+      return;
+    }
+
     try {
-      if (isAuthenticated) {
-        const statsData = await apiClient.getDriverStats();
-        setStats(statsData);
-      }
+      // Utiliser le cache intelligent pour les stats
+      await loadDriverStatsWithSmartCache(
+        driver._id, // driverId
+        () => apiClient.getDriverStats(), // apiFetcher
+        (data, fromCache) => {
+          // onDataLoaded - appelé quand les données sont prêtes (cache ou API)
+          setStats(data);
+          if (fromCache) {
+            console.log('🔄 Stats chargées depuis le cache dans DriverContext');
+          }
+        },
+        (data) => {
+          // onDataUpdated - appelé quand les données sont mises à jour depuis l'API
+          setStats(data);
+          console.log('🔄 Stats mises à jour depuis l\'API dans DriverContext');
+        },
+        (loading) => {
+          // onLoadingStateChange - on pourrait utiliser un état de chargement spécifique
+          console.log(`🔄 État de chargement des stats: ${loading}`);
+        },
+        (errorMsg) => {
+          // onError
+          console.error('Erreur chargement stats:', errorMsg);
+        }
+      );
     } catch (error) {
-      console.error('Error loading driver stats:', error);
+      console.error('Error loading driver stats with smart cache:', error);
     }
   };
 
@@ -275,6 +301,19 @@ export const DriverProvider = ({ children }) => {
     }
   };
 
+  // Invalider le cache des stats (pour forcer un rechargement)
+  const invalidateDriverStatsCache = async () => {
+    if (driver?._id) {
+      try {
+        await clearDriverStatsCache(driver._id);
+        console.log('🗑️ Cache des stats invalidé');
+        await loadDriverStats(); // Recharger immédiatement
+      } catch (error) {
+        console.error('Erreur lors de l\'invalidation du cache des stats:', error);
+      }
+    }
+  };
+
   const value = {
     driver,
     isLoading,
@@ -289,6 +328,7 @@ export const DriverProvider = ({ children }) => {
     loadDriverStats,
     loadDriverOrders,
     invalidateDeliveriesCache,
+    invalidateDriverStatsCache,
   };
 
   return (

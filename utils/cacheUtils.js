@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const CACHE_KEYS = {
   SETTINGS: 'app_settings',
   DRIVER_DELIVERIES: 'driver_deliveries',
+  DRIVER_STATS: 'driver_stats',
   CACHE_TIMESTAMP: '_timestamp',
   CACHE_VERSION: 'cache_version'
 };
@@ -47,6 +48,22 @@ export const hasDeliveriesChanged = (oldDeliveries, newDeliveries) => {
   const newIds = newDeliveries.map(delivery => `${delivery._id}_${delivery.status}_${delivery.updatedAt || delivery.createdAt}`);
 
   return JSON.stringify(oldIds.sort()) !== JSON.stringify(newIds.sort());
+};
+
+/**
+ * Compare deux objets stats pour voir s'ils sont différents
+ * @param {Object} oldStats - Anciennes stats
+ * @param {Object} newStats - Nouvelles stats
+ * @returns {boolean} True si les stats ont changé
+ */
+export const hasDriverStatsChanged = (oldStats, newStats) => {
+  if (!oldStats || !newStats) return true;
+
+  // Comparaison des valeurs principales des stats
+  const oldValues = `${oldStats.todayDeliveries || 0}_${oldStats.totalEarnings || 0}_${oldStats.rating || 0}_${oldStats.completedOrders || 0}`;
+  const newValues = `${newStats.todayDeliveries || 0}_${newStats.totalEarnings || 0}_${newStats.rating || 0}_${newStats.completedOrders || 0}`;
+
+  return oldValues !== newValues;
 };
 
 /**
@@ -106,6 +123,37 @@ export const saveDeliveriesToCache = async (deliveries, driverId) => {
     console.log(`💾 Livraisons sauvegardées en cache pour driver ${driverId}: ${deliveries.length} livraisons`);
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde des livraisons en cache:', error);
+  }
+};
+
+/**
+ * Sauvegarde les stats du driver en cache
+ * @param {Object} stats - Stats à sauvegarder
+ * @param {string} driverId - ID du driver pour identifier le cache
+ */
+export const saveDriverStatsToCache = async (stats, driverId) => {
+  try {
+    if (!stats || !driverId) {
+      console.warn('⚠️ Tentative de sauvegarde de stats invalides en cache');
+      return;
+    }
+
+    const cacheKey = `${CACHE_KEYS.DRIVER_STATS}_${driverId}`;
+    const timestampKey = `${CACHE_KEYS.DRIVER_STATS}_${driverId}${CACHE_KEYS.CACHE_TIMESTAMP}`;
+
+    const cacheData = {
+      stats,
+      version: CACHE_CONFIG.VERSION,
+      timestamp: Date.now(),
+      driverId
+    };
+
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    await AsyncStorage.setItem(timestampKey, cacheData.timestamp.toString());
+
+    console.log(`💾 Stats sauvegardées en cache pour driver ${driverId}: ${stats.todayDeliveries || 0} livraisons aujourd'hui`);
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde des stats en cache:', error);
   }
 };
 
@@ -198,6 +246,52 @@ export const getDeliveriesFromCache = async (driverId) => {
 };
 
 /**
+ * Récupère les stats du driver depuis le cache
+ * @param {string} driverId - ID du driver
+ * @returns {Object|null} Données du cache ou null
+ */
+export const getDriverStatsFromCache = async (driverId) => {
+  try {
+    if (!driverId) {
+      console.log('❌ DriverId requis pour récupérer le cache des stats');
+      return null;
+    }
+
+    const cacheKey = `${CACHE_KEYS.DRIVER_STATS}_${driverId}`;
+    const timestampKey = `${CACHE_KEYS.DRIVER_STATS}_${driverId}${CACHE_KEYS.CACHE_TIMESTAMP}`;
+
+    const cachedData = await AsyncStorage.getItem(cacheKey);
+
+    if (!cachedData) {
+      console.log(`📭 Pas de stats en cache pour driver ${driverId}`);
+      return null;
+    }
+
+    const parsedData = JSON.parse(cachedData);
+
+    // Vérifier la version du cache
+    if (parsedData.version !== CACHE_CONFIG.VERSION) {
+      console.log(`🔄 Version du cache des stats obsolète pour driver ${driverId}, suppression`);
+      await clearDriverStatsCache(driverId);
+      return null;
+    }
+
+    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
+
+    console.log(`📖 Stats chargées depuis le cache pour driver ${driverId}: ${parsedData.stats.todayDeliveries || 0} livraisons aujourd'hui`);
+    return {
+      stats: parsedData.stats,
+      timestamp: parsedData.timestamp,
+      fromCache: true
+    };
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la lecture du cache des stats:', error);
+    return null;
+  }
+};
+
+/**
  * Supprime le cache des settings
  */
 export const clearSettingsCache = async () => {
@@ -234,6 +328,29 @@ export const clearDeliveriesCache = async (driverId) => {
     console.log(`🗑️ Cache des livraisons supprimé pour driver ${driverId}`);
   } catch (error) {
     console.error('❌ Erreur lors de la suppression du cache des livraisons:', error);
+  }
+};
+
+/**
+ * Supprime le cache des stats pour un driver
+ * @param {string} driverId - ID du driver
+ */
+export const clearDriverStatsCache = async (driverId) => {
+  try {
+    if (!driverId) {
+      console.log('❌ DriverId requis pour supprimer le cache des stats');
+      return;
+    }
+
+    const cacheKey = `${CACHE_KEYS.DRIVER_STATS}_${driverId}`;
+    const timestampKey = `${CACHE_KEYS.DRIVER_STATS}_${driverId}${CACHE_KEYS.CACHE_TIMESTAMP}`;
+
+    await AsyncStorage.removeItem(cacheKey);
+    await AsyncStorage.removeItem(timestampKey);
+
+    console.log(`🗑️ Cache des stats supprimé pour driver ${driverId}`);
+  } catch (error) {
+    console.error('❌ Erreur lors de la suppression du cache des stats:', error);
   }
 };
 
@@ -424,6 +541,103 @@ export const loadDeliveriesWithSmartCache = async (
       // Si pas de cache, retourner un tableau vide
       console.log('🔄 Pas de cache disponible, utilisation d\'un tableau vide');
       onDataLoaded([], false);
+    }
+  }
+};
+
+/**
+ * Charge les stats du driver avec un cache intelligent
+ * 1. Lit d'abord le cache AsyncStorage
+ * 2. Affiche immédiatement si disponible
+ * 3. Fetch l'API en arrière-plan
+ * 4. Met à jour si les données ont changé
+ *
+ * @param {string} driverId - ID du driver
+ * @param {Function} apiFetcher - Fonction pour fetch l'API (getDriverStats)
+ * @param {Function} onDataLoaded - Callback quand les données sont prêtes (cache ou API)
+ * @param {Function} onDataUpdated - Callback quand les données sont mises à jour depuis l'API
+ * @param {Function} onLoadingStateChange - Callback pour l'état de chargement
+ * @param {Function} onError - Callback en cas d'erreur
+ */
+export const loadDriverStatsWithSmartCache = async (
+  driverId,
+  apiFetcher,
+  onDataLoaded,
+  onDataUpdated,
+  onLoadingStateChange,
+  onError
+) => {
+  if (!driverId) {
+    console.error('❌ DriverId requis pour le chargement des stats');
+    onError?.('DriverId requis');
+    return;
+  }
+
+  try {
+    console.log(`🚀 Démarrage du chargement intelligent des stats pour driver ${driverId}`);
+
+    // 1. Essayer de charger depuis le cache
+    onLoadingStateChange?.(true);
+    const cachedData = await getDriverStatsFromCache(driverId);
+
+    if (cachedData && cachedData.stats) {
+      console.log('⚡ Stats affichées depuis le cache');
+      onDataLoaded(cachedData.stats, true); // true = fromCache
+      onLoadingStateChange?.(false);
+    } else {
+      console.log('📭 Pas de cache disponible, attente des données API');
+      onLoadingStateChange?.(true);
+    }
+
+    // 2. Fetch l'API en arrière-plan (toujours, même si cache disponible)
+    console.log('🌐 Fetch API en arrière-plan pour les stats...');
+    const freshData = await apiFetcher();
+
+    if (freshData) {
+      console.log(`📡 Stats API reçues`);
+
+      // 3. Vérifier si les données ont changé
+      const hasChanged = !cachedData || hasDriverStatsChanged(cachedData.stats, freshData);
+
+      if (hasChanged) {
+        console.log('🔄 Stats mises à jour, sauvegarde en cache et affichage');
+
+        // Sauvegarder en cache
+        await saveDriverStatsToCache(freshData, driverId);
+
+        // Mettre à jour l'affichage
+        onDataUpdated(freshData);
+      } else {
+        console.log('✅ Stats identiques, pas de mise à jour nécessaire');
+      }
+    } else {
+      console.warn('⚠️ Données stats API invalides ou vides');
+      onError?.('Données stats invalides');
+    }
+
+    // Fin du chargement
+    onLoadingStateChange?.(false);
+
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement intelligent des stats:', error);
+    onLoadingStateChange?.(false);
+    onError?.(error.message);
+
+    // En cas d'erreur, essayer quand même d'utiliser le cache si disponible
+    const fallbackCache = await getDriverStatsFromCache(driverId);
+    if (fallbackCache && fallbackCache.stats) {
+      console.log('🔄 Erreur API, utilisation du cache comme fallback');
+      onDataLoaded(fallbackCache.stats, true);
+    } else {
+      // Si pas de cache, retourner les stats par défaut
+      console.log('🔄 Pas de cache disponible, utilisation des stats par défaut');
+      const defaultStats = {
+        todayDeliveries: 0,
+        totalEarnings: 0,
+        rating: 0,
+        completedOrders: 0
+      };
+      onDataLoaded(defaultStats, false);
     }
   }
 };
