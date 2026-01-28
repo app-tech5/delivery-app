@@ -9,13 +9,16 @@ import {
   Platform,
   TouchableOpacity,
   Alert,
-  Dimensions
+  Dimensions,
+  Image
 } from 'react-native';
 import { Icon, Card, Button } from 'react-native-elements';
 import Loader from './Loader';
 // import MapView, { Marker } from 'react-native-maps'; // Temporairement désactivé
 import { colors } from '../global';
 import { useDriver } from '../contexts/DriverContext';
+import { useSettings } from '../contexts/SettingContext';
+import i18n from '../i18n';
 
 const { width, height } = Dimensions.get('window');
 
@@ -30,6 +33,8 @@ export default function HomeScreen() {
     isAuthenticated,
     isLoading: contextLoading
   } = useDriver();
+
+  const { currency } = useSettings();
 
   const [currentLocation, setCurrentLocation] = useState({
     latitude: 48.8566,
@@ -61,9 +66,9 @@ export default function HomeScreen() {
         longitude: currentLocation.longitude
       } : null);
 
-      Alert.alert('Succès', `Statut mis à jour: ${getStatusLabel(newStatus)}`);
+      Alert.alert(i18n.t('common.ok'), `${i18n.t('driver.statusChanged')} ${getStatusLabel(newStatus)}`);
     } catch (error) {
-      Alert.alert('Erreur', 'Impossible de mettre à jour le statut');
+      Alert.alert(i18n.t('errors.networkError'), i18n.t('driver.statusUpdateError'));
     } finally {
       setLocalLoading(false);
     }
@@ -77,9 +82,9 @@ export default function HomeScreen() {
 
     try {
       await updateDeliveryStatus(orderId, newStatus);
-      Alert.alert('Succès', `Commande ${newStatus === 'delivered' ? 'livrée' : 'mise à jour'}`);
+      Alert.alert(i18n.t('common.ok'), `${i18n.t('driver.orderDelivered')} (${i18n.t('driver.simulation')})`);
     } catch (error) {
-      Alert.alert('Erreur', 'Impossible de mettre à jour la commande');
+      Alert.alert(i18n.t('errors.networkError'), i18n.t('driver.statusUpdateError'));
     } finally {
       setLocalLoading(false);
     }
@@ -88,10 +93,10 @@ export default function HomeScreen() {
   // Obtenir le label du statut
   const getStatusLabel = (status) => {
     switch (status) {
-      case 'available': return 'Disponible';
-      case 'on_delivery': return 'En livraison';
-      case 'offline': return 'Hors ligne';
-      case 'busy': return 'Occupé';
+      case 'available': return i18n.t('driver.available');
+      case 'on_delivery': return i18n.t('driver.onDelivery');
+      case 'offline': return i18n.t('driver.offline');
+      case 'busy': return i18n.t('driver.busy');
       default: return status;
     }
   };
@@ -117,9 +122,9 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
-          <Text style={styles.title}>Veuillez vous reconnecter</Text>
+          <Text style={styles.title}>{i18n.t('home.reconnect')}</Text>
           <Button
-            title="Se reconnecter"
+            title={i18n.t('navigation.login')}
             onPress={() => navigation.navigate('Login')}
             buttonStyle={styles.loginButton}
           />
@@ -138,19 +143,26 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <View style={styles.driverInfo}>
-              <Icon
-                name="person"
-                type="material"
-                size={40}
-                color={colors.white}
-                containerStyle={styles.avatar}
-              />
+              {driver?.userId?.image ? (
+                <Image
+                  source={{ uri: driver.userId.image }}
+                  style={styles.driverImage}
+                />
+              ) : (
+                <Icon
+                  name="person"
+                  type="material"
+                  size={40}
+                  color={colors.white}
+                  containerStyle={styles.avatar}
+                />
+              )}
               <View>
                 <Text style={styles.driverName}>
-                  {driver?.userId?.name || 'Livreur'}
+                  {driver?.userId?.name || i18n.t('driver.driver')}
                 </Text>
                 <Text style={styles.driverId}>
-                  ID: {driver?.licenseNumber || 'N/A'}
+                  {i18n.t('driver.id')}: {driver?.licenseNumber || 'N/A'}
                 </Text>
               </View>
             </View>
@@ -178,7 +190,7 @@ export default function HomeScreen() {
             disabled={isLoading}
           >
             <Icon name="check-circle" type="material" size={24} color={colors.white} />
-            <Text style={styles.statusButtonText}>Disponible</Text>
+            <Text style={styles.statusButtonText}>{i18n.t('driver.available')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -191,7 +203,7 @@ export default function HomeScreen() {
             disabled={isLoading}
           >
             <Icon name="work" type="material" size={24} color={colors.white} />
-            <Text style={styles.statusButtonText}>Occupé</Text>
+            <Text style={styles.statusButtonText}>{i18n.t('driver.busy')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -204,30 +216,30 @@ export default function HomeScreen() {
             disabled={isLoading}
           >
             <Icon name="power-settings-new" type="material" size={24} color={colors.white} />
-            <Text style={styles.statusButtonText}>Hors ligne</Text>
+            <Text style={styles.statusButtonText}>{i18n.t('driver.offline')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Statistiques */}
         <View style={styles.statsContainer}>
-          <Text style={styles.sectionTitle}>Statistiques du jour</Text>
+          <Text style={styles.sectionTitle}>{i18n.t('home.todayDeliveries')}</Text>
           <View style={styles.statsGrid}>
             <Card containerStyle={styles.statCard}>
               <Icon name="local-shipping" type="material" size={30} color={colors.primary} />
               <Text style={styles.statNumber}>{stats.todayDeliveries || 0}</Text>
-              <Text style={styles.statLabel}>Livraisons</Text>
+              <Text style={styles.statLabel}>{i18n.t('home.todayDeliveries')}</Text>
             </Card>
 
             <Card containerStyle={styles.statCard}>
-              <Icon name="euro" type="material" size={30} color={colors.success} />
-              <Text style={styles.statNumber}>{stats.totalEarnings || 0}€</Text>
-              <Text style={styles.statLabel}>Revenus</Text>
+              <Icon name="attach-money" type="material" size={30} color={colors.success} />
+              <Text style={styles.statNumber}>{stats.totalEarnings || 0}{currency.symbol}</Text>
+              <Text style={styles.statLabel}>{i18n.t('home.earnings')}</Text>
             </Card>
 
             <Card containerStyle={styles.statCard}>
               <Icon name="star" type="material" size={30} color={colors.rating} />
               <Text style={styles.statNumber}>{stats.rating || 0}</Text>
-              <Text style={styles.statLabel}>Note</Text>
+              <Text style={styles.statLabel}>{i18n.t('home.rating')}</Text>
             </Card>
           </View>
         </View>
@@ -235,7 +247,7 @@ export default function HomeScreen() {
         {/* Livraisons actives */}
         {activeDeliveries.length > 0 && (
           <View style={styles.deliveriesContainer}>
-            <Text style={styles.sectionTitle}>Livraisons en cours</Text>
+            <Text style={styles.sectionTitle}>{i18n.t('home.activeDeliveries')}</Text>
             {activeDeliveries.slice(0, 2).map((order) => (
               <Card key={order._id} containerStyle={styles.deliveryCard}>
                 <View style={styles.deliveryHeader}>
@@ -244,11 +256,11 @@ export default function HomeScreen() {
                     styles.deliveryStatus,
                     { color: getStatusColor(order.status) }
                   ]}>
-                    {order.status === 'out_for_delivery' ? 'En livraison' : order.status}
+                    {order.status === 'out_for_delivery' ? i18n.t('driver.onDelivery') : order.status}
                   </Text>
                 </View>
                 <Text style={styles.deliveryAddress}>
-                  📍 {order.delivery?.address || 'Adresse non disponible'}
+                  📍 {order.delivery?.address || i18n.t('errors.locationError')}
                 </Text>
                 {order.user && (
                   <Text style={styles.customerInfo}>
@@ -261,12 +273,12 @@ export default function HomeScreen() {
                   </Text>
                 )}
                 <View style={styles.amountSection}>
-                  <Text style={styles.amountLabel}>Montant:</Text>
-                  <Text style={styles.amountValue}>{order.totalPrice}€</Text>
+                  <Text style={styles.amountLabel}>{i18n.t('common.amount')}:</Text>
+                  <Text style={styles.amountValue}>{order.totalPrice}{currency.symbol}</Text>
                 </View>
                 <View style={styles.deliveryActions}>
                   <Button
-                    title="Marquer comme livré"
+                    title={i18n.t('driver.orderDelivered')}
                     onPress={() => handleOrderStatusChange(order._id, 'delivered')}
                     loading={localLoading}
                     buttonStyle={styles.deliverButton}
@@ -279,15 +291,15 @@ export default function HomeScreen() {
 
         {/* Position */}
         <View style={styles.mapContainer}>
-          <Text style={styles.sectionTitle}>Votre position</Text>
+          <Text style={styles.sectionTitle}>{i18n.t('home.currentLocation')}</Text>
           <View style={styles.mapWrapper}>
             <View style={styles.mapPlaceholder}>
               <Icon name="location-on" type="material" size={50} color={colors.primary} />
               <Text style={styles.mapPlaceholderText}>
-                Position: {currentLocation ? `${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}` : 'Non disponible'}
+                Position: {currentLocation ? `${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}` : i18n.t('errors.locationError')}
               </Text>
               <Text style={styles.mapPlaceholderSubtext}>
-                Mise à jour en temps réel
+                {i18n.t('home.realTimeUpdate')}
               </Text>
             </View>
           </View>
@@ -337,6 +349,14 @@ const styles = StyleSheet.create({
   },
   avatar: {
     marginRight: 15,
+  },
+  driverImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+    borderWidth: 2,
+    borderColor: colors.white,
   },
   driverName: {
     fontSize: 18,

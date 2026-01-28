@@ -37,7 +37,7 @@ export const DriverProvider = ({ children }) => {
     }
   };
 
-  // Initialisation du driver depuis AsyncStorage
+  // Initialisation du driver depuis AsyncStorage et refresh depuis API
   useEffect(() => {
     const initializeDriver = async () => {
       try {
@@ -45,11 +45,28 @@ export const DriverProvider = ({ children }) => {
         const token = await AsyncStorage.getItem('driverToken');
 
         if (driverData && token) {
+          // Charger d'abord les données du cache
           const parsedDriver = JSON.parse(driverData);
           setDriver(parsedDriver);
           setIsAuthenticated(true);
           apiClient.token = token;
           apiClient.driver = parsedDriver;
+
+          // Puis rafraîchir avec les données les plus récentes de l'API
+          try {
+            const freshDriverData = await apiClient.getDriverProfile();
+            if (freshDriverData) {
+              setDriver(freshDriverData);
+              // Mettre à jour le cache avec les nouvelles données
+              await AsyncStorage.setItem('driverData', JSON.stringify(freshDriverData));
+            }
+          } catch (refreshError) {
+            console.log('Could not refresh driver data, using cached data:', refreshError.message);
+          }
+
+          // Charger les stats et commandes
+          await loadDriverStats();
+          await loadDriverOrders();
         }
       } catch (error) {
         console.error('Error initializing driver:', error);
@@ -91,13 +108,24 @@ export const DriverProvider = ({ children }) => {
       setIsLoading(true);
       const response = await apiClient.driverLogin(email, password);
 
-      if (response.driver && response.token) {
-        setDriver(response.driver);
-        setIsAuthenticated(true);
+      if (response.user && response.token) {
+        // Récupérer les données les plus récentes du driver depuis l'API
+        try {
+          const freshDriverData = await apiClient.getDriverProfile();
+          setDriver(freshDriverData);
+          setIsAuthenticated(true);
 
-        // Charger les données initiales
-        await loadDriverStats();
-        await loadDriverOrders();
+          // Charger les données initiales
+          await loadDriverStats();
+          await loadDriverOrders();
+        } catch (driverError) {
+          console.error('Error loading fresh driver data:', driverError);
+          // Fallback: utiliser les données de la réponse de login
+          if (response.driver) {
+            setDriver(response.driver);
+            setIsAuthenticated(true);
+          }
+        }
       }
 
       return response;

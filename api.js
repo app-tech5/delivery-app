@@ -284,6 +284,11 @@ class ApiClient {
       body: JSON.stringify(profileData),
     });
   }
+
+  // Récupérer les settings de l'application
+  async getSettings() {
+    return await this.apiCall('/resource/settings');
+  }
 }
 
 // Instance unique de l'API client
@@ -305,3 +310,6 @@ export const {
   getDriverProfile,
   updateDriverProfile,
 } = apiClient;
+
+// Export séparé pour getSettings (comme dans customer-app)
+export const getSettings = () => apiClient.getSettings();

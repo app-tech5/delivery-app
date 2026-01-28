@@ -1,0 +1,92 @@
+{
+  "app": {
+    "name": "Good Food Driver",
+    "version": "1.0.0"
+  },
+  "navigation": {
+    "home": "Home",
+    "deliveries": "Deliveries",
+    "profile": "Profile",
+    "login": "Login"
+  },
+  "auth": {
+    "welcome": "Welcome to Good Food Driver",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signingIn": "Signing in...",
+    "emailAndPasswordRequired": "Email and password are required",
+    "userNotFound": "User not found",
+    "incorrectPassword": "Incorrect password",
+    "loginSuccessful": "Login successful",
+    "serverError": "Server error",
+    "demoMode": "Demo Mode Active",
+    "driverNotFound": "You are not registered as a driver"
+  },
+  "home": {
+    "sections": {
+      "specialOffers": "Special Offers",
+      "topRated": "Top Rated",
+      "quickCuisine": "Quick Cuisine",
+      "expressPickup": "Express Pickup",
+      "mostPopular": "Most Popular",
+      "italianCuisine": "Italian Cuisine",
+      "americanCuisine": "American Cuisine",
+      "discover": "Discover"
+    },
+    "viewAll": "View All",
+    "todayDeliveries": "Today's Deliveries",
+    "earnings": "Earnings",
+    "rating": "Rating",
+    "completedOrders": "Completed Orders",
+    "activeDeliveries": "Active Deliveries",
+    "availableOrders": "Available Orders",
+    "driverStatus": "Driver Status",
+    "currentLocation": "Current Location",
+    "reconnect": "Please reconnect",
+    "demoSimulation": "Demo mode - simulation",
+    "realTimeUpdate": "Real-time update"
+  },
+  "driver": {
+    "available": "Available",
+    "onDelivery": "On Delivery",
+    "offline": "Offline",
+    "busy": "Busy",
+    "statusChanged": "Status changed to",
+    "simulation": "simulation",
+    "orderAccepted": "Order accepted",
+    "orderDelivered": "Mark as Delivered",
+    "noOrders": "No active orders",
+    "noAvailableOrders": "No available orders",
+    "loadingOrders": "Loading orders...",
+    "statusUpdateError": "Unable to update status",
+    "driver": "Driver",
+    "id": "ID"
+  },
+  "errors": {
+    "networkError": "Network error",
+    "serverError": "Server error",
+    "locationError": "Location access error",
+    "permissionDenied": "Permission denied",
+    "tryAgain": "Try again",
+    "checkConnection": "Check your internet connection"
+  },
+  "common": {
+    "loading": "Loading...",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "amount": "Amount"
+  }
+}
