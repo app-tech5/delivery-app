@@ -216,7 +216,7 @@ class ApiClient {
 
       return {
         todayDeliveries: todayOrders.filter(order => order.status === 'delivered').length,
-        totalEarnings: orders
+        totalEarnings: todayOrders
           .filter(order => order.status === 'delivered')
           .reduce((total, order) => total + (order.delivery?.deliveryFee || 0), 0),
         rating: this.driver?.rating || 0,
