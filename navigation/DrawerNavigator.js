@@ -1,5 +1,6 @@
 import React from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
+import { View, Alert } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import DeliveriesScreen from '../screens/DeliveriesScreen';
 import EarningsScreen from '../screens/EarningsScreen';
@@ -10,12 +11,75 @@ import SupportScreen from '../screens/SupportScreen';
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
+import { useDriver } from '../contexts/DriverContext';
 
 const Drawer = createDrawerNavigator();
+
+// Composant personnalisé pour le contenu du drawer
+function CustomDrawerContent(props) {
+  const { logout } = useDriver();
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Déconnexion',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+        {
+          text: 'Déconnexion',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+              // La navigation vers l'écran de login sera gérée par l'App.js ou le contexte d'authentification
+            } catch (error) {
+              console.error('Erreur lors de la déconnexion:', error);
+              Alert.alert('Erreur', 'Une erreur est survenue lors de la déconnexion');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+      <View style={{ marginTop: 'auto', marginBottom: 20 }}>
+        <DrawerItem
+          label="Déconnexion"
+          onPress={handleLogout}
+          icon={({ focused, size }) => (
+            <Ionicons
+              name="log-out-outline"
+              color="#ff4444"
+              size={size}
+            />
+          )}
+          labelStyle={{
+            color: '#ff4444',
+            fontSize: 16,
+            fontWeight: '500',
+            marginLeft: 8,
+          }}
+          style={{
+            marginVertical: 2,
+            marginHorizontal: 8,
+            borderRadius: 8,
+          }}
+        />
+      </View>
+    </DrawerContentScrollView>
+  );
+}
 
 export default function DrawerNavigator() {
   return (
     <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
         drawerStyle: {
