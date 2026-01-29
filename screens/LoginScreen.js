@@ -31,7 +31,7 @@ export default function LoginScreen({ navigation }) {
 
         if (token && driverData) {
           // L'utilisateur est déjà connecté, aller directement au Home
-          navigation.replace('Home');
+          navigation.replace('DrawerNavigator');
         }
       } catch (error) {
         console.error('Error checking existing login:', error);
