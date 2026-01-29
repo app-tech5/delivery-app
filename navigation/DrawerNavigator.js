@@ -7,7 +7,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import SupportScreen from '../screens/SupportScreen';
-import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, Feather, FontAwesome } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
 
@@ -38,7 +38,7 @@ export default function DrawerNavigator() {
         drawerInactiveBackgroundColor: 'transparent',
       }}
     >
-      {/* 🏠 ACCUEIL */}
+      {/* 🏠 TABLEAU DE BORD */}
       <Drawer.Screen
         name="Home"
         component={HomeScreen}
@@ -54,7 +54,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 🚚 LIVRAISONS */}
+      {/* 🚚 LIVRAISONS ACTIVES */}
       <Drawer.Screen
         name="Deliveries"
         component={DeliveriesScreen}
@@ -70,7 +70,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 💰 REVENUS */}
+      {/* 💰 REVENUS & TRANSACTIONS */}
       <Drawer.Screen
         name="Earnings"
         component={EarningsScreen}
@@ -86,7 +86,23 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 📊 HISTORIQUE */}
+      {/* 💳 TRANSACTIONS */}
+      <Drawer.Screen
+        name="Transactions"
+        component={EarningsScreen} // Temporaire - utiliser EarningsScreen
+        options={{
+          title: 'Transactions',
+          drawerIcon: ({ focused, size }) => (
+            <Ionicons
+              name="card-outline"
+              color={focused ? colors.primary : '#666'}
+              size={size}
+            />
+          ),
+        }}
+      />
+
+      {/* 📊 HISTORIQUE DES LIVRAISONS */}
       <Drawer.Screen
         name="History"
         component={HistoryScreen}
@@ -95,6 +111,54 @@ export default function DrawerNavigator() {
           drawerIcon: ({ focused, size }) => (
             <Feather
               name="clock"
+              color={focused ? colors.primary : '#666'}
+              size={size}
+            />
+          ),
+        }}
+      />
+
+      {/* 📈 RAPPORTS */}
+      <Drawer.Screen
+        name="Reports"
+        component={HistoryScreen} // Temporaire - utiliser HistoryScreen
+        options={{
+          title: 'Rapports',
+          drawerIcon: ({ focused, size }) => (
+            <Ionicons
+              name="bar-chart-outline"
+              color={focused ? colors.primary : '#666'}
+              size={size}
+            />
+          ),
+        }}
+      />
+
+      {/* 🔔 NOTIFICATIONS */}
+      <Drawer.Screen
+        name="Notifications"
+        component={ProfileScreen} // Temporaire - utiliser ProfileScreen
+        options={{
+          title: 'Notifications',
+          drawerIcon: ({ focused, size }) => (
+            <Ionicons
+              name="notifications-outline"
+              color={focused ? colors.primary : '#666'}
+              size={size}
+            />
+          ),
+        }}
+      />
+
+      {/* 🆘 SUPPORT CLIENT */}
+      <Drawer.Screen
+        name="Support"
+        component={SupportScreen}
+        options={{
+          title: 'Support',
+          drawerIcon: ({ focused, size }) => (
+            <Ionicons
+              name="help-circle-outline"
               color={focused ? colors.primary : '#666'}
               size={size}
             />
@@ -127,22 +191,6 @@ export default function DrawerNavigator() {
           drawerIcon: ({ focused, size }) => (
             <Ionicons
               name="settings-outline"
-              color={focused ? colors.primary : '#666'}
-              size={size}
-            />
-          ),
-        }}
-      />
-
-      {/* 🆘 SUPPORT */}
-      <Drawer.Screen
-        name="Support"
-        component={SupportScreen}
-        options={{
-          title: 'Support',
-          drawerIcon: ({ focused, size }) => (
-            <Ionicons
-              name="help-circle-outline"
               color={focused ? colors.primary : '#666'}
               size={size}
             />
