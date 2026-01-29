@@ -2,6 +2,9 @@
 import { config } from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Fonction utilitaire pour vérifier si on est en mode démo
+const isDemoMode = () => config.DEMO_MODE === true;
+
 const API_BASE_URL = config.API_BASE_URL;
 const API_TIMEOUT = config.API_TIMEOUT;
 
@@ -203,7 +206,19 @@ class ApiClient {
   // Récupérer les statistiques du driver
   async getDriverStats() {
     try {
-      // Pour l'instant, calculer les stats depuis les orders du driver
+      // Vérification du mode démo via la configuration
+      if (isDemoMode()) {
+        // Retourner des statistiques mockées pour le mode démo
+        console.log('🔄 Mode démo détecté - Retour des statistiques mockées');
+        return {
+          todayDeliveries: 3, // 3 livraisons aujourd'hui
+          totalEarnings: 12.50, // 12.50€ gagnés aujourd'hui
+          rating: 4.8, // Note du driver
+          completedOrders: 42 // Total des livraisons (comme dans la DB)
+        };
+      }
+
+      // Mode normal : calculer les stats depuis les orders du driver
       const orders = await this.getDriverOrders();
       const today = new Date();
       today.setHours(0, 0, 0, 0);
