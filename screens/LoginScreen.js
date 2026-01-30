@@ -55,7 +55,8 @@ export default function LoginScreen({ navigation }) {
 
       if (response.token) {
         Alert.alert('Succès', 'Connexion réussie !');
-        navigation.replace('Home');
+        navigation.replace('DrawerNavigator', { screen: 'Home' });
+
       }
     } catch (error) {
       console.error('Login error:', error);
