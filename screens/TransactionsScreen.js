@@ -35,9 +35,9 @@ export default function TransactionsScreen() {
   // Filtres de période disponibles
   const periodFilters = [
     { key: 'all', label: i18n.t('common.all'), days: null },
-    { key: 'today', label: 'Aujourd\'hui', days: 0 },
-    { key: 'week', label: '7 jours', days: 7 },
-    { key: 'month', label: '30 jours', days: 30 },
+    { key: 'today', label: i18n.t('reports.todayFilter'), days: 0 },
+    { key: 'week', label: i18n.t('reports.weekFilter'), days: 7 },
+    { key: 'month', label: i18n.t('reports.monthFilter'), days: 30 },
   ];
 
   // Calculer les transactions depuis les livraisons
@@ -49,7 +49,7 @@ export default function TransactionsScreen() {
         id: delivery._id,
         type: 'delivery_fee',
         amount: delivery.delivery?.deliveryFee || 0,
-        description: `Livraison #${delivery._id.slice(-6)}`,
+        description: `${i18n.t('reports.deliveryDescription')}${delivery._id.slice(-6)}`,
         date: new Date(delivery.createdAt || delivery.updatedAt),
         status: 'completed',
         details: {
@@ -100,7 +100,7 @@ export default function TransactionsScreen() {
       await loadDriverOrders();
     } catch (error) {
       console.error('Erreur lors du rafraîchissement:', error);
-      Alert.alert('Erreur', 'Impossible de rafraîchir les transactions');
+      Alert.alert('Error', i18n.t('reports.refreshTransactionsError'));
     } finally {
       setRefreshing(false);
     }
@@ -117,11 +117,11 @@ export default function TransactionsScreen() {
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 1) return 'Aujourd\'hui';
-    if (diffDays === 2) return 'Hier';
-    if (diffDays <= 7) return `Il y a ${diffDays - 1} jours`;
+    if (diffDays === 1) return i18n.t('reports.today');
+    if (diffDays === 2) return i18n.t('reports.yesterday');
+    if (diffDays <= 7) return `${diffDays - 1} ${i18n.t('reports.daysAgo')}`;
 
-    return date.toLocaleDateString('fr-FR', {
+    return date.toLocaleDateString(i18n.locale, {
       day: 'numeric',
       month: 'short',
       year: 'numeric'
@@ -154,7 +154,7 @@ export default function TransactionsScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
           <Text style={styles.title}>{i18n.t('home.reconnect')}</Text>
-          <Text style={styles.subtitle}>Veuillez vous reconnecter pour voir vos transactions</Text>
+          <Text style={styles.subtitle}>{i18n.t('reports.pleaseReconnectTransactions')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -163,9 +163,9 @@ export default function TransactionsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Transactions</Text>
+        <Text style={styles.headerTitle}>{i18n.t('reports.transactionsTitle')}</Text>
         <Text style={styles.headerSubtitle}>
-          {transactionStats.count} transaction{transactionStats.count !== 1 ? 's' : ''}
+          {transactionStats.count} {transactionStats.count === 1 ? i18n.t('reports.transactionSingular') : i18n.t('reports.transactionPlural')}
         </Text>
       </View>
 
@@ -200,17 +200,17 @@ export default function TransactionsScreen() {
       <View style={styles.summaryContainer}>
         <Card containerStyle={styles.summaryCard}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Total</Text>
+            <Text style={styles.summaryLabel}>{i18n.t('reports.totalLabel')}</Text>
             <Text style={styles.summaryValue}>{formatCurrency(transactionStats.total)}</Text>
           </View>
 
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Nombre</Text>
+            <Text style={styles.summaryLabel}>{i18n.t('reports.countLabel')}</Text>
             <Text style={styles.summaryValue}>{transactionStats.count}</Text>
           </View>
 
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Moyenne</Text>
+            <Text style={styles.summaryLabel}>{i18n.t('reports.averageLabel')}</Text>
             <Text style={styles.summaryValue}>{formatCurrency(transactionStats.average)}</Text>
           </View>
         </Card>
@@ -236,12 +236,12 @@ export default function TransactionsScreen() {
               color={colors.text.secondary}
             />
             <Text style={styles.emptyTitle}>
-              {activeFilter === 'all' ? 'Aucune transaction' : 'Aucune transaction trouvée'}
+              {activeFilter === 'all' ? i18n.t('reports.noTransactions') : i18n.t('reports.noTransactionsFiltered')}
             </Text>
             <Text style={styles.emptySubtitle}>
               {activeFilter === 'all'
-                ? 'Vous n\'avez encore aucune transaction'
-                : `Aucune transaction pour cette période`
+                ? i18n.t('reports.noTransactionsAtAll')
+                : i18n.t('reports.noTransactionsForPeriod')
               }
             </Text>
           </View>
@@ -276,7 +276,7 @@ export default function TransactionsScreen() {
                       +{formatCurrency(transaction.amount)}
                     </Text>
                     <Chip
-                      title="Terminée"
+                      title={i18n.t('reports.completedStatus')}
                       buttonStyle={styles.statusChip}
                       titleStyle={styles.statusChipText}
                     />
@@ -487,12 +487,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statusChip: {
-    height: 20,
+    height: 24,
     backgroundColor: colors.success,
-    borderRadius: 10,
+    borderRadius: 12,
+    paddingHorizontal: 8,
   },
   statusChipText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '500',
   },
 
