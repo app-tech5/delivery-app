@@ -95,6 +95,7 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "amount": "Montant",
-    "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ?"
+    "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "all": "Toutes"
   }
 }

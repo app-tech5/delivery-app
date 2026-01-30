@@ -95,6 +95,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "amount": "Amount",
-    "confirmLogout": "Are you sure you want to log out?"
+    "confirmLogout": "Are you sure you want to log out?",
+    "all": "All"
   }
 }
