@@ -16,11 +16,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '../global';
 import { config } from '../config';
 import apiClient from '../api';
+import { useDriver } from '../contexts/DriverContext';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState(config.DEMO_MODE ? config.DEMO_EMAIL : '');
   const [password, setPassword] = useState(config.DEMO_MODE ? config.DEMO_PASSWORD : '');
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useDriver();
 
   // Vérifier si l'utilisateur est déjà connecté au démarrage
   useEffect(() => {
@@ -50,13 +52,13 @@ export default function LoginScreen({ navigation }) {
     setIsLoading(true);
 
     try {
-      // Appel à l'API driver login
-      const response = await apiClient.driverLogin(email, password);
+      // Utiliser la fonction login du DriverContext pour gérer l'état d'authentification
+      const response = await login(email, password);
 
-      if (response.token) {
+      if (response.token && response.user) {
         Alert.alert('Succès', 'Connexion réussie !');
-        navigation.replace('DrawerNavigator', { screen: 'Home' });
-
+        // La navigation est maintenant gérée automatiquement par AppNavigator.js
+        // basé sur l'état d'authentification du DriverContext
       }
     } catch (error) {
       console.error('Login error:', error);

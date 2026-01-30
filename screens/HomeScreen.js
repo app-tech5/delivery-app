@@ -179,6 +179,7 @@ export default function HomeScreen() {
     delivery.status === 'out_for_delivery'
   );
 
+  console.log("isAuthenticated et driver:", isAuthenticated, driver);
   // Vérifier l'authentification
   if (!isAuthenticated || !driver) {
     return (

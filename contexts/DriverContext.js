@@ -163,22 +163,28 @@ export const DriverProvider = ({ children }) => {
       const response = await apiClient.driverLogin(email, password);
 
       if (response.user && response.token) {
-        // Récupérer les données les plus récentes du driver depuis l'API
-        try {
-          const freshDriverData = await apiClient.getDriverProfile();
-          setDriver(freshDriverData);
+        // Le driver a déjà été vérifié et stocké dans apiClient.driver lors de driverLogin()
+        // On peut l'utiliser directement
+        if (apiClient.driver) {
+          setDriver(apiClient.driver);
           setIsAuthenticated(true);
 
           // Charger les données initiales
           await loadDriverStats();
           await loadDriverOrders();
-        } catch (driverError) {
-          console.error('Error loading fresh driver data:', driverError);
-          // Fallback: utiliser les données de la réponse de login
-          if (response.driver) {
-            setDriver(response.driver);
-            setIsAuthenticated(true);
+
+          // Essayer de rafraîchir les données driver en arrière-plan (sans bloquer)
+          try {
+            const freshDriverData = await apiClient.getDriverProfile();
+            if (freshDriverData) {
+              setDriver(freshDriverData);
+            }
+          } catch (refreshError) {
+            // Ne pas échouer si le refresh échoue, on garde les données existantes
+            console.log('Could not refresh driver data, using existing data');
           }
+        } else {
+          throw new Error('Données driver non disponibles');
         }
       }
 
