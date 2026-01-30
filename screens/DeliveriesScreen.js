@@ -39,11 +39,11 @@ export default function DeliveriesScreen() {
   // Filtres disponibles
   const filters = [
     { key: 'all', label: i18n.t('common.all'), icon: 'list' },
-    { key: 'pending', label: 'En attente', icon: 'clock-outline' },
-    { key: 'accepted', label: 'Acceptées', icon: 'check-circle-outline' },
-    { key: 'out_for_delivery', label: 'En livraison', icon: 'truck-delivery' },
-    { key: 'delivered', label: 'Livrées', icon: 'check-circle' },
-    { key: 'cancelled', label: 'Annulées', icon: 'close-circle' }
+    { key: 'pending', label: i18n.t('reports.pendingLabel'), icon: 'clock-outline' },
+    { key: 'accepted', label: i18n.t('reports.acceptedLabel'), icon: 'check-circle-outline' },
+    { key: 'out_for_delivery', label: i18n.t('reports.outForDeliveryLabel'), icon: 'truck-delivery' },
+    { key: 'delivered', label: i18n.t('reports.deliveredLabel'), icon: 'check-circle' },
+    { key: 'cancelled', label: i18n.t('reports.cancelledLabel'), icon: 'close-circle' }
   ];
 
   // Filtrer les livraisons selon le filtre actif
@@ -61,7 +61,7 @@ export default function DeliveriesScreen() {
       await loadDriverOrders();
     } catch (error) {
       console.error('Erreur lors du rafraîchissement:', error);
-      Alert.alert('Erreur', 'Impossible de rafraîchir les livraisons');
+      Alert.alert('Error', i18n.t('reports.refreshError'));
     } finally {
       setRefreshing(false);
     }
@@ -70,20 +70,20 @@ export default function DeliveriesScreen() {
   // Gestionnaire pour accepter une livraison
   const handleAcceptDelivery = async (orderId) => {
     Alert.alert(
-      'Accepter la livraison',
-      'Êtes-vous sûr de vouloir accepter cette livraison ?',
+      i18n.t('reports.acceptDeliveryTitle'),
+      i18n.t('reports.acceptDeliveryConfirm'),
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: i18n.t('common.cancel'), style: 'cancel' },
         {
-          text: 'Accepter',
+          text: i18n.t('common.confirm'),
           onPress: async () => {
             setLoading(true);
             try {
               await acceptDelivery(orderId);
-              Alert.alert('Succès', 'Livraison acceptée avec succès');
+              Alert.alert('Success', i18n.t('reports.acceptSuccess'));
             } catch (error) {
               console.error('Erreur lors de l\'acceptation:', error);
-              Alert.alert('Erreur', 'Impossible d\'accepter la livraison');
+              Alert.alert('Error', i18n.t('reports.acceptError'));
             } finally {
               setLoading(false);
             }
@@ -96,20 +96,20 @@ export default function DeliveriesScreen() {
   // Gestionnaire pour changer le statut d'une livraison
   const handleStatusChange = async (orderId, newStatus, confirmMessage) => {
     Alert.alert(
-      'Changer le statut',
+      'Change Status',
       confirmMessage,
       [
-        { text: 'Annuler', style: 'cancel' },
+        { text: i18n.t('common.cancel'), style: 'cancel' },
         {
-          text: 'Confirmer',
+          text: i18n.t('common.confirm'),
           onPress: async () => {
             setLoading(true);
             try {
               await updateDeliveryStatus(orderId, newStatus);
-              Alert.alert('Succès', 'Statut mis à jour avec succès');
+              Alert.alert('Success', i18n.t('reports.updateSuccess'));
             } catch (error) {
               console.error('Erreur lors de la mise à jour:', error);
-              Alert.alert('Erreur', 'Impossible de mettre à jour le statut');
+              Alert.alert('Error', i18n.t('reports.updateError'));
             } finally {
               setLoading(false);
             }
@@ -125,7 +125,7 @@ export default function DeliveriesScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
           <Text style={styles.title}>{i18n.t('home.reconnect')}</Text>
-          <Text style={styles.subtitle}>Veuillez vous reconnecter pour voir vos livraisons</Text>
+          <Text style={styles.subtitle}>{i18n.t('reports.pleaseReconnectHistory')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -136,7 +136,7 @@ export default function DeliveriesScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{i18n.t('navigation.deliveries')}</Text>
         <Text style={styles.headerSubtitle}>
-          {filteredDeliveries.length} livraison{filteredDeliveries.length !== 1 ? 's' : ''}
+          {filteredDeliveries.length} {filteredDeliveries.length === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')}
         </Text>
       </View>
 
@@ -193,11 +193,11 @@ export default function DeliveriesScreen() {
               color={colors.text.secondary}
             />
             <Text style={styles.emptyTitle}>
-              {activeFilter === 'all' ? 'Aucune livraison' : 'Aucune livraison trouvée'}
+              {activeFilter === 'all' ? i18n.t('reports.noDeliveries') : i18n.t('reports.noDeliveriesFiltered')}
             </Text>
             <Text style={styles.emptySubtitle}>
               {activeFilter === 'all'
-                ? 'Vous n\'avez encore aucune livraison'
+                ? i18n.t('reports.noDeliveriesAtAll')
                 : `Aucune livraison avec le statut "${filters.find(f => f.key === activeFilter)?.label}"`
               }
             </Text>
@@ -212,12 +212,12 @@ export default function DeliveriesScreen() {
                 onStartDelivery={(id) => handleStatusChange(
                   id,
                   'out_for_delivery',
-                  'Êtes-vous sûr de vouloir commencer cette livraison ?'
+                  i18n.t('reports.startDeliveryConfirm')
                 )}
                 onMarkDelivered={(id) => handleStatusChange(
                   id,
                   'delivered',
-                  'Êtes-vous sûr que cette livraison est terminée ?'
+                  i18n.t('reports.completeDeliveryConfirm')
                 )}
               />
             ))}
