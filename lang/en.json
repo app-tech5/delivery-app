@@ -55,6 +55,15 @@
     "demoSimulation": "Demo mode - simulation",
     "realTimeUpdate": "Real-time update"
   },
+  "history":{
+    "filters": {
+    "all": "All",
+    "today": "Today",
+    "week": "This week",
+    "month": "This month",
+    "last_month": "Last month"
+  }
+  },
   "driver": {
     "available": "Available",
     "onDelivery": "On Delivery",

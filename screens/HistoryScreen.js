@@ -34,13 +34,13 @@ export default function HistoryScreen() {
 
   // Filtres temporels disponibles
   const timeFilters = [
-    { key: 'all', label: 'Tout', icon: 'calendar' },
-    { key: 'today', label: 'Aujourd\'hui', icon: 'calendar-today' },
-    { key: 'week', label: 'Cette semaine', icon: 'calendar-week' },
-    { key: 'month', label: 'Ce mois', icon: 'calendar-month' },
-    { key: 'last_month', label: 'Mois dernier', icon: 'calendar-month-outline' },
+    { key: 'all', label: i18n.t('history.filters.all'), icon: 'calendar' },
+    { key: 'today', label: i18n.t('history.filters.today'), icon: 'calendar-today' },
+    { key: 'week', label: i18n.t('history.filters.week'), icon: 'calendar-week' },
+    { key: 'month', label: i18n.t('history.filters.month'), icon: 'calendar-month' },
+    { key: 'last_month', label: i18n.t('history.filters.last_month'), icon: 'calendar-month-outline' },
   ];
-
+  
   // Grouper les livraisons par date
   const groupedDeliveries = useMemo(() => {
     const completedDeliveries = deliveries.filter(delivery => delivery.status === 'delivered');
@@ -145,6 +145,7 @@ export default function HistoryScreen() {
 
   // Fonction pour formater les dates
   const formatDate = (date) => {
+    const locale = i18n.locale;
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -152,7 +153,7 @@ export default function HistoryScreen() {
     if (diffDays === 1) return 'Aujourd\'hui';
     if (diffDays === 2) return 'Hier';
 
-    return date.toLocaleDateString('fr-FR', {
+    return date.toLocaleDateString(i18n.locale, {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
@@ -306,7 +307,7 @@ export default function HistoryScreen() {
                             Commande #{delivery._id.slice(-6)}
                           </Text>
                           <Text style={styles.deliveryTime}>
-                            {new Date(delivery.createdAt || delivery.updatedAt).toLocaleTimeString('fr-FR', {
+                            {new Date(delivery.createdAt || delivery.updatedAt).toLocaleTimeString(i18n.locale, {
                               hour: '2-digit',
                               minute: '2-digit'
                             })}
