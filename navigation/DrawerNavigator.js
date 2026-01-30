@@ -4,6 +4,7 @@ import { View, Alert } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import DeliveriesScreen from '../screens/DeliveriesScreen';
 import EarningsScreen from '../screens/EarningsScreen';
+import TransactionsScreen from '../screens/TransactionsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import HistoryScreen from '../screens/HistoryScreen';
@@ -153,7 +154,7 @@ export default function DrawerNavigator() {
       {/* 💳 TRANSACTIONS */}
       <Drawer.Screen
         name="Transactions"
-        component={EarningsScreen} // Temporaire - utiliser EarningsScreen
+        component={TransactionsScreen}
         options={{
           title: i18n.t('navigation.transactions'),
           drawerIcon: ({ focused, size }) => (
