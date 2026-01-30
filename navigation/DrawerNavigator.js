@@ -21,15 +21,15 @@ function CustomDrawerContent(props) {
 
   const handleLogout = async () => {
     Alert.alert(
-      'Déconnexion',
-      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      i18n.t('navigation.logout'),
+      i18n.t('common.confirmLogout'),
       [
         {
-          text: 'Annuler',
+          text: i18n.t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Déconnexion',
+          text: i18n.t('navigation.logout'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -50,7 +50,7 @@ function CustomDrawerContent(props) {
       <DrawerItemList {...props} />
       <View style={{ marginTop: 'auto', marginBottom: 20 }}>
         <DrawerItem
-          label="Déconnexion"
+          label={i18n.t('navigation.logout')}
           onPress={handleLogout}
           icon={({ focused, size }) => (
             <Ionicons
@@ -155,7 +155,7 @@ export default function DrawerNavigator() {
         name="Transactions"
         component={EarningsScreen} // Temporaire - utiliser EarningsScreen
         options={{
-          title: 'Transactions',
+          title: i18n.t('navigation.transactions'),
           drawerIcon: ({ focused, size }) => (
             <Ionicons
               name="card-outline"
@@ -171,7 +171,7 @@ export default function DrawerNavigator() {
         name="History"
         component={HistoryScreen}
         options={{
-          title: 'Historique',
+          title: i18n.t('navigation.history'),
           drawerIcon: ({ focused, size }) => (
             <Feather
               name="clock"
@@ -187,7 +187,7 @@ export default function DrawerNavigator() {
         name="Reports"
         component={HistoryScreen} // Temporaire - utiliser HistoryScreen
         options={{
-          title: 'Rapports',
+          title: i18n.t('navigation.reports'),
           drawerIcon: ({ focused, size }) => (
             <Ionicons
               name="bar-chart-outline"
@@ -203,7 +203,7 @@ export default function DrawerNavigator() {
         name="Notifications"
         component={ProfileScreen} // Temporaire - utiliser ProfileScreen
         options={{
-          title: 'Notifications',
+          title: i18n.t('navigation.notifications'),
           drawerIcon: ({ focused, size }) => (
             <Ionicons
               name="notifications-outline"
@@ -219,7 +219,7 @@ export default function DrawerNavigator() {
         name="Support"
         component={SupportScreen}
         options={{
-          title: 'Support',
+          title: i18n.t('navigation.support'),
           drawerIcon: ({ focused, size }) => (
             <Ionicons
               name="help-circle-outline"
@@ -251,7 +251,7 @@ export default function DrawerNavigator() {
         name="Settings"
         component={SettingsScreen}
         options={{
-          title: 'Paramètres',
+          title: i18n.t('navigation.settings'),
           drawerIcon: ({ focused, size }) => (
             <Ionicons
               name="settings-outline"

@@ -7,7 +7,14 @@
     "home": "Home",
     "deliveries": "Deliveries",
     "profile": "Profile",
-    "login": "Login"
+    "login": "Login",
+    "transactions": "Transactions",
+    "history": "History",
+    "reports": "Reports",
+    "notifications": "Notifications",
+    "support": "Support",
+    "settings": "Settings",
+    "logout": "Logout"
   },
   "auth": {
     "welcome": "Welcome to Good Food Driver",
@@ -87,6 +94,7 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "amount": "Amount"
+    "amount": "Amount",
+    "confirmLogout": "Are you sure you want to log out?"
   }
 }

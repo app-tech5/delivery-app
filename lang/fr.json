@@ -1,0 +1,100 @@
+{
+  "app": {
+    "name": "Good Food Driver",
+    "version": "1.0.0"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "deliveries": "Livraisons",
+    "profile": "Profil",
+    "login": "Connexion",
+    "transactions": "Transactions",
+    "history": "Historique",
+    "reports": "Rapports",
+    "notifications": "Notifications",
+    "support": "Support",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "welcome": "Bienvenue sur Good Food Driver",
+    "email": "Email",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "signingIn": "Connexion en cours...",
+    "emailAndPasswordRequired": "Email et mot de passe requis",
+    "userNotFound": "Utilisateur non trouvé",
+    "incorrectPassword": "Mot de passe incorrect",
+    "loginSuccessful": "Connexion réussie",
+    "serverError": "Erreur serveur",
+    "demoMode": "Mode démonstration activé",
+    "driverNotFound": "Vous n'êtes pas enregistré en tant que livreur"
+  },
+  "home": {
+    "sections": {
+      "specialOffers": "Offres spéciales",
+      "topRated": "Les mieux notés",
+      "quickCuisine": "Cuisine rapide",
+      "expressPickup": "Retrait express",
+      "mostPopular": "Les plus populaires",
+      "italianCuisine": "Cuisine italienne",
+      "americanCuisine": "Cuisine américaine",
+      "discover": "Découvrir"
+    },
+    "viewAll": "Voir tout",
+    "todayDeliveries": "Livraisons du jour",
+    "earnings": "Gains",
+    "rating": "Note",
+    "completedOrders": "Commandes terminées",
+    "activeDeliveries": "Livraisons actives",
+    "availableOrders": "Commandes disponibles",
+    "driverStatus": "Statut du livreur",
+    "currentLocation": "Position actuelle",
+    "reconnect": "Veuillez vous reconnecter",
+    "demoSimulation": "Mode démo - simulation",
+    "realTimeUpdate": "Mise à jour en temps réel"
+  },
+  "driver": {
+    "available": "Disponible",
+    "onDelivery": "En livraison",
+    "offline": "Hors ligne",
+    "busy": "Occupé",
+    "statusChanged": "Statut changé à",
+    "simulation": "simulation",
+    "orderAccepted": "Commande acceptée",
+    "orderDelivered": "Marquer comme livrée",
+    "noOrders": "Aucune commande active",
+    "noAvailableOrders": "Aucune commande disponible",
+    "loadingOrders": "Chargement des commandes...",
+    "statusUpdateError": "Impossible de mettre à jour le statut",
+    "driver": "Livreur",
+    "id": "ID"
+  },
+  "errors": {
+    "networkError": "Erreur réseau",
+    "serverError": "Erreur serveur",
+    "locationError": "Erreur d'accès à la localisation",
+    "permissionDenied": "Permission refusée",
+    "tryAgain": "Réessayer",
+    "checkConnection": "Vérifiez votre connexion internet"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "close": "Fermer",
+    "save": "Sauvegarder",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "amount": "Montant",
+    "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ?"
+  }
+}
