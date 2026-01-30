@@ -5,6 +5,7 @@ import HomeScreen from '../screens/HomeScreen';
 import DeliveriesScreen from '../screens/DeliveriesScreen';
 import EarningsScreen from '../screens/EarningsScreen';
 import TransactionsScreen from '../screens/TransactionsScreen';
+import ReportsScreen from '../screens/ReportsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import HistoryScreen from '../screens/HistoryScreen';
@@ -186,7 +187,7 @@ export default function DrawerNavigator() {
       {/* 📈 RAPPORTS */}
       <Drawer.Screen
         name="Reports"
-        component={HistoryScreen} // Temporaire - utiliser HistoryScreen
+        component={ReportsScreen}
         options={{
           title: i18n.t('navigation.reports'),
           drawerIcon: ({ focused, size }) => (
