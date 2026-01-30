@@ -6,6 +6,7 @@ import DeliveriesScreen from '../screens/DeliveriesScreen';
 import EarningsScreen from '../screens/EarningsScreen';
 import TransactionsScreen from '../screens/TransactionsScreen';
 import ReportsScreen from '../screens/ReportsScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import HistoryScreen from '../screens/HistoryScreen';
@@ -203,7 +204,7 @@ export default function DrawerNavigator() {
       {/* 🔔 NOTIFICATIONS */}
       <Drawer.Screen
         name="Notifications"
-        component={ProfileScreen} // Temporaire - utiliser ProfileScreen
+        component={NotificationsScreen}
         options={{
           title: i18n.t('navigation.notifications'),
           drawerIcon: ({ focused, size }) => (
