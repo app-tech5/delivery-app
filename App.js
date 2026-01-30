@@ -7,11 +7,11 @@ import { SettingProvider } from './contexts/SettingContext';
 export default function App() {
   return (
     <SafeAreaProvider>
-      <SettingProvider>
-        <DriverProvider>
+      <DriverProvider>
+        <SettingProvider>
           <AppNavigator />
-        </DriverProvider>
-      </SettingProvider>
+        </SettingProvider>
+      </DriverProvider>
     </SafeAreaProvider>
   );
 }
