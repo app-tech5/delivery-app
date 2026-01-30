@@ -59,7 +59,7 @@ export default function EarningsScreen() {
       await loadDriverStats();
     } catch (error) {
       console.error('Erreur lors du rafraîchissement des stats:', error);
-      Alert.alert('Erreur', 'Impossible de rafraîchir les statistiques');
+      Alert.alert('Error', i18n.t('reports.refreshStatsError'));
     } finally {
       setRefreshing(false);
     }
@@ -90,7 +90,7 @@ export default function EarningsScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
           <Text style={styles.title}>{i18n.t('home.reconnect')}</Text>
-          <Text style={styles.subtitle}>Veuillez vous reconnecter pour voir vos revenus</Text>
+          <Text style={styles.subtitle}>{i18n.t('reports.pleaseReconnectEarnings')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -99,9 +99,9 @@ export default function EarningsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{i18n.t('home.earnings')}</Text>
+        <Text style={styles.headerTitle}>{i18n.t('reports.earningsTitle')}</Text>
         <Text style={styles.headerSubtitle}>
-          {new Date().toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          {new Date().toLocaleDateString(i18n.locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </Text>
       </View>
 
@@ -129,7 +129,7 @@ export default function EarningsScreen() {
             </View>
             <View style={styles.statContent}>
               <Text style={styles.statValue}>{formatCurrency(stats.totalEarnings)}</Text>
-              <Text style={styles.statLabel}>{i18n.t('home.earnings')} du jour</Text>
+              <Text style={styles.statLabel}>{i18n.t('reports.todayEarningsLabel')}</Text>
             </View>
             <View style={styles.trendContainer}>
               <Icon
@@ -153,7 +153,7 @@ export default function EarningsScreen() {
             </View>
             <View style={styles.statContent}>
               <Text style={styles.statValue}>{stats.todayDeliveries || 0}</Text>
-              <Text style={styles.statLabel}>Livraisons du jour</Text>
+              <Text style={styles.statLabel}>{i18n.t('reports.todaysDeliveries')}</Text>
             </View>
             <View style={styles.trendContainer}>
               <Icon
@@ -204,7 +204,7 @@ export default function EarningsScreen() {
             </View>
             <View style={styles.statContent}>
               <Text style={styles.statValue}>{stats.completedOrders || 0}</Text>
-              <Text style={styles.statLabel}>Total livraisons</Text>
+              <Text style={styles.statLabel}>{i18n.t('reports.totalDeliveries')}</Text>
             </View>
             <View style={styles.trendContainer}>
               <Icon
@@ -219,16 +219,16 @@ export default function EarningsScreen() {
 
         {/* Section des revenus détaillés */}
         <View style={styles.detailsSection}>
-          <Text style={styles.sectionTitle}>Détails des revenus</Text>
+          <Text style={styles.sectionTitle}>{i18n.t('reports.earningsDetails')}</Text>
 
           <Card containerStyle={styles.detailCard}>
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Livraisons complétées aujourd'hui</Text>
+              <Text style={styles.detailLabel}>{i18n.t('reports.deliveriesCompletedToday')}</Text>
               <Text style={styles.detailValue}>{stats.todayDeliveries || 0}</Text>
             </View>
 
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Revenus moyens par livraison</Text>
+              <Text style={styles.detailLabel}>{i18n.t('reports.averageEarningsPerDelivery')}</Text>
               <Text style={styles.detailValue}>
                 {stats.todayDeliveries > 0
                   ? formatCurrency(stats.totalEarnings / stats.todayDeliveries)
@@ -238,7 +238,7 @@ export default function EarningsScreen() {
             </View>
 
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Note moyenne</Text>
+              <Text style={styles.detailLabel}>{i18n.t('reports.currentRating')}</Text>
               <View style={styles.ratingContainer}>
                 <Text style={styles.detailValue}>{stats.rating?.toFixed(1) || '0.0'}</Text>
                 <View style={styles.miniStars}>
@@ -260,22 +260,22 @@ export default function EarningsScreen() {
         {/* Livraisons récentes */}
         {recentDeliveries.length > 0 && (
           <View style={styles.recentSection}>
-            <Text style={styles.sectionTitle}>Livraisons récentes</Text>
+            <Text style={styles.sectionTitle}>{i18n.t('reports.recentDeliveries')}</Text>
 
             {recentDeliveries.map((delivery) => (
               <Card key={delivery._id} containerStyle={styles.recentDeliveryCard}>
                 <View style={styles.recentDeliveryHeader}>
                   <Text style={styles.recentDeliveryId}>
-                    Commande #{delivery._id.slice(-6)}
+                    {i18n.t('reports.orderPrefix')}{delivery._id.slice(-6)}
                   </Text>
                   <Text style={styles.recentDeliveryDate}>
-                    {new Date(delivery.createdAt || delivery.updatedAt).toLocaleDateString('fr-FR')}
+                    {new Date(delivery.createdAt || delivery.updatedAt).toLocaleDateString(i18n.locale)}
                   </Text>
                 </View>
 
                 <View style={styles.recentDeliveryDetails}>
                   <Text style={styles.recentDeliveryAddress}>
-                    📍 {delivery.delivery?.address || 'Adresse non disponible'}
+                    📍 {delivery.delivery?.address || i18n.t('reports.addressNotAvailable')}
                   </Text>
 
                   {delivery.user && (
@@ -295,7 +295,7 @@ export default function EarningsScreen() {
                         size={14}
                         color={colors.success}
                       />
-                      <Text style={styles.recentDeliveryStatusText}>Livrée</Text>
+                      <Text style={styles.recentDeliveryStatusText}>{i18n.t('reports.delivered')}</Text>
                     </View>
                   </View>
                 </View>
