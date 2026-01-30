@@ -10,11 +10,12 @@ import {
   Alert,
   Dimensions
 } from 'react-native';
-import { Card, Button, Icon, Chip } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
+import { DeliveryCard } from '../components';
 
 const { width } = Dimensions.get('window');
 
@@ -51,29 +52,6 @@ export default function DeliveriesScreen() {
     return delivery.status === activeFilter;
   });
 
-  // Fonction pour obtenir la couleur du statut
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending': return colors.warning;
-      case 'accepted': return colors.info;
-      case 'out_for_delivery': return colors.primary;
-      case 'delivered': return colors.success;
-      case 'cancelled': return colors.error;
-      default: return colors.text.secondary;
-    }
-  };
-
-  // Fonction pour obtenir le label du statut
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'pending': return 'En attente';
-      case 'accepted': return 'Acceptée';
-      case 'out_for_delivery': return 'En livraison';
-      case 'delivered': return 'Livrée';
-      case 'cancelled': return 'Annulée';
-      default: return status;
-    }
-  };
 
   // Gestionnaire de pull-to-refresh
   const onRefresh = async () => {
@@ -227,107 +205,21 @@ export default function DeliveriesScreen() {
         ) : (
           <View style={styles.deliveriesList}>
             {filteredDeliveries.map((delivery) => (
-              <Card key={delivery._id} containerStyle={styles.deliveryCard}>
-                <View style={styles.deliveryHeader}>
-                  <View style={styles.deliveryInfo}>
-                    <Text style={styles.deliveryId}>
-                      Commande #{delivery._id.slice(-6)}
-                    </Text>
-                    <Chip
-                      title={getStatusLabel(delivery.status)}
-                      buttonStyle={[
-                        styles.statusChip,
-                        { backgroundColor: getStatusColor(delivery.status) }
-                      ]}
-                      titleStyle={styles.statusChipText}
-                    />
-                  </View>
-                  <Text style={styles.deliveryDate}>
-                    {delivery.createdAt ? new Date(delivery.createdAt).toLocaleDateString('fr-FR') : ''}
-                  </Text>
-                </View>
-
-                <View style={styles.deliveryDetails}>
-                  <Text style={styles.deliveryAddress}>
-                    📍 {delivery.delivery?.address || 'Adresse non disponible'}
-                  </Text>
-
-                  {delivery.user && (
-                    <Text style={styles.customerInfo}>
-                      👤 {delivery.user.name} - {delivery.user.phone}
-                    </Text>
-                  )}
-
-                  {delivery.restaurant && (
-                    <Text style={styles.restaurantInfo}>
-                      🏪 {delivery.restaurant.name}
-                    </Text>
-                  )}
-
-                  <View style={styles.amountSection}>
-                    <Text style={styles.amountLabel}>{i18n.t('common.amount')}:</Text>
-                    <Text style={styles.amountValue}>
-                      {delivery.totalPrice || 0}{currency?.symbol || '€'}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Actions selon le statut */}
-                <View style={styles.deliveryActions}>
-                  {delivery.status === 'pending' && (
-                    <Button
-                      title="Accepter"
-                      onPress={() => handleAcceptDelivery(delivery._id)}
-                      loading={loading}
-                      buttonStyle={styles.acceptButton}
-                      icon={
-                        <Icon
-                          name="check"
-                          type="material"
-                          size={16}
-                          color={colors.white}
-                          style={{ marginRight: 8 }}
-                        />
-                      }
-                    />
-                  )}
-
-                  {delivery.status === 'accepted' && (
-                    <Button
-                      title="Commencer la livraison"
-                      onPress={() => handleStatusChange(
-                        delivery._id,
-                        'out_for_delivery',
-                        'Êtes-vous sûr de vouloir commencer cette livraison ?'
-                      )}
-                      loading={loading}
-                      buttonStyle={styles.startDeliveryButton}
-                    />
-                  )}
-
-                  {delivery.status === 'out_for_delivery' && (
-                    <Button
-                      title="Marquer comme livrée"
-                      onPress={() => handleStatusChange(
-                        delivery._id,
-                        'delivered',
-                        'Êtes-vous sûr que cette livraison est terminée ?'
-                      )}
-                      loading={loading}
-                      buttonStyle={styles.deliverButton}
-                      icon={
-                        <Icon
-                          name="check-circle"
-                          type="material"
-                          size={16}
-                          color={colors.white}
-                          style={{ marginRight: 8 }}
-                        />
-                      }
-                    />
-                  )}
-                </View>
-              </Card>
+              <DeliveryCard
+                key={delivery._id}
+                delivery={delivery}
+                onAccept={handleAcceptDelivery}
+                onStartDelivery={(id) => handleStatusChange(
+                  id,
+                  'out_for_delivery',
+                  'Êtes-vous sûr de vouloir commencer cette livraison ?'
+                )}
+                onMarkDelivered={(id) => handleStatusChange(
+                  id,
+                  'delivered',
+                  'Êtes-vous sûr que cette livraison est terminée ?'
+                )}
+              />
             ))}
           </View>
         )}
@@ -441,94 +333,5 @@ const styles = StyleSheet.create({
   // Deliveries list
   deliveriesList: {
     padding: 16,
-  },
-  deliveryCard: {
-    borderRadius: 12,
-    marginBottom: 16,
-    padding: 16,
-  },
-
-  // Delivery card header
-  deliveryHeader: {
-    marginBottom: 12,
-  },
-  deliveryInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  deliveryId: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-  },
-  statusChip: {
-    height: 24,
-    borderRadius: 12,
-  },
-  statusChipText: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  deliveryDate: {
-    fontSize: 12,
-    color: colors.text.secondary,
-  },
-
-  // Delivery details
-  deliveryDetails: {
-    marginBottom: 16,
-  },
-  deliveryAddress: {
-    fontSize: 14,
-    color: colors.text.primary,
-    marginBottom: 8,
-    lineHeight: 20,
-  },
-  customerInfo: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: 4,
-  },
-  restaurantInfo: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: 8,
-    fontWeight: '500',
-  },
-  amountSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.background.secondary,
-    padding: 12,
-    borderRadius: 8,
-  },
-  amountLabel: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
-  amountValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.primary,
-  },
-
-  // Delivery actions
-  deliveryActions: {
-    marginTop: 8,
-  },
-  acceptButton: {
-    backgroundColor: colors.success,
-    borderRadius: 8,
-  },
-  startDeliveryButton: {
-    backgroundColor: colors.info,
-    borderRadius: 8,
-  },
-  deliverButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 8,
   },
 });

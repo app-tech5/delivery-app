@@ -14,6 +14,7 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
+import { StatCard } from '../components';
 
 const { width } = Dimensions.get('window');
 

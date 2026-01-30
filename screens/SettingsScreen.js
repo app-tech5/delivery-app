@@ -11,11 +11,12 @@ import {
   Linking,
   Dimensions
 } from 'react-native';
-import { Card, Icon, Button } from 'react-native-elements';
+import { Card, Button } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
+import { SettingRow } from '../components';
 
 const { width } = Dimensions.get('window');
 
@@ -163,39 +164,6 @@ export default function SettingsScreen() {
     });
   };
 
-  // Rendu d'un élément de setting avec switch
-  const renderSwitchSetting = (title, subtitle, key, disabled = false) => (
-    <View style={styles.settingRow}>
-      <View style={styles.settingInfo}>
-        <Text style={styles.settingTitle}>{title}</Text>
-        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
-      </View>
-      <Switch
-        value={localSettings[key]}
-        onValueChange={(value) => handleSwitchChange(key, value)}
-        trackColor={{ false: colors.background.secondary, true: colors.primary }}
-        thumbColor={localSettings[key] ? colors.white : colors.text.secondary}
-        disabled={disabled}
-      />
-    </View>
-  );
-
-  // Rendu d'un élément de setting avec sélection
-  const renderSelectSetting = (title, subtitle, options, selectedValue, onSelect) => (
-    <TouchableOpacity style={styles.settingRow} onPress={() => {
-      // Pour la démo, on simule une sélection
-      Alert.alert('Feature', 'Selection dialog coming soon');
-    }}>
-      <View style={styles.settingInfo}>
-        <Text style={styles.settingTitle}>{title}</Text>
-        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
-        <Text style={styles.settingValue}>
-          {options.find(opt => opt.key === selectedValue)?.label || selectedValue}
-        </Text>
-      </View>
-      <Icon name="chevron-right" type="material" size={24} color={colors.text.secondary} />
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -209,21 +177,21 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{i18n.t('settings.general')}</Text>
 
           <Card containerStyle={styles.card}>
-            {renderSelectSetting(
-              i18n.t('settings.language'),
-              i18n.t('settings.currentLanguage'),
-              languageOptions,
-              'en',
-              () => {}
-            )}
+            <SettingRow
+              title={i18n.t('settings.language')}
+              subtitle={i18n.t('settings.currentLanguage')}
+              value="English"
+              showChevron={true}
+              onPress={() => Alert.alert('Feature', 'Language selection coming soon')}
+            />
 
-            {renderSelectSetting(
-              i18n.t('settings.currency'),
-              `${currency?.symbol || '€'} (${currency?.code || 'EUR'})`,
-              currencyOptions,
-              currency?.code || 'EUR',
-              () => {}
-            )}
+            <SettingRow
+              title={i18n.t('settings.currency')}
+              subtitle="Display currency for prices"
+              value={`${currency?.symbol || '€'} (${currency?.code || 'EUR'})`}
+              showChevron={true}
+              onPress={() => Alert.alert('Feature', 'Currency selection coming soon')}
+            />
 
             <View style={styles.themeSelector}>
               <Text style={styles.settingTitle}>{i18n.t('settings.theme')}</Text>
@@ -261,43 +229,61 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{i18n.t('settings.notifications')}</Text>
 
           <Card containerStyle={styles.card}>
-            {renderSwitchSetting(
-              i18n.t('settings.orderAlerts'),
-              'Get notified when new orders are available',
-              'orderAlerts'
-            )}
+            <SettingRow
+              title={i18n.t('settings.orderAlerts')}
+              subtitle="Get notified when new orders are available"
+              switchProps={{
+                value: localSettings.orderAlerts,
+                onValueChange: (value) => handleSwitchChange('orderAlerts', value)
+              }}
+            />
 
-            {renderSwitchSetting(
-              i18n.t('settings.paymentAlerts'),
-              'Receive payment confirmations and updates',
-              'paymentAlerts'
-            )}
+            <SettingRow
+              title={i18n.t('settings.paymentAlerts')}
+              subtitle="Receive payment confirmations and updates"
+              switchProps={{
+                value: localSettings.paymentAlerts,
+                onValueChange: (value) => handleSwitchChange('paymentAlerts', value)
+              }}
+            />
 
-            {renderSwitchSetting(
-              i18n.t('settings.systemUpdates'),
-              'Important app updates and maintenance notices',
-              'systemUpdates'
-            )}
+            <SettingRow
+              title={i18n.t('settings.systemUpdates')}
+              subtitle="Important app updates and maintenance notices"
+              switchProps={{
+                value: localSettings.systemUpdates,
+                onValueChange: (value) => handleSwitchChange('systemUpdates', value)
+              }}
+            />
 
-            {renderSwitchSetting(
-              i18n.t('settings.marketing'),
-              'Promotional offers and marketing communications',
-              'marketing'
-            )}
+            <SettingRow
+              title={i18n.t('settings.marketing')}
+              subtitle="Promotional offers and marketing communications"
+              switchProps={{
+                value: localSettings.marketing,
+                onValueChange: (value) => handleSwitchChange('marketing', value)
+              }}
+            />
 
             <View style={styles.divider} />
 
-            {renderSwitchSetting(
-              i18n.t('settings.sound'),
-              'Play notification sounds',
-              'sound'
-            )}
+            <SettingRow
+              title={i18n.t('settings.sound')}
+              subtitle="Play notification sounds"
+              switchProps={{
+                value: localSettings.sound,
+                onValueChange: (value) => handleSwitchChange('sound', value)
+              }}
+            />
 
-            {renderSwitchSetting(
-              i18n.t('settings.vibration'),
-              'Vibrate on notifications',
-              'vibration'
-            )}
+            <SettingRow
+              title={i18n.t('settings.vibration')}
+              subtitle="Vibrate on notifications"
+              switchProps={{
+                value: localSettings.vibration,
+                onValueChange: (value) => handleSwitchChange('vibration', value)
+              }}
+            />
           </Card>
         </View>
 
