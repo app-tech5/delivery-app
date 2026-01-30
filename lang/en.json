@@ -201,7 +201,12 @@
     "updateSuccess": "Status updated successfully",
     "acceptError": "Unable to accept delivery",
     "updateError": "Unable to update status",
-    "refreshError": "Unable to refresh deliveries"
+    "refreshError": "Unable to refresh deliveries",
+    "acceptButton": "Accept",
+    "startButton": "Start",
+    "deliveredButton": "Delivered",
+    "addressNotAvailable": "Address not available",
+    "orderPrefix": "Order #"
   },
   "notifications": {
     "title": "Notifications",

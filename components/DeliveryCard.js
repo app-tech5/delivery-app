@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card, Icon, Button, Badge } from 'react-native-elements';
 import { colors } from '../global';
+import i18n from '../i18n';
 import { useSettings } from '../contexts/SettingContext';
 
 export default function DeliveryCard({
@@ -19,7 +20,7 @@ export default function DeliveryCard({
   };
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('fr-FR', {
+    return new Date(date).toLocaleDateString(i18n.locale, {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -40,11 +41,11 @@ export default function DeliveryCard({
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case 'pending': return 'En attente';
-      case 'accepted': return 'Acceptée';
-      case 'out_for_delivery': return 'En livraison';
-      case 'delivered': return 'Livrée';
-      case 'cancelled': return 'Annulée';
+      case 'pending': return i18n.t('reports.pendingLabel');
+      case 'accepted': return i18n.t('reports.acceptedLabel');
+      case 'out_for_delivery': return i18n.t('reports.outForDeliveryLabel');
+      case 'delivered': return i18n.t('reports.deliveredLabel');
+      case 'cancelled': return i18n.t('reports.cancelledLabel');
       default: return status;
     }
   };
@@ -56,7 +57,7 @@ export default function DeliveryCard({
       case 'pending':
         return (
           <Button
-            title="Accepter"
+            title={i18n.t('reports.acceptButton')}
             onPress={() => onAccept(delivery._id)}
             buttonStyle={styles.acceptButton}
             icon={
@@ -74,7 +75,7 @@ export default function DeliveryCard({
       case 'accepted':
         return (
           <Button
-            title="Commencer"
+            title={i18n.t('reports.startButton')}
             onPress={() => onStartDelivery(delivery._id)}
             buttonStyle={styles.startButton}
           />
@@ -83,7 +84,7 @@ export default function DeliveryCard({
       case 'out_for_delivery':
         return (
           <Button
-            title="Livrée"
+            title={i18n.t('reports.deliveredButton')}
             onPress={() => onMarkDelivered(delivery._id)}
             buttonStyle={styles.deliveredButton}
             icon={
@@ -120,7 +121,7 @@ export default function DeliveryCard({
         </View>
 
         <Text style={styles.compactAddress}>
-          📍 {delivery.delivery?.address || 'Adresse non disponible'}
+          📍 {delivery.delivery?.address || i18n.t('reports.addressNotAvailable')}
         </Text>
 
         {delivery.user && (
@@ -143,7 +144,7 @@ export default function DeliveryCard({
     <Card containerStyle={styles.card}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.id}>Commande #{delivery._id.slice(-6)}</Text>
+          <Text style={styles.id}>{i18n.t('reports.orderPrefix')}{delivery._id.slice(-6)}</Text>
           <Text style={styles.date}>
             {formatDate(delivery.createdAt || delivery.updatedAt)}
           </Text>
@@ -163,7 +164,7 @@ export default function DeliveryCard({
 
       <View style={styles.details}>
         <Text style={styles.address}>
-          📍 {delivery.delivery?.address || 'Adresse non disponible'}
+          📍 {delivery.delivery?.address || i18n.t('reports.addressNotAvailable')}
         </Text>
 
         {delivery.user && (
