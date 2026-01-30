@@ -11,7 +11,7 @@ import {
   Linking,
   Dimensions
 } from 'react-native';
-import { Card, Button } from 'react-native-elements';
+import { Card, Button, Icon } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
@@ -292,46 +292,60 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{i18n.t('settings.privacy')}</Text>
 
           <Card containerStyle={styles.card}>
-            {renderSwitchSetting(
-              i18n.t('settings.locationServices'),
-              'Allow access to location for delivery services',
-              'locationServices'
-            )}
+            <SettingRow
+              title={i18n.t('settings.locationServices')}
+              subtitle="Allow access to location for delivery services"
+              switchProps={{
+                value: localSettings.locationServices,
+                onValueChange: (value) => handleSwitchChange('locationServices', value)
+              }}
+            />
 
-            {renderSwitchSetting(
-              i18n.t('settings.backgroundLocation'),
-              'Continue tracking location in background',
-              'backgroundLocation',
-              !localSettings.locationServices
-            )}
+            <SettingRow
+              title={i18n.t('settings.backgroundLocation')}
+              subtitle="Continue tracking location in background"
+              switchProps={{
+                value: localSettings.backgroundLocation,
+                onValueChange: (value) => handleSwitchChange('backgroundLocation', value),
+                disabled: !localSettings.locationServices
+              }}
+            />
 
-            {renderSwitchSetting(
-              i18n.t('settings.analytics'),
-              'Help improve the app by sharing usage data',
-              'analytics'
-            )}
+            <SettingRow
+              title={i18n.t('settings.analytics')}
+              subtitle="Help improve the app by sharing usage data"
+              switchProps={{
+                value: localSettings.analytics,
+                onValueChange: (value) => handleSwitchChange('analytics', value)
+              }}
+            />
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.settingRow}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>{i18n.t('settings.changePassword')}</Text>
-                <Text style={styles.settingSubtitle}>Update your account password</Text>
-              </View>
-              <Icon name="chevron-right" type="material" size={24} color={colors.text.secondary} />
-            </TouchableOpacity>
+            <SettingRow
+              title={i18n.t('settings.changePassword')}
+              subtitle="Update your account password"
+              showChevron={true}
+              onPress={() => Alert.alert('Feature', 'Change password coming soon')}
+            />
 
-            {renderSwitchSetting(
-              i18n.t('settings.biometricAuth'),
-              'Use fingerprint or face recognition to login',
-              'biometricAuth'
-            )}
+            <SettingRow
+              title={i18n.t('settings.biometricAuth')}
+              subtitle="Use fingerprint or face recognition to login"
+              switchProps={{
+                value: localSettings.biometricAuth,
+                onValueChange: (value) => handleSwitchChange('biometricAuth', value)
+              }}
+            />
 
-            {renderSwitchSetting(
-              i18n.t('settings.twoFactorAuth'),
-              'Add an extra layer of security to your account',
-              'twoFactorAuth'
-            )}
+            <SettingRow
+              title={i18n.t('settings.twoFactorAuth')}
+              subtitle="Add an extra layer of security to your account"
+              switchProps={{
+                value: localSettings.twoFactorAuth,
+                onValueChange: (value) => handleSwitchChange('twoFactorAuth', value)
+              }}
+            />
           </Card>
         </View>
 
