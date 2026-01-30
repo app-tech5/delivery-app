@@ -171,7 +171,20 @@
     "vsPrevious": "vs Previous",
     "performanceScore": "Performance Score",
     "efficiency": "Efficiency",
-    "consistency": "Consistency"
+    "consistency": "Consistency",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "noDeliveriesYet": "You haven't completed any deliveries yet",
+    "noDeliveriesFound": "No deliveries found for this period",
+    "historyTitle": "History",
+    "pleaseReconnectHistory": "Please reconnect to view your history",
+    "noHistory": "No history",
+    "deliveriesLabel": "Deliveries",
+    "earningsLabel": "Earnings",
+    "averageLabel": "Average",
+    "orderPrefix": "Order #",
+    "deliverySingular": "delivery",
+    "deliveryPlural": "deliveries"
   },
   "notifications": {
     "title": "Notifications",

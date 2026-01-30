@@ -150,8 +150,8 @@ export default function HistoryScreen() {
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 1) return 'Aujourd\'hui';
-    if (diffDays === 2) return 'Hier';
+    if (diffDays === 1) return i18n.t('reports.today');
+    if (diffDays === 2) return i18n.t('reports.yesterday');
 
     return date.toLocaleDateString(i18n.locale, {
       weekday: 'long',
@@ -176,7 +176,7 @@ export default function HistoryScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
           <Text style={styles.title}>{i18n.t('home.reconnect')}</Text>
-          <Text style={styles.subtitle}>Veuillez vous reconnecter pour voir votre historique</Text>
+          <Text style={styles.subtitle}>{i18n.t('reports.pleaseReconnectHistory')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -185,9 +185,9 @@ export default function HistoryScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Historique</Text>
+        <Text style={styles.headerTitle}>{i18n.t('reports.historyTitle')}</Text>
         <Text style={styles.headerSubtitle}>
-          {globalStats.periodDeliveries} livraison{globalStats.periodDeliveries !== 1 ? 's' : ''} • {formatCurrency(globalStats.periodEarnings)}
+          {globalStats.periodDeliveries} {globalStats.periodDeliveries === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')} • {formatCurrency(globalStats.periodEarnings)}
         </Text>
       </View>
 
@@ -230,15 +230,15 @@ export default function HistoryScreen() {
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{globalStats.periodDeliveries}</Text>
-              <Text style={styles.statLabel}>Livraisons</Text>
+              <Text style={styles.statLabel}>{i18n.t('reports.deliveriesLabel')}</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{formatCurrency(globalStats.periodEarnings)}</Text>
-              <Text style={styles.statLabel}>Revenus</Text>
+              <Text style={styles.statLabel}>{i18n.t('reports.earningsLabel')}</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{formatCurrency(globalStats.averageEarnings)}</Text>
-              <Text style={styles.statLabel}>Moyenne</Text>
+              <Text style={styles.statLabel}>{i18n.t('reports.averageLabel')}</Text>
             </View>
           </View>
         </Card>
@@ -264,12 +264,12 @@ export default function HistoryScreen() {
               color={colors.text.secondary}
             />
             <Text style={styles.emptyTitle}>
-              Aucun historique
+              {i18n.t('reports.noHistory')}
             </Text>
             <Text style={styles.emptySubtitle}>
               {activeFilter === 'all'
-                ? 'Vous n\'avez encore effectué aucune livraison'
-                : `Aucune livraison trouvée pour cette période`
+                ? i18n.t('reports.noDeliveriesYet')
+                : i18n.t('reports.noDeliveriesFound')
               }
             </Text>
           </View>
@@ -283,7 +283,7 @@ export default function HistoryScreen() {
                   <View style={styles.dateContent}>
                     <Text style={styles.dateText}>{formatDate(group.date)}</Text>
                     <View style={styles.dateStats}>
-                      <Text style={styles.dateDeliveries}>{group.count} livraison{group.count !== 1 ? 's' : ''}</Text>
+                      <Text style={styles.dateDeliveries}>{group.count} {group.count === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')}</Text>
                       <Text style={styles.dateEarnings}>{formatCurrency(group.totalEarnings)}</Text>
                     </View>
                   </View>
@@ -304,7 +304,7 @@ export default function HistoryScreen() {
                       <View style={styles.deliveryHeader}>
                         <View style={styles.deliveryInfo}>
                           <Text style={styles.deliveryId}>
-                            Commande #{delivery._id.slice(-6)}
+                            {i18n.t('reports.orderPrefix')}{delivery._id.slice(-6)}
                           </Text>
                           <Text style={styles.deliveryTime}>
                             {new Date(delivery.createdAt || delivery.updatedAt).toLocaleTimeString(i18n.locale, {
