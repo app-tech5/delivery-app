@@ -18,3 +18,12 @@ export { default as StatusButtons } from './StatusButtons';
 export { default as DriverStats } from './DriverStats';
 export { default as ActiveDeliveries } from './ActiveDeliveries';
 export { default as RestaurantMap } from './RestaurantMap';
+
+// HistoryScreen components
+export { default as DateGroupHeader } from './DateGroupHeader';
+export { default as DeliveryTimelineItem } from './DeliveryTimelineItem';
+
+// EarningsScreen components
+export { default as EnhancedStatCard } from './EnhancedStatCard';
+export { default as EarningsDetailsCard } from './EarningsDetailsCard';
+export { default as RecentDeliveryCard } from './RecentDeliveryCard';

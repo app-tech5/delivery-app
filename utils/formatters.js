@@ -129,3 +129,26 @@ export const truncateText = (text, maxLength = 50) => {
   if (!text || text.length <= maxLength) return text;
   return `${text.substring(0, maxLength)}...`;
 };
+
+/**
+ * Retourne la couleur associée à une note
+ * @param {number} rating - Note (0-5)
+ * @returns {string} Couleur hex
+ */
+export const getRatingColor = (rating) => {
+  if (rating >= 4.5) return colors.success;
+  if (rating >= 4.0) return colors.warning;
+  return colors.error;
+};
+
+/**
+ * Retourne l'icône et la couleur de tendance
+ * @param {number} value - Valeur à comparer
+ * @param {number} threshold - Seuil de comparaison
+ * @returns {Object} {name, color} de l'icône
+ */
+export const getTrendIcon = (value, threshold = 0) => {
+  if (value > threshold) return { name: 'trending-up', color: colors.success };
+  if (value < threshold) return { name: 'trending-down', color: colors.error };
+  return { name: 'trending-flat', color: colors.text.secondary };
+};
