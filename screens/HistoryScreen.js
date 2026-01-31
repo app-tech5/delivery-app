@@ -319,7 +319,7 @@ export default function HistoryScreen() {
                             +{formatCurrency(delivery.delivery?.deliveryFee || 0)}
                           </Text>
                           <Chip
-                            title="Livrée"
+                            title={i18n.t('reports.delivered')}
                             buttonStyle={styles.statusChip}
                             titleStyle={styles.statusChipText}
                           />
@@ -590,12 +590,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statusChip: {
-    height: 20,
+    height: 35,
     backgroundColor: colors.success,
     borderRadius: 10,
   },
   statusChipText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '500',
   },
 

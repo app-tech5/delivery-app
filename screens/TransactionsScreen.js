@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statusChip: {
-    height: 24,
+    height: 34,
     backgroundColor: colors.success,
     borderRadius: 12,
     paddingHorizontal: 8,
