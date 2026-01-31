@@ -86,7 +86,10 @@ export default function DeliveriesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <AuthGuard />
+      <AuthGuard
+        isAuthenticated={isAuthenticated}
+        driver={driver}
+      />
 
       {isAuthenticated && driver && (
         <>
@@ -103,49 +106,49 @@ export default function DeliveriesScreen() {
             iconType="material-community"
           />
 
-      {/* Liste des livraisons */}
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[colors.primary]}
-          />
-        }
-      >
-        {filteredDeliveries.length === 0 ? (
-          <EmptyState
-            icon="package-variant-closed"
-            iconType="material-community"
-            title={activeFilter === 'all' ? i18n.t('reports.noDeliveries') : i18n.t('reports.noDeliveriesFiltered')}
-            subtitle={activeFilter === 'all'
-              ? i18n.t('reports.noDeliveriesAtAll')
-              : `Aucune livraison avec le statut "${filters.find(f => f.key === activeFilter)?.label}"`
-            }
-          />
-        ) : (
-          <View style={styles.deliveriesList}>
-            {filteredDeliveries.map((delivery) => (
-              <DeliveryCard
-                key={delivery._id}
-                delivery={delivery}
-                onAccept={handleAcceptDelivery}
-                onStartDelivery={(id) => handleStatusChange(
-                  id,
-                  'out_for_delivery',
-                  i18n.t('reports.startDeliveryConfirm')
-                )}
-                onMarkDelivered={(id) => handleStatusChange(
-                  id,
-                  'delivered',
-                  i18n.t('reports.completeDeliveryConfirm')
-                )}
+          {/* Liste des livraisons */}
+          <ScrollView
+            style={styles.scrollView}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[colors.primary]}
               />
-            ))}
-          </View>
-        )}
-        </ScrollView>
+            }
+          >
+            {filteredDeliveries.length === 0 ? (
+              <EmptyState
+                icon="package-variant-closed"
+                iconType="material-community"
+                title={activeFilter === 'all' ? i18n.t('reports.noDeliveries') : i18n.t('reports.noDeliveriesFiltered')}
+                subtitle={activeFilter === 'all'
+                  ? i18n.t('reports.noDeliveriesAtAll')
+                  : `Aucune livraison avec le statut "${filters.find(f => f.key === activeFilter)?.label}"`
+                }
+              />
+            ) : (
+              <View style={styles.deliveriesList}>
+                {filteredDeliveries.map((delivery) => (
+                  <DeliveryCard
+                    key={delivery._id}
+                    delivery={delivery}
+                    onAccept={handleAcceptDelivery}
+                    onStartDelivery={(id) => handleStatusChange(
+                      id,
+                      'out_for_delivery',
+                      i18n.t('reports.startDeliveryConfirm')
+                    )}
+                    onMarkDelivered={(id) => handleStatusChange(
+                      id,
+                      'delivered',
+                      i18n.t('reports.completeDeliveryConfirm')
+                    )}
+                  />
+                ))}
+              </View>
+            )}
+          </ScrollView>
         </>
       )}
     </SafeAreaView>
