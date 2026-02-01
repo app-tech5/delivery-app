@@ -152,3 +152,49 @@ export const getTrendIcon = (value, threshold = 0) => {
   if (value < threshold) return { name: 'trending-down', color: colors.error };
   return { name: 'trending-flat', color: colors.text.secondary };
 };
+
+/**
+ * Formate le temps relatif (il y a X minutes/heures/jours)
+ * @param {Date|string} timestamp - Timestamp à formater
+ * @returns {string} Temps relatif formaté
+ */
+export const formatTimeAgo = (timestamp) => {
+  const now = new Date();
+  const diff = now - new Date(timestamp);
+  const minutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (minutes < 1) return i18n.t('notifications.justNow');
+  if (minutes < 60) return `${minutes} ${i18n.t('notifications.minutesAgo')}`;
+  if (hours < 24) return `${hours} ${i18n.t('notifications.hoursAgo')}`;
+  return `${days} ${i18n.t('notifications.daysAgo')}`;
+};
+
+/**
+ * Retourne la couleur associée au type de notification
+ * @param {string} type - Type de notification
+ * @returns {string} Couleur hex
+ */
+export const getNotificationColor = (type) => {
+  switch (type) {
+    case 'order': return colors.primary;
+    case 'system': return colors.info;
+    case 'promotion': return colors.success;
+    default: return colors.text.secondary;
+  }
+};
+
+/**
+ * Retourne l'icône associée au type de notification
+ * @param {string} type - Type de notification
+ * @returns {string} Nom de l'icône Material Design
+ */
+export const getNotificationIcon = (type) => {
+  switch (type) {
+    case 'order': return 'local-shipping';
+    case 'system': return 'info';
+    case 'promotion': return 'local-offer';
+    default: return 'notifications';
+  }
+};
