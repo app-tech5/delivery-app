@@ -22,14 +22,14 @@ export const useDriverStatus = () => {
 
     console.log('🔄 Tentative de changement de statut vers:', newStatus);
 
-    setLocalLoading(true);
+    // setLocalLoading(true);
 
     try {
       await updateStatus(newStatus, null); // Simplifié pour le debug
 
       console.log('🔄 updateStatus terminé, statut devrait être mis à jour');
 
-      Alert.alert(i18n.t('common.ok'), `${i18n.t('driver.statusChanged')} ${getStatusLabel(newStatus)}`);
+      // Alert.alert(i18n.t('common.ok'), `${i18n.t('driver.statusChanged')} ${getStatusLabel(newStatus)}`);
     } catch (error) {
       console.error('❌ Erreur lors du changement de statut:', error);
       Alert.alert(i18n.t('errors.networkError'), i18n.t('driver.statusUpdateError'));

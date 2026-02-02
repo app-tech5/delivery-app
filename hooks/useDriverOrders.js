@@ -57,7 +57,7 @@ export const useDriverOrders = (driver, isAuthenticated) => {
   const updateStatus = async (status, location = null) => {
     if (config.DEMO_MODE) {
       // Mode démo : simulation locale uniquement
-      Alert.alert('Mode Démo', `Statut changé à "${getDriverStatusLabel(status)}" (simulation)`);
+      // Alert.alert('Mode Démo', `Statut changé à "${getDriverStatusLabel(status)}" (simulation)`);
       return { driver: { ...(driver || {}), status } };
     }
 
