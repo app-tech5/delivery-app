@@ -6,7 +6,7 @@ import i18n from '../i18n';
 import { SettingRow } from './index';
 import { THEME_OPTIONS } from '../utils/settingsData';
 
-const GeneralSettings = ({ localSettings, currency, onThemeChange, onFeatureComingSoon }) => {
+const GeneralSettings = ({ localSettings = {}, currency, onThemeChange, onFeatureComingSoon }) => {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{i18n.t('settings.general')}</Text>

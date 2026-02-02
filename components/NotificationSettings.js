@@ -5,7 +5,7 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { SettingRow } from './index';
 
-const NotificationSettings = ({ localSettings, onSwitchChange }) => {
+const NotificationSettings = ({ localSettings = {}, onSwitchChange }) => {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{i18n.t('settings.notifications')}</Text>
