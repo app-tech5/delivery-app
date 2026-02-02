@@ -3,7 +3,8 @@ import { Alert } from 'react-native';
 import apiClient from '../api';
 import { config } from '../config';
 import { loadDeliveriesWithSmartCache, clearDeliveriesCache } from '../utils/cacheUtils';
-import { isDriverAuthenticated, getStatusLabel } from '../utils/driverUtils';
+import { isDriverAuthenticated } from '../utils/driverUtils';
+import { getDriverStatusLabel } from '../utils/statusUtils';
 
 /**
  * Hook personnalisé pour gérer les commandes du driver
@@ -56,7 +57,7 @@ export const useDriverOrders = (driver, isAuthenticated) => {
   const updateStatus = async (status, location = null) => {
     if (config.DEMO_MODE) {
       // Mode démo : simulation locale uniquement
-      Alert.alert('Mode Démo', `Statut changé à "${getStatusLabel(status)}" (simulation)`);
+      Alert.alert('Mode Démo', `Statut changé à "${getDriverStatusLabel(status)}" (simulation)`);
       return { driver: { ...(driver || {}), status } };
     }
 

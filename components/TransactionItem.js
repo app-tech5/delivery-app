@@ -3,7 +3,9 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Card, Icon, Chip } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
-import { formatCurrency, formatDate, getTransactionColor, getTransactionIcon } from '../utils/transactionUtils';
+import { formatCurrency } from '../utils/currencyUtils';
+import { formatDate } from '../utils/dateUtils';
+import { getTransactionTypeColor, getTransactionTypeIcon } from '../utils/statusUtils';
 
 const TransactionItem = ({ transaction, currency }) => {
   return (
@@ -11,10 +13,10 @@ const TransactionItem = ({ transaction, currency }) => {
       <View style={styles.transactionHeader}>
         <View style={styles.transactionIcon}>
           <Icon
-            name={getTransactionIcon(transaction.type)}
+            name={getTransactionTypeIcon(transaction.type)}
             type="material-community"
             size={20}
-            color={getTransactionColor(transaction.type)}
+            color={getTransactionTypeColor(transaction.type)}
           />
         </View>
 
@@ -30,7 +32,7 @@ const TransactionItem = ({ transaction, currency }) => {
         <View style={styles.transactionAmount}>
           <Text style={[
             styles.amountValue,
-            { color: getTransactionColor(transaction.type) }
+            { color: getTransactionTypeColor(transaction.type) }
           ]}>
             +{formatCurrency(transaction.amount, currency)}
           </Text>

@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { useDriver } from '../contexts/DriverContext';
-import {
-  DELIVERY_ACTION_CONFIRMATIONS,
-  DELIVERY_ACTION_LABELS,
-  getNextStatus
-} from '../utils/statusUtils';
 import i18n from '../i18n';
 
 /**

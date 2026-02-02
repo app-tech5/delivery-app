@@ -1,4 +1,4 @@
-import i18n from '../i18n';
+import { colors } from '../global';
 
 /**
  * Statuts possibles pour les drivers
@@ -8,6 +8,35 @@ export const DRIVER_STATUSES = {
   ON_DELIVERY: 'on_delivery',
   OFFLINE: 'offline',
   BUSY: 'busy'
+};
+
+/**
+ * Labels des statuts de driver
+ */
+export const DRIVER_STATUS_LABELS = {
+  [DRIVER_STATUSES.AVAILABLE]: 'Disponible',
+  [DRIVER_STATUSES.ON_DELIVERY]: 'En livraison',
+  [DRIVER_STATUSES.OFFLINE]: 'Hors ligne',
+  [DRIVER_STATUSES.BUSY]: 'Occupé'
+};
+
+/**
+ * Couleurs des statuts de driver
+ */
+export const DRIVER_STATUS_COLORS = {
+  [DRIVER_STATUSES.AVAILABLE]: colors.success,
+  [DRIVER_STATUSES.ON_DELIVERY]: colors.primary,
+  [DRIVER_STATUSES.OFFLINE]: colors.text.secondary,
+  [DRIVER_STATUSES.BUSY]: colors.warning
+};
+
+/**
+ * Statuts possibles pour les transactions
+ */
+export const TRANSACTION_STATUSES = {
+  COMPLETED: 'completed',
+  PENDING: 'pending',
+  FAILED: 'failed'
 };
 
 /**
@@ -22,130 +51,113 @@ export const DELIVERY_STATUSES = {
 };
 
 /**
- * Actions possibles sur une livraison selon son statut
- */
-export const DELIVERY_ACTIONS = {
-  [DELIVERY_STATUSES.PENDING]: ['accept', 'cancel'],
-  [DELIVERY_STATUSES.ACCEPTED]: ['start_delivery', 'cancel'],
-  [DELIVERY_STATUSES.OUT_FOR_DELIVERY]: ['deliver', 'cancel'],
-  [DELIVERY_STATUSES.DELIVERED]: [],
-  [DELIVERY_STATUSES.CANCELLED]: []
-};
-
-/**
- * Labels pour les statuts de livraison
+ * Labels des statuts de livraison
  */
 export const DELIVERY_STATUS_LABELS = {
-  [DELIVERY_STATUSES.PENDING]: i18n.t('reports.pendingLabel'),
-  [DELIVERY_STATUSES.ACCEPTED]: i18n.t('reports.acceptedLabel'),
-  [DELIVERY_STATUSES.OUT_FOR_DELIVERY]: i18n.t('reports.outForDeliveryLabel'),
-  [DELIVERY_STATUSES.DELIVERED]: i18n.t('reports.deliveredLabel'),
-  [DELIVERY_STATUSES.CANCELLED]: i18n.t('reports.cancelledLabel')
+  [DELIVERY_STATUSES.PENDING]: 'En attente',
+  [DELIVERY_STATUSES.ACCEPTED]: 'Acceptée',
+  [DELIVERY_STATUSES.OUT_FOR_DELIVERY]: 'En livraison',
+  [DELIVERY_STATUSES.DELIVERED]: 'Livrée',
+  [DELIVERY_STATUSES.CANCELLED]: 'Annulée'
 };
 
 /**
- * Labels pour les actions sur les livraisons
+ * Couleurs des statuts de livraison
  */
-export const DELIVERY_ACTION_LABELS = {
-  accept: i18n.t('reports.acceptDelivery'),
-  start_delivery: i18n.t('reports.startDelivery'),
-  deliver: i18n.t('reports.markAsDelivered'),
-  cancel: i18n.t('common.cancel')
+export const DELIVERY_STATUS_COLORS = {
+  [DELIVERY_STATUSES.PENDING]: colors.warning,
+  [DELIVERY_STATUSES.ACCEPTED]: colors.primary,
+  [DELIVERY_STATUSES.OUT_FOR_DELIVERY]: colors.info,
+  [DELIVERY_STATUSES.DELIVERED]: colors.success,
+  [DELIVERY_STATUSES.CANCELLED]: colors.error
 };
 
 /**
- * Messages de confirmation pour les actions
+ * Types de transaction possibles
  */
-export const DELIVERY_ACTION_CONFIRMATIONS = {
-  accept: i18n.t('reports.acceptDeliveryConfirm'),
-  start_delivery: i18n.t('reports.startDeliveryConfirm'),
-  deliver: i18n.t('reports.completeDeliveryConfirm'),
-  cancel: i18n.t('reports.cancelDeliveryConfirm')
+export const TRANSACTION_TYPES = {
+  DELIVERY_FEE: 'delivery_fee',
+  BONUS: 'bonus',
+  PENALTY: 'penalty'
 };
 
 /**
- * Vérifie si une action est disponible pour un statut donné
- * @param {string} status - Statut actuel
- * @param {string} action - Action à vérifier
- * @returns {boolean} True si l'action est disponible
+ * Couleurs des types de transaction
  */
-export const isActionAvailable = (status, action) => {
-  return DELIVERY_ACTIONS[status]?.includes(action) || false;
+export const TRANSACTION_TYPE_COLORS = {
+  [TRANSACTION_TYPES.DELIVERY_FEE]: colors.success,
+  [TRANSACTION_TYPES.BONUS]: colors.primary,
+  [TRANSACTION_TYPES.PENALTY]: colors.error
 };
 
 /**
- * Obtient la liste des actions disponibles pour un statut
- * @param {string} status - Statut de la livraison
- * @returns {Array} Liste des actions disponibles
+ * Icônes des types de transaction
  */
-export const getAvailableActions = (status) => {
-  return DELIVERY_ACTIONS[status] || [];
+export const TRANSACTION_TYPE_ICONS = {
+  [TRANSACTION_TYPES.DELIVERY_FEE]: 'truck-delivery',
+  [TRANSACTION_TYPES.BONUS]: 'gift',
+  [TRANSACTION_TYPES.PENALTY]: 'alert-circle'
 };
 
 /**
- * Obtient le prochain statut après une action
- * @param {string} currentStatus - Statut actuel
- * @param {string} action - Action effectuée
- * @returns {string|null} Nouveau statut ou null si invalide
+ * Retourne le label associé à un statut de driver
+ * @param {string} status - Statut du driver
+ * @returns {string} Label du statut
  */
-export const getNextStatus = (currentStatus, action) => {
-  const transitions = {
-    [DELIVERY_STATUSES.PENDING]: {
-      accept: DELIVERY_STATUSES.ACCEPTED,
-      cancel: DELIVERY_STATUSES.CANCELLED
-    },
-    [DELIVERY_STATUSES.ACCEPTED]: {
-      start_delivery: DELIVERY_STATUSES.OUT_FOR_DELIVERY,
-      cancel: DELIVERY_STATUSES.CANCELLED
-    },
-    [DELIVERY_STATUSES.OUT_FOR_DELIVERY]: {
-      deliver: DELIVERY_STATUSES.DELIVERED,
-      cancel: DELIVERY_STATUSES.CANCELLED
-    }
-  };
-
-  return transitions[currentStatus]?.[action] || null;
+export const getDriverStatusLabel = (status) => {
+  return DRIVER_STATUS_LABELS[status] || status;
 };
 
 /**
- * Vérifie si un statut est final (ne peut plus changer)
- * @param {string} status - Statut à vérifier
- * @returns {boolean} True si le statut est final
+ * Retourne la couleur associée à un statut de driver
+ * @param {string} status - Statut du driver
+ * @returns {string} Couleur hex
  */
-export const isFinalStatus = (status) => {
-  return [DELIVERY_STATUSES.DELIVERED, DELIVERY_STATUSES.CANCELLED].includes(status);
+export const getDriverStatusColor = (status) => {
+  return DRIVER_STATUS_COLORS[status] || colors.text.secondary;
 };
 
 /**
- * Filtre les livraisons selon leur statut
- * @param {Array} deliveries - Liste des livraisons
- * @param {string} status - Statut à filtrer (ou 'all' pour tout)
- * @returns {Array} Livraisons filtrées
+ * Retourne la couleur associée au type de transaction
+ * @param {string} type - Type de transaction
+ * @returns {string} Couleur hex
  */
-export const filterDeliveriesByStatus = (deliveries, status) => {
-  if (status === 'all') return deliveries;
-  return deliveries.filter(delivery => delivery.status === status);
+export const getTransactionTypeColor = (type) => {
+  return TRANSACTION_TYPE_COLORS[type] || colors.text.secondary;
 };
 
 /**
- * Compte les livraisons par statut
- * @param {Array} deliveries - Liste des livraisons
- * @returns {Object} Objet avec les compteurs par statut
+ * Retourne l'icône associée au type de transaction
+ * @param {string} type - Type de transaction
+ * @returns {string} Nom de l'icône Material Community
  */
-export const countDeliveriesByStatus = (deliveries) => {
-  const counts = {
-    [DELIVERY_STATUSES.PENDING]: 0,
-    [DELIVERY_STATUSES.ACCEPTED]: 0,
-    [DELIVERY_STATUSES.OUT_FOR_DELIVERY]: 0,
-    [DELIVERY_STATUSES.DELIVERED]: 0,
-    [DELIVERY_STATUSES.CANCELLED]: 0
-  };
+export const getTransactionTypeIcon = (type) => {
+  return TRANSACTION_TYPE_ICONS[type] || 'cash';
+};
 
-  deliveries.forEach(delivery => {
-    if (counts[delivery.status] !== undefined) {
-      counts[delivery.status]++;
-    }
-  });
+/**
+ * Vérifie si un statut de driver est actif
+ * @param {string} status - Statut du driver
+ * @returns {boolean} True si actif
+ */
+export const isDriverStatusActive = (status) => {
+  return [DRIVER_STATUSES.AVAILABLE, DRIVER_STATUSES.ON_DELIVERY].includes(status);
+};
 
-  return counts;
+/**
+ * Obtient le statut d'affichage pour une transaction
+ * @param {string} status - Statut de la transaction
+ * @returns {string} Label du statut
+ */
+export const getTransactionStatusLabel = (status) => {
+  switch (status) {
+    case TRANSACTION_STATUSES.COMPLETED:
+      return 'Completed';
+    case TRANSACTION_STATUSES.PENDING:
+      return 'Pending';
+    case TRANSACTION_STATUSES.FAILED:
+      return 'Failed';
+    default:
+      return status;
+  }
 };

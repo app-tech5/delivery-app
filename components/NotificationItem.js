@@ -3,42 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Card, Icon, Button } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
+import { getNotificationColor, getNotificationIcon } from '../utils/formatters';
+import { formatTimeAgo } from '../utils/dateUtils';
 
 export default function NotificationItem({
   notification,
   onMarkAsRead,
   onDelete
 }) {
-  const getNotificationColor = (type) => {
-    switch (type) {
-      case 'order': return colors.primary;
-      case 'system': return colors.info;
-      case 'promotion': return colors.success;
-      default: return colors.text.secondary;
-    }
-  };
-
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'order': return 'local-shipping';
-      case 'system': return 'info';
-      case 'promotion': return 'local-offer';
-      default: return 'notifications';
-    }
-  };
-
-  const formatTimeAgo = (timestamp) => {
-    const now = new Date();
-    const diff = now - new Date(timestamp);
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (minutes < 1) return i18n.t('notifications.justNow');
-    if (minutes < 60) return `${minutes} ${i18n.t('notifications.minutesAgo')}`;
-    if (hours < 24) return `${hours} ${i18n.t('notifications.hoursAgo')}`;
-    return `${days} ${i18n.t('notifications.daysAgo')}`;
-  };
 
   return (
     <Card containerStyle={[

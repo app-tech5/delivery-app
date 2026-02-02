@@ -1,113 +1,117 @@
-import { useState } from 'react';
-import { Alert, Linking } from 'react-native';
-import i18n from '../i18n';
-import { DEFAULT_SETTINGS, EXTERNAL_LINKS } from '../utils/settingsData';
+import { useState, useEffect } from 'react';
+import { getSettings } from '../api';
+import { loadSettingsWithSmartCache, clearSettingsCache, saveSettingsToCache } from '../utils/cacheUtils';
+import {
+  getCurrency,
+  getLanguage,
+  getAppName,
+  resetSettingsState
+} from '../utils/settingsUtils';
 
 /**
  * Hook personnalisé pour gérer les paramètres de l'application
- * @param {Function} invalidateCache - Fonction pour invalider le cache
- * @param {Function} logout - Fonction de déconnexion
+ * @param {boolean} isAuthenticated - État d'authentification du driver
  * @returns {Object} État et fonctions pour gérer les paramètres
  */
-export const useSettingsManager = (invalidateCache, logout) => {
-  const [localSettings, setLocalSettings] = useState(DEFAULT_SETTINGS);
+export const useSettingsManager = (isAuthenticated) => {
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Gestionnaire de changement de switch
-  const handleSwitchChange = (key, value) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-  // Gestionnaire de changement de thème
-  const handleThemeChange = (theme) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      theme
-    }));
-  };
-
-  // Gestionnaire de sauvegarde
-  const handleSave = () => {
-    // Simulation de sauvegarde
-    Alert.alert('Success', i18n.t('settings.settingsSaved'));
-  };
-
-  // Gestionnaire de reset
-  const handleReset = () => {
-    Alert.alert(
-      'Reset Settings',
-      i18n.t('settings.confirmReset'),
-      [
-        { text: i18n.t('common.cancel'), style: 'cancel' },
-        {
-          text: 'Reset',
-          style: 'destructive',
-          onPress: () => {
-            setLocalSettings(DEFAULT_SETTINGS);
-            Alert.alert('Success', 'Settings reset to default');
+  useEffect(() => {
+    // Ne charger les settings que si l'utilisateur est authentifié
+    if (isAuthenticated) {
+      console.log('🔄 Chargement des settings car utilisateur authentifié');
+      // Charger les settings avec le système de cache intelligent
+      loadSettingsWithSmartCache(
+        getSettings, // apiFetcher
+        (data, fromCache) => {
+          // onDataLoaded - appelé quand les données sont prêtes (cache ou API)
+          setSettings(data);
+          setError(null);
+          if (fromCache) {
+            console.log('🔄 Settings chargés depuis le cache');
           }
+        },
+        (data) => {
+          // onDataUpdated - appelé quand les données sont mises à jour depuis l'API
+          setSettings(data);
+          console.log('🔄 Settings mis à jour depuis l\'API');
+        },
+        (loading) => {
+          // onLoadingStateChange
+          setLoading(loading);
+        },
+        (errorMsg) => {
+          // onError
+          setError(errorMsg);
+          console.error('Erreur chargement settings:', errorMsg);
         }
-      ]
-    );
-  };
+      );
+    } else {
+      // Si l'utilisateur n'est pas authentifié, remettre à zéro les settings
+      console.log('🔄 Utilisateur non authentifié - remise à zéro des settings');
+      const resetState = resetSettingsState();
+      setSettings(resetState.settings);
+      setLoading(resetState.loading);
+      setError(resetState.error);
+    }
+  }, [isAuthenticated]);
 
-  // Gestionnaire de clear cache
-  const handleClearCache = async () => {
+  const refreshSettings = async () => {
+    // Ne rafraîchir que si l'utilisateur est authentifié
+    if (!isAuthenticated) {
+      console.log('🔄 Impossible de rafraîchir les settings - utilisateur non authentifié');
+      return;
+    }
+
+    // Forcer le rechargement depuis l'API (sans cache)
     try {
-      await invalidateCache();
-      Alert.alert('Success', i18n.t('settings.cacheCleared'));
-    } catch (error) {
-      Alert.alert('Error', 'Failed to clear cache');
+      setLoading(true);
+      const settingsData = await getSettings();
+      const appSettings = Array.isArray(settingsData) ? settingsData[0] : settingsData;
+      setSettings(appSettings);
+      setError(null);
+
+      // Sauvegarder dans le cache
+      saveSettingsToCache(appSettings);
+    } catch (err) {
+      console.error('Erreur rechargement settings:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Gestionnaire de clear data
-  const handleClearData = () => {
-    Alert.alert(
-      'Clear All Data',
-      i18n.t('settings.confirmDataClear'),
-      [
-        { text: i18n.t('common.cancel'), style: 'cancel' },
-        {
-          text: 'Clear Data',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await logout();
-              Alert.alert('Success', i18n.t('settings.dataCleared'));
-            } catch (error) {
-              Alert.alert('Error', 'Failed to clear data');
-            }
-          }
-        }
-      ]
-    );
+  const invalidateCache = async () => {
+    // Invalider le cache et forcer un rechargement (seulement si authentifié)
+    if (!isAuthenticated) {
+      console.log('🔄 Impossible d\'invalider le cache des settings - utilisateur non authentifié');
+      return;
+    }
+
+    try {
+      await clearSettingsCache();
+      console.log('🗑️ Cache des settings invalidé');
+      await refreshSettings();
+    } catch (error) {
+      console.error('Erreur lors de l\'invalidation du cache:', error);
+    }
   };
 
-  // Gestionnaire d'ouverture d'URL
-  const openURL = (url) => {
-    Linking.openURL(url).catch(() => {
-      Alert.alert('Error', 'Unable to open link');
-    });
-  };
-
-  // Gestionnaire pour les actions génériques (langue, devise, etc.)
-  const handleFeatureComingSoon = (feature) => {
-    Alert.alert('Feature', `${feature} coming soon`);
-  };
+  // Valeurs calculées
+  const currency = getCurrency(settings);
+  const language = getLanguage(settings);
+  const appName = getAppName(settings);
 
   return {
-    localSettings,
-    handleSwitchChange,
-    handleThemeChange,
-    handleSave,
-    handleReset,
-    handleClearCache,
-    handleClearData,
-    openURL,
-    handleFeatureComingSoon,
-    externalLinks: EXTERNAL_LINKS
+    settings,
+    loading,
+    error,
+    refreshSettings,
+    invalidateCache,
+    currency,
+    language,
+    appName
   };
 };

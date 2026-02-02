@@ -1,64 +1,11 @@
-import i18n from '../i18n';
-import { colors } from '../global';
+import { formatCurrency } from './currencyUtils';
+import { formatDate } from './dateUtils';
+import { getTransactionTypeColor, getTransactionTypeIcon } from './statusUtils';
 
-/**
- * Formate un montant avec la devise
- * @param {number} amount - Montant à formater
- * @param {Object} currency - Objet devise
- * @returns {string} Montant formaté
- */
-export const formatCurrency = (amount, currency) => {
-  return `${amount?.toFixed(2) || '0.00'}${currency?.symbol || '€'}`;
-};
-
-/**
- * Formate une date de manière relative
- * @param {Date} date - Date à formater
- * @returns {string} Date formatée
- */
-export const formatDate = (date) => {
-  const now = new Date();
-  const diffTime = Math.abs(now - date);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 1) return i18n.t('reports.today');
-  if (diffDays === 2) return i18n.t('reports.yesterday');
-  if (diffDays <= 7) return `${diffDays - 1} ${i18n.t('reports.daysAgo')}`;
-
-  return date.toLocaleDateString(i18n.locale, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  });
-};
-
-/**
- * Retourne la couleur associée au type de transaction
- * @param {string} type - Type de transaction
- * @returns {string} Couleur hex
- */
-export const getTransactionColor = (type) => {
-  switch (type) {
-    case 'delivery_fee': return colors.success;
-    case 'bonus': return colors.primary;
-    case 'penalty': return colors.error;
-    default: return colors.text.secondary;
-  }
-};
-
-/**
- * Retourne l'icône associée au type de transaction
- * @param {string} type - Type de transaction
- * @returns {string} Nom de l'icône Material Community
- */
-export const getTransactionIcon = (type) => {
-  switch (type) {
-    case 'delivery_fee': return 'truck-delivery';
-    case 'bonus': return 'gift';
-    case 'penalty': return 'alert-circle';
-    default: return 'cash';
-  }
-};
+// Réexport des fonctions depuis les modules spécialisés
+export { formatCurrency, formatDate };
+export { getTransactionTypeColor as getTransactionColor };
+export { getTransactionTypeIcon as getTransactionIcon };
 
 /**
  * Calcule les statistiques des transactions

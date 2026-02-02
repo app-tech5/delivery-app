@@ -65,7 +65,7 @@ export default function DeliveriesScreen() {
   });
 
   // Utiliser le hook pour les actions sur les livraisons
-  const { handleAcceptDelivery, handleStartDelivery, handleMarkDelivered } = useDeliveryActions();
+  const { handleAcceptDelivery, handleStartDelivery, handleMarkDelivered, handleStatusChange } = useDeliveryActions();
 
 
   // Gestionnaire de pull-to-refresh
