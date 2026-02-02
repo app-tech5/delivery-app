@@ -37,11 +37,23 @@ export const DriverProvider = ({ children }) => {
   const {
     deliveries,
     loadDriverOrders,
-    updateStatus,
+    updateStatus: ordersUpdateStatus,
     acceptDelivery,
     updateDeliveryStatus,
     invalidateDeliveriesCache
   } = useDriverOrders(driver, isAuthenticated);
+
+  // Wrapper pour updateStatus qui met à jour l'état du driver
+  const updateStatus = async (status, location = null) => {
+    const result = await ordersUpdateStatus(status, location);
+
+    // En mode démo, mettre à jour l'état du driver localement
+    if (result && result.driver) {
+      setDriver(result.driver);
+    }
+
+    return result;
+  };
 
   // Wrapper pour le logout qui nettoie tous les états
   const logout = async () => {

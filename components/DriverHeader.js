@@ -38,7 +38,7 @@ const DriverHeader = ({ driver }) => {
         <View style={styles.statusContainer}>
           <View style={[
             styles.statusIndicator,
-            { backgroundColor: getStatusColor(driver?.status) }
+            { backgroundColor: getStatusColor(driver?.status, 'driver') }
           ]} />
           <Text style={styles.statusText}>
             {driver?.status || 'unknown'}
