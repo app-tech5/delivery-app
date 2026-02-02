@@ -22,7 +22,10 @@ export {
   isYesterday,
   getStartOfDay,
   getEndOfDay,
-  getDaysDifference
+  getDaysDifference,
+  groupDeliveriesByDate,
+  calculateHistoryStats,
+  TIME_FILTERS
 } from './dateUtils';
 
 // Status utilities
@@ -68,7 +71,8 @@ export {
 
 export {
   calculateTransactionStats,
-  filterTransactionsByPeriod
+  filterTransactionsByPeriod,
+  filterDeliveriesByPeriod
 } from './transactionUtils';
 
 export {
@@ -101,3 +105,10 @@ export {
   getDriverLocation,
   getActiveDeliveries
 } from './locationUtils';
+
+// Delivery adapters
+export {
+  mapDeliveryToHistoryItem,
+  mapDeliveryGroupToUI,
+  mapHistoryStatsToUI
+} from './deliveryAdapters';

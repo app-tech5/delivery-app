@@ -1,9 +1,6 @@
 import { useMemo } from 'react';
-import {
-  filterDeliveriesByPeriod,
-  groupDeliveriesByDate,
-  calculateHistoryStats
-} from '../utils/dateUtils';
+import { filterDeliveriesByPeriod } from '../utils/transactionUtils';
+import { groupDeliveriesByDate, calculateHistoryStats } from '../utils/dateUtils';
 
 /**
  * Hook personnalisé pour gérer le groupement et les statistiques des livraisons

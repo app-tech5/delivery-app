@@ -1,6 +1,17 @@
 import i18n from '../i18n';
 
 /**
+ * Filtres temporels disponibles pour l'historique
+ */
+export const TIME_FILTERS = [
+  { key: 'all', label: i18n.t('history.filters.all'), icon: 'calendar' },
+  { key: 'today', label: i18n.t('history.filters.today'), icon: 'calendar-today' },
+  { key: 'week', label: i18n.t('history.filters.week'), icon: 'calendar-week' },
+  { key: 'month', label: i18n.t('history.filters.month'), icon: 'calendar-month' },
+  { key: 'last_month', label: i18n.t('history.filters.last_month'), icon: 'calendar-month-outline' },
+];
+
+/**
  * Formate une date de manière relative (aujourd'hui, hier, il y a X jours)
  * @param {Date} date - Date à formater
  * @returns {string} Date formatée
@@ -104,6 +115,60 @@ export const getEndOfDay = (date) => {
 export const getDaysDifference = (date1, date2) => {
   const diffTime = Math.abs(date2 - date1);
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
+/**
+ * Groupe les livraisons par date
+ * @param {Array} deliveries - Liste des livraisons
+ * @returns {Array} Livraisons groupées par date
+ */
+export const groupDeliveriesByDate = (deliveries) => {
+  const groups = {};
+
+  deliveries.forEach(delivery => {
+    const date = new Date(delivery.createdAt || delivery.updatedAt);
+    const dateKey = date.toISOString().split('T')[0]; // YYYY-MM-DD
+
+    if (!groups[dateKey]) {
+      groups[dateKey] = {
+        date: date,
+        deliveries: [],
+        totalEarnings: 0,
+        count: 0
+      };
+    }
+
+    groups[dateKey].deliveries.push(delivery);
+    groups[dateKey].totalEarnings += delivery.delivery?.deliveryFee || 0;
+    groups[dateKey].count += 1;
+  });
+
+  // Convertir en array et trier par date décroissante
+  return Object.values(groups).sort((a, b) => b.date - a.date);
+};
+
+/**
+ * Calcule les statistiques globales pour l'historique
+ * @param {Array} deliveries - Toutes les livraisons
+ * @param {Array} groupedDeliveries - Livraisons groupées par période
+ * @returns {Object} Statistiques globales et de période
+ */
+export const calculateHistoryStats = (deliveries, groupedDeliveries) => {
+  const completedDeliveries = deliveries.filter(d => d.status === 'delivered');
+  const totalEarnings = completedDeliveries.reduce((sum, d) => sum + (d.delivery?.deliveryFee || 0), 0);
+  const totalDeliveries = completedDeliveries.length;
+
+  // Statistiques de la période filtrée
+  const periodDeliveries = groupedDeliveries.reduce((sum, group) => sum + group.count, 0);
+  const periodEarnings = groupedDeliveries.reduce((sum, group) => sum + group.totalEarnings, 0);
+
+  return {
+    totalDeliveries,
+    totalEarnings,
+    periodDeliveries,
+    periodEarnings,
+    averageEarnings: periodDeliveries > 0 ? periodEarnings / periodDeliveries : 0
+  };
 };
 
 /**
