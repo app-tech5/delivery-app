@@ -11,6 +11,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import SupportScreen from '../screens/SupportScreen';
+import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
@@ -246,6 +247,25 @@ export default function DrawerNavigator() {
               size={size}
             />
           ),
+        }}
+      />
+
+      {/* 📋 DÉTAILS COMMANDE */}
+      <Drawer.Screen
+        name="OrderDetails"
+        component={OrderDetailsScreen}
+        options={{
+          title: i18n.t('orderDetails.title'),
+          drawerIcon: ({ focused, size }) => (
+            <Ionicons
+              name="document-text-outline"
+              color={focused ? colors.primary : '#666'}
+              size={size}
+            />
+          ),
+          drawerItemStyle: {
+            display: 'none' // Masquer du drawer car accessible depuis d'autres écrans
+          }
         }}
       />
 

@@ -10,6 +10,7 @@ import {
   Dimensions
 } from 'react-native';
 import { Icon } from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
@@ -32,6 +33,7 @@ import {
 const { width } = Dimensions.get('window');
 
 export default function DeliveriesScreen() {
+  const navigation = useNavigation();
   const {
     deliveries,
     isAuthenticated,
@@ -47,6 +49,10 @@ export default function DeliveriesScreen() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const handleViewDetails = (orderId) => {
+    navigation.navigate('OrderDetails', { orderId });
+  };
 
   // Filtres disponibles
   const filters = [
@@ -144,6 +150,7 @@ export default function DeliveriesScreen() {
                       'delivered',
                       i18n.t('reports.completeDeliveryConfirm')
                     )}
+                    onViewDetails={handleViewDetails}
                   />
                 ))}
               </View>

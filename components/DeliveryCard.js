@@ -10,6 +10,7 @@ export default function DeliveryCard({
   onAccept,
   onStartDelivery,
   onMarkDelivered,
+  onViewDetails,
   showActions = true,
   compact = false
 }) {
@@ -53,55 +54,79 @@ export default function DeliveryCard({
   const renderActions = () => {
     if (!showActions) return null;
 
-    switch (delivery.status) {
-      case 'pending':
-        return (
+    const renderActionButtons = () => {
+      switch (delivery.status) {
+        case 'pending':
+          return (
+            <Button
+              title={i18n.t('reports.acceptButton')}
+              onPress={() => onAccept(delivery._id)}
+              buttonStyle={styles.acceptButton}
+              icon={
+                <Icon
+                  name="check"
+                  type="material"
+                  size={16}
+                  color={colors.white}
+                  style={{ marginRight: 8 }}
+                />
+              }
+            />
+          );
+
+        case 'accepted':
+          return (
+            <Button
+              title={i18n.t('reports.startButton')}
+              onPress={() => onStartDelivery(delivery._id)}
+              buttonStyle={styles.startButton}
+            />
+          );
+
+        case 'out_for_delivery':
+          return (
+            <Button
+              title={i18n.t('reports.deliveredButton')}
+              onPress={() => onMarkDelivered(delivery._id)}
+              buttonStyle={styles.deliveredButton}
+              icon={
+                <Icon
+                  name="check-circle"
+                  type="material"
+                  size={16}
+                  color={colors.white}
+                  style={{ marginRight: 8 }}
+                />
+              }
+            />
+          );
+
+        default:
+          return null;
+      }
+    };
+
+    return (
+      <View style={styles.actionsContainer}>
+        {onViewDetails && (
           <Button
-            title={i18n.t('reports.acceptButton')}
-            onPress={() => onAccept(delivery._id)}
-            buttonStyle={styles.acceptButton}
+            title="View Details"
+            onPress={() => onViewDetails(delivery._id)}
+            buttonStyle={styles.detailsButton}
             icon={
               <Icon
-                name="check"
+                name="eye"
                 type="material"
                 size={16}
-                color={colors.white}
+                color={colors.primary}
                 style={{ marginRight: 8 }}
               />
             }
           />
-        );
-
-      case 'accepted':
-        return (
-          <Button
-            title={i18n.t('reports.startButton')}
-            onPress={() => onStartDelivery(delivery._id)}
-            buttonStyle={styles.startButton}
-          />
-        );
-
-      case 'out_for_delivery':
-        return (
-          <Button
-            title={i18n.t('reports.deliveredButton')}
-            onPress={() => onMarkDelivered(delivery._id)}
-            buttonStyle={styles.deliveredButton}
-            icon={
-              <Icon
-                name="check-circle"
-                type="material"
-                size={16}
-                color={colors.white}
-                style={{ marginRight: 8 }}
-              />
-            }
-          />
-        );
-
-      default:
-        return null;
-    }
+        )}
+        {renderActionButtons()}
+      </View>
+    );
   };
 
   if (compact) {
@@ -258,6 +283,17 @@ const styles = StyleSheet.create({
   },
   deliveredButton: {
     backgroundColor: colors.primary,
+    borderRadius: 8,
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  detailsButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.primary,
     borderRadius: 8,
   },
 

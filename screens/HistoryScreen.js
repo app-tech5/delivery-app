@@ -7,6 +7,7 @@ import {
   Dimensions,
   RefreshControl
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
@@ -33,6 +34,7 @@ import {
 const { width } = Dimensions.get('window');
 
 export default function HistoryScreen() {
+  const navigation = useNavigation();
   const {
     deliveries,
     isAuthenticated,
@@ -44,6 +46,10 @@ export default function HistoryScreen() {
   const { currency } = useSettings();
 
   const [activeFilter, setActiveFilter] = useState('all');
+
+  const handleViewDetails = (delivery) => {
+    navigation.navigate('OrderDetails', { orderId: delivery.rawDelivery._id });
+  };
 
   // Utiliser le hook personnalisé pour le groupement des livraisons
   const { groupedDeliveries, globalStats } = useDeliveriesGrouping(deliveries, activeFilter);
@@ -134,6 +140,7 @@ export default function HistoryScreen() {
                     delivery={delivery}
                     isLast={deliveryIndex === group.deliveries.length - 1}
                     currency={currency}
+                    onPress={() => handleViewDetails(delivery)}
                   />
                 ))}
               </View>
