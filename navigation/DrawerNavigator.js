@@ -12,6 +12,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import SupportScreen from '../screens/SupportScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
+import DeliveryDetailsScreen from '../screens/DeliveryDetailsScreen';
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
@@ -259,6 +260,25 @@ export default function DrawerNavigator() {
           drawerIcon: ({ focused, size }) => (
             <Ionicons
               name="document-text-outline"
+              color={focused ? colors.primary : '#666'}
+              size={size}
+            />
+          ),
+          drawerItemStyle: {
+            display: 'none' // Masquer du drawer car accessible depuis d'autres écrans
+          }
+        }}
+      />
+
+      {/* 📦 DÉTAILS LIVRAISON */}
+      <Drawer.Screen
+        name="DeliveryDetails"
+        component={DeliveryDetailsScreen}
+        options={{
+          title: i18n.t('navigation.deliveryDetails'),
+          drawerIcon: ({ focused, size }) => (
+            <Ionicons
+              name="package"
               color={focused ? colors.primary : '#666'}
               size={size}
             />

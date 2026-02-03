@@ -51,7 +51,7 @@ export default function DeliveriesScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleViewDetails = (orderId) => {
-    navigation.navigate('OrderDetails', { orderId });
+    navigation.navigate('DeliveryDetails', { orderId });
   };
 
   // Filtres disponibles

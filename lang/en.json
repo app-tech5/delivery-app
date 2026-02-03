@@ -14,7 +14,8 @@
     "notifications": "Notifications",
     "support": "Support",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "deliveryDetails": "Delivery Details"
   },
   "reports": {
     "title": "Reports",
@@ -283,7 +284,10 @@
     "preparationTime": "Preparation Time",
     "readyForPickup": "Ready for pickup",
     "outForDelivery": "Out for delivery",
-    "delivered": "Delivered"
+    "delivered": "Delivered",
+    "deliveryActions": "Delivery Actions",
+    "navigateTo": "Navigate to",
+    "navigation": "Navigation"
   },
   "notifications": {
     "title": "Notifications",
