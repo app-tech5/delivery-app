@@ -5,6 +5,7 @@ import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { useTransactions } from '../hooks/useTransactions';
+import { ScreenHeader } from '../components';
 import TransactionFilters from '../components/TransactionFilters';
 import TransactionSummary from '../components/TransactionSummary';
 import TransactionList from '../components/TransactionList';
@@ -44,12 +45,11 @@ export default function TransactionsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{i18n.t('reports.transactionsTitle')}</Text>
-        <Text style={styles.headerSubtitle}>
-          {transactionStats.count} {transactionStats.count === 1 ? i18n.t('reports.transactionSingular') : i18n.t('reports.transactionPlural')}
-        </Text>
-      </View>
+      <ScreenHeader
+        title={i18n.t('reports.transactionsTitle')}
+        subtitle={`${transactionStats.count} ${transactionStats.count === 1 ? i18n.t('reports.transactionSingular') : i18n.t('reports.transactionPlural')}`}
+        containerStyle={{ paddingTop: 10 }}
+      />
 
       <TransactionFilters
         periodFilters={periodFilters}
@@ -95,21 +95,5 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     marginBottom: 20,
     textAlign: 'center',
-  },
-  header: {
-    backgroundColor: colors.primary,
-    padding: 20,
-    paddingTop: 10,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.white,
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: colors.white,
-    opacity: 0.8,
   },
 });

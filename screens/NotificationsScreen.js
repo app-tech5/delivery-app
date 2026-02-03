@@ -5,7 +5,7 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useNotifications } from '../hooks/useNotifications';
-import NotificationsHeader from '../components/NotificationsHeader';
+import { ScreenHeader } from '../components';
 import NotificationItem from '../components/NotificationItem';
 import EmptyState from '../components/EmptyState';
 
@@ -55,9 +55,21 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <NotificationsHeader
-        unreadCount={unreadCount}
-        onMarkAllAsRead={markAllAsRead}
+      <ScreenHeader
+        title={i18n.t('notifications.title')}
+        containerStyle={{ paddingTop: 10 }}
+        titleAccessory={unreadCount > 0 ? (
+          <Badge
+            value={unreadCount}
+            status="error"
+            containerStyle={styles.headerBadgeContainer}
+          />
+        ) : null}
+        rightComponent={unreadCount > 0 ? (
+          <TouchableOpacity onPress={markAllAsRead} style={styles.markAllButton}>
+            <Text style={styles.markAllText}>{i18n.t('notifications.markAllAsRead')}</Text>
+          </TouchableOpacity>
+        ) : null}
       />
 
       {/* Filtres */}
@@ -209,5 +221,20 @@ const styles = StyleSheet.create({
   },
   filterBadgeText: {
     fontSize: 10,
+  },
+  // Header actions
+  headerBadgeContainer: {
+    marginTop: -8,
+  },
+  markAllButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  markAllText: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: '600',
   },
 });

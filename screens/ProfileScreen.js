@@ -14,6 +14,7 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
+import { ScreenHeader } from '../components';
 
 const { width } = Dimensions.get('window');
 
@@ -137,14 +138,15 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{i18n.t('navigation.profile')}</Text>
-        {!isEditing && (
+      <ScreenHeader
+        title={i18n.t('navigation.profile')}
+        containerStyle={{ paddingTop: 10 }}
+        rightComponent={!isEditing ? (
           <TouchableOpacity onPress={handleEdit} style={styles.editButton}>
             <Icon name="edit" type="material" size={20} color={colors.white} />
           </TouchableOpacity>
-        )}
-      </View>
+        ) : null}
+      />
 
       <ScrollView style={styles.scrollView}>
         {/* Section Photo et Infos de Base */}
@@ -401,23 +403,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-
-  // Header
-  header: {
-    backgroundColor: colors.primary,
-    padding: 20,
-    paddingTop: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.white,
-  },
   editButton: {
-    padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
 
   // ScrollView

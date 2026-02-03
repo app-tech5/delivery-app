@@ -4,6 +4,7 @@ import { Icon } from 'react-native-elements';
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../global';
+import { ScreenHeader } from '../components';
 
 export default function SplashScreen({ navigation }) {
   return (
@@ -21,8 +22,14 @@ export default function SplashScreen({ navigation }) {
             color={colors.primary}
             containerStyle={styles.iconContainer}
           />
-          <Text style={styles.appName}>Good Food Driver</Text>
-          <Text style={styles.tagline}>Livraison rapide & fiable</Text>
+          <ScreenHeader
+            title="Good Food Driver"
+            subtitle="Livraison rapide & fiable"
+            containerStyle={styles.screenHeader}
+            contentStyle={styles.screenHeaderContent}
+            titleStyle={styles.appName}
+            subtitleStyle={styles.tagline}
+          />
         </Animatable.View>
       </View>
 
@@ -65,11 +72,19 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginBottom: 20,
   },
+  screenHeader: {
+    backgroundColor: 'transparent',
+    padding: 0,
+    paddingTop: 0,
+  },
+  screenHeaderContent: {
+    alignItems: 'center',
+  },
   appName: {
     fontSize: 32,
     fontWeight: 'bold',
     color: colors.primary,
-    marginBottom: 10,
+    marginBottom: 6,
     textAlign: 'center',
   },
   tagline: {
@@ -77,6 +92,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     textAlign: 'center',
     fontStyle: 'italic',
+    opacity: 1,
   },
   container2: {
     flex: 1,

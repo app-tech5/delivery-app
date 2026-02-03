@@ -7,3 +7,4 @@ export { useDriverStatus } from './useDriverStatus';
 export { useHistoryRefresh } from './useHistoryRefresh';
 export { useRecentDeliveries } from './useRecentDeliveries';
 export { useEarningsRefresh } from './useEarningsRefresh';
+export { useReportsData } from './useReportsData';

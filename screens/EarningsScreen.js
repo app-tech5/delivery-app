@@ -13,7 +13,8 @@ import {
   AuthGuard,
   EnhancedStatCard,
   EarningsDetailsCard,
-  RecentDeliveryCard
+  RecentDeliveryCard,
+  ScreenHeader
 } from '../components';
 
 // Import utilities
@@ -69,12 +70,10 @@ export default function EarningsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{i18n.t('reports.earningsTitle')}</Text>
-        <Text style={styles.headerSubtitle}>
-          {new Date().toLocaleDateString(i18n.locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-        </Text>
-      </View>
+      <ScreenHeader
+        title={i18n.t('reports.earningsTitle')}
+        subtitle={new Date().toLocaleDateString(i18n.locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -130,24 +129,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.secondary,
-  },
-
-  // Header
-  header: {
-    backgroundColor: colors.primary,
-    padding: 20,
-    paddingTop: 10,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.white,
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: colors.white,
-    opacity: 0.8,
   },
 
   // ScrollView

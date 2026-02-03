@@ -17,6 +17,7 @@ import { colors } from '../global';
 import { config } from '../config';
 import apiClient from '../api';
 import { useDriver } from '../contexts/DriverContext';
+import { ScreenHeader } from '../components';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState(config.DEMO_MODE ? config.DEMO_EMAIL : '');
@@ -87,11 +88,18 @@ export default function LoginScreen({ navigation }) {
             size={80}
             color={colors.white}
           />
-          <Text style={styles.title}>{config.APP_NAME}</Text>
-          <Text style={styles.subtitle}>Connectez-vous à votre compte</Text>
-          {config.DEMO_MODE && (
-            <Text style={styles.demoText}>🚗 Mode démonstration activé</Text>
-          )}
+          <ScreenHeader
+            title={config.APP_NAME}
+            subtitle="Connectez-vous à votre compte"
+            containerStyle={styles.screenHeader}
+            contentStyle={styles.screenHeaderContent}
+            titleStyle={styles.title}
+            subtitleStyle={styles.subtitle}
+          >
+            {config.DEMO_MODE && (
+              <Text style={styles.demoText}>🚗 Mode démonstration activé</Text>
+            )}
+          </ScreenHeader>
         </View>
       </LinearGradient>
 
@@ -182,12 +190,20 @@ const styles = StyleSheet.create({
   headerContent: {
     alignItems: 'center',
   },
+  screenHeader: {
+    backgroundColor: 'transparent',
+    padding: 0,
+    paddingTop: 0,
+    marginTop: 20,
+  },
+  screenHeaderContent: {
+    alignItems: 'center',
+  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: colors.white,
-    marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 6,
     letterSpacing: 2,
   },
   subtitle: {

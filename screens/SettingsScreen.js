@@ -5,6 +5,7 @@ import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { useSettingsManager } from '../hooks/useSettingsManager';
+import { ScreenHeader } from '../components';
 import GeneralSettings from '../components/GeneralSettings';
 import NotificationSettings from '../components/NotificationSettings';
 import PrivacySettings from '../components/PrivacySettings';
@@ -31,9 +32,10 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{i18n.t('navigation.settings')}</Text>
-      </View>
+      <ScreenHeader
+        title={i18n.t('navigation.settings')}
+        containerStyle={{ paddingTop: 10 }}
+      />
 
       <ScrollView style={styles.scrollView}>
         <GeneralSettings
@@ -78,16 +80,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.secondary,
-  },
-  header: {
-    backgroundColor: colors.primary,
-    padding: 20,
-    paddingTop: 10,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.white,
   },
   scrollView: {
     flex: 1,
