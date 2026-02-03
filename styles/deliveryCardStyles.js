@@ -78,7 +78,7 @@ export const deliveryCardStyles = StyleSheet.create({
     gap: 12,
   },
   detailsButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: colors.primary,
     borderWidth: 1,
     borderColor: colors.primary,
     borderRadius: 8,
