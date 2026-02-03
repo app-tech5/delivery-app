@@ -17,6 +17,7 @@ export const TIME_FILTERS = [
  * @returns {string} Date formatée
  */
 export const formatDate = (date) => {
+  const parsedDate = date instanceof Date ? date : new Date(date);
   const now = new Date();
   const diffTime = Math.abs(now - date);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -25,7 +26,7 @@ export const formatDate = (date) => {
   if (diffDays === 2) return i18n.t('reports.yesterday');
   if (diffDays <= 7) return `${diffDays - 1} ${i18n.t('reports.daysAgo')}`;
 
-  return date.toLocaleDateString(i18n.locale, {
+  return parsedDate.toLocaleDateString(i18n.locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric'
