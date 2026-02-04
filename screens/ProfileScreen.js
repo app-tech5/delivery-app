@@ -14,7 +14,7 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
-import { ScreenHeader } from '../components';
+import { ScreenHeader, ReconnectMessage } from '../components';
 
 const { width } = Dimensions.get('window');
 
@@ -126,14 +126,7 @@ export default function ProfileScreen() {
 
   // Vérifier l'authentification
   if (!isAuthenticated || !driver) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.centerContent}>
-          <Text style={styles.title}>{i18n.t('home.reconnect')}</Text>
-          <Text style={styles.subtitle}>Please reconnect to view your profile</Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <ReconnectMessage message="Please reconnect to view your profile" />;
   }
 
   return (
@@ -384,24 +377,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.secondary,
-  },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginBottom: 20,
-    textAlign: 'center',
   },
   editButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',

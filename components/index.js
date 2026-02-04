@@ -12,6 +12,7 @@ export { default as StatsGrid } from './StatsGrid';
 export { default as AuthGuard } from './AuthGuard';
 export { default as Loading } from './Loading';
 export { default as LoadingOverlay } from './LoadingOverlay';
+export { default as ReconnectMessage } from './ReconnectMessage';
 
 // HomeScreen components
 export { default as DriverHeader } from './DriverHeader';

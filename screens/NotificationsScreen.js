@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, Text} from 'react-native';
 import { Icon, Badge } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useNotifications } from '../hooks/useNotifications';
-import { ScreenHeader } from '../components';
+import { ScreenHeader, AuthGuard } from '../components';
 import NotificationItem from '../components/NotificationItem';
 import EmptyState from '../components/EmptyState';
 
@@ -27,14 +27,7 @@ export default function NotificationsScreen() {
 
   // Vérifier l'authentification
   if (!isAuthenticated || !driver) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.centerContent}>
-          <Text style={styles.title}>{i18n.t('home.reconnect')}</Text>
-          <Text style={styles.subtitle}>Please reconnect to view notifications</Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <AuthGuard isAuthenticated={isAuthenticated} driver={driver} subtitle="Please reconnect to view notifications" />;
   }
 
   // Fonction pour obtenir le titre et sous-titre de l'état vide
@@ -152,24 +145,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.secondary,
-  },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginBottom: 20,
-    textAlign: 'center',
   },
   scrollView: {
     flex: 1,

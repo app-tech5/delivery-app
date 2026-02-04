@@ -18,7 +18,8 @@ import {
   PeriodSelector,
   ReportsMetricsGrid,
   AnalyticsCard,
-  PerformanceScoreCard
+  PerformanceScoreCard,
+  AuthGuard
 } from '../components';
 
 export default function ReportsScreen() {
@@ -59,14 +60,7 @@ export default function ReportsScreen() {
 
   // Vérifier l'authentification
   if (!isAuthenticated || !driver) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.centerContent}>
-          <Text style={styles.title}>{i18n.t('home.reconnect')}</Text>
-          <Text style={styles.subtitle}>Please reconnect to view reports</Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <ReconnectMessage message="Please reconnect to view reports" />;
   }
 
   return (
@@ -114,24 +108,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.secondary,
-  },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginBottom: 20,
-    textAlign: 'center',
   },
   scrollView: {
     flex: 1,
