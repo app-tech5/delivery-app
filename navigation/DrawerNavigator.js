@@ -8,7 +8,7 @@ import TransactionsScreen from '../screens/TransactionsScreen';
 import ReportsScreen from '../screens/ReportsScreen';
 import RatingScreen from '../screens/RatingScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import ProfileStackNavigator from './ProfileStackNavigator';
 import SettingsStackNavigator from './SettingsStackNavigator';
 import HistoryScreen from '../screens/HistoryScreen';
 import SupportScreen from '../screens/SupportScreen';
@@ -255,7 +255,7 @@ export default function DrawerNavigator() {
       {/* 👤 PROFIL */}
       <Drawer.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStackNavigator}
         options={{
           title: i18n.t('navigation.profile'),
           drawerIcon: ({ focused, size }) => (

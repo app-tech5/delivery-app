@@ -10,15 +10,18 @@ import {
   Dimensions
 } from 'react-native';
 import { Card, Icon, Button, Avatar, Badge } from 'react-native-elements';
+import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
+import { useNavigation } from '@react-navigation/native';
 import { ScreenHeader, ReconnectMessage } from '../components';
 
 const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
+  const navigation = useNavigation();
   const { driver, isAuthenticated, stats, logout } = useDriver();
   const { currency } = useSettings();
 
@@ -43,6 +46,11 @@ export default function ProfileScreen() {
     { id: 'registration', name: 'Vehicle Registration', status: 'pending', expiry: null },
     { id: 'background', name: 'Background Check', status: 'verified', expiry: null }
   ];
+
+  // Navigation vers les détails du véhicule
+  const navigateToVehicleDetails = () => {
+    navigation.navigate('VehicleDetails');
+  };
 
   // Calculer les statistiques du profil
   const profileStats = {
@@ -270,6 +278,14 @@ export default function ProfileScreen() {
                 {new Date(mockVehicleData.insuranceExpiry).toLocaleDateString('en-US')}
               </Text>
             </View>
+
+            <TouchableOpacity
+              style={styles.vehicleDetailsButton}
+              onPress={navigateToVehicleDetails}
+            >
+              <MaterialIcons name="expand-more" size={20} color={colors.primary} />
+              <Text style={styles.vehicleDetailsText}>{i18n.t('profile.viewVehicleDetails')}</Text>
+            </TouchableOpacity>
           </Card>
         </View>
 
@@ -597,6 +613,24 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: colors.primary,
     flex: 1,
+  },
+
+  // Vehicle details button
+  vehicleDetailsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 16,
+    backgroundColor: colors.background.secondary,
+    borderRadius: 8,
+  },
+  vehicleDetailsText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.primary,
+    marginLeft: 8,
   },
 
   // Bottom spacer

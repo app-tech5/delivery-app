@@ -45,6 +45,7 @@ export { default as AddPaymentMethodModal } from './AddPaymentMethodModal';
 
 // Settings components
 export { default as PaymentSettings } from './PaymentSettings';
+export { default as VehicleInfoCard } from './VehicleInfoCard';
 
 // OrderDetailsScreen components
 export { default as OrderHeaderCard } from './OrderHeaderCard';
