@@ -2,7 +2,7 @@ import React from 'react';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { View, Alert } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
-import DeliveriesScreen from '../screens/DeliveriesScreen';
+import DeliveriesStackNavigator from './DeliveriesStackNavigator';
 import EarningsScreen from '../screens/EarningsScreen';
 import TransactionsScreen from '../screens/TransactionsScreen';
 import ReportsScreen from '../screens/ReportsScreen';
@@ -13,7 +13,6 @@ import SettingsStackNavigator from './SettingsStackNavigator';
 import HistoryScreen from '../screens/HistoryScreen';
 import SupportScreen from '../screens/SupportScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
-import DeliveryDetailsScreen from '../screens/DeliveryDetailsScreen';
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
@@ -127,7 +126,7 @@ export default function DrawerNavigator() {
       {/* 🚚 LIVRAISONS ACTIVES */}
       <Drawer.Screen
         name="Deliveries"
-        component={DeliveriesScreen}
+        component={DeliveriesStackNavigator}
         options={{
           title: i18n.t('navigation.deliveries'),
           drawerIcon: ({ focused, size }) => (
@@ -287,24 +286,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 📦 DÉTAILS LIVRAISON */}
-      <Drawer.Screen
-        name="DeliveryDetails"
-        component={DeliveryDetailsScreen}
-        options={{
-          title: i18n.t('navigation.deliveryDetails'),
-          drawerIcon: ({ focused, size }) => (
-            <Ionicons
-              name="package"
-              color={focused ? colors.primary : '#666'}
-              size={size}
-            />
-          ),
-          drawerItemStyle: {
-            display: 'none' // Masquer du drawer car accessible depuis d'autres écrans
-          }
-        }}
-      />
 
       {/* 💳 MÉTHODES DE PAIEMENT */}
       {/* <Drawer.Screen
