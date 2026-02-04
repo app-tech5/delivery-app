@@ -248,6 +248,49 @@ class ApiClient {
     }
   }
 
+  // Récupérer les méthodes de paiement de l'utilisateur
+  async getPaymentMethods() {
+    try {
+      // Vérification du mode démo via la configuration
+      if (isDemoMode()) {
+        // Retourner des méthodes de paiement mockées pour le mode démo
+        console.log('🔄 Mode démo détecté - Retour des méthodes de paiement mockées');
+        return [
+          {
+            _id: 'demo_card_1',
+            methodType: 'credit_card',
+            isDefault: true,
+            isActive: true,
+            cardBrand: 'visa',
+            last4: '4242',
+            expiryMonth: 12,
+            expiryYear: 2025,
+            cardholderName: 'John Doe',
+            verificationStatus: 'verified',
+            createdAt: new Date().toISOString()
+          },
+          {
+            _id: 'demo_paypal_1',
+            methodType: 'paypal',
+            isDefault: false,
+            isActive: true,
+            paypalEmail: 'john.doe@example.com',
+            verificationStatus: 'verified',
+            createdAt: new Date().toISOString()
+          }
+        ];
+      }
+
+      // Mode normal : récupérer depuis l'API
+      const paymentMethods = await this.apiCall('/resource/paymentmethods');
+      return paymentMethods || [];
+
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      return [];
+    }
+  }
+
   // Sauvegarder dans AsyncStorage (pour utilisateurs normaux)
   async saveToStorage() {
     try {
@@ -370,6 +413,7 @@ export const {
   getDriverDeliveries,
   updateDeliveryStatus,
   getDriverStats,
+  getPaymentMethods,
   logout,
   getDriverProfile,
   updateDriverProfile,

@@ -7,6 +7,7 @@ import { useSettings } from '../contexts/SettingContext';
 import { useSettingsManager } from '../hooks/useSettingsManager';
 import { ScreenHeader } from '../components';
 import GeneralSettings from '../components/GeneralSettings';
+import PaymentSettings from '../components/PaymentSettings';
 import NotificationSettings from '../components/NotificationSettings';
 import PrivacySettings from '../components/PrivacySettings';
 import DataSettings from '../components/DataSettings';
@@ -44,6 +45,8 @@ export default function SettingsScreen() {
           onThemeChange={handleThemeChange}
           onFeatureComingSoon={handleFeatureComingSoon}
         />
+
+        <PaymentSettings />
 
         <NotificationSettings
           localSettings={localSettings}

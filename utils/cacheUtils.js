@@ -5,6 +5,7 @@ const CACHE_KEYS = {
   SETTINGS: 'app_settings',
   DRIVER_DELIVERIES: 'driver_deliveries',
   DRIVER_STATS: 'driver_stats',
+  PAYMENT_METHODS: 'payment_methods',
   NEARBY_RESTAURANTS: 'nearby_restaurants',
   CACHE_TIMESTAMP: '_timestamp',
   CACHE_VERSION: 'cache_version'
@@ -756,6 +757,199 @@ export const loadDriverStatsWithSmartCache = async (
       };
       onDataLoaded(defaultStats, false);
     }
+  }
+};
+
+/**
+ * Sauvegarde les méthodes de paiement dans le cache
+ * @param {string} userId - ID de l'utilisateur
+ * @param {Array} paymentMethods - Liste des méthodes de paiement
+ */
+export const setPaymentMethodsCache = async (userId, paymentMethods) => {
+  try {
+    if (!userId) {
+      console.log('❌ UserId requis pour sauvegarder le cache des méthodes de paiement');
+      return;
+    }
+
+    const cacheKey = `${CACHE_KEYS.PAYMENT_METHODS}_${userId}`;
+    const timestampKey = `${CACHE_KEYS.PAYMENT_METHODS}_${userId}${CACHE_KEYS.CACHE_TIMESTAMP}`;
+
+    const cacheData = {
+      paymentMethods,
+      timestamp: Date.now(),
+      version: CACHE_CONFIG.VERSION
+    };
+
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    await AsyncStorage.setItem(timestampKey, Date.now().toString());
+
+    console.log(`💾 Cache des méthodes de paiement sauvegardé pour user ${userId}: ${paymentMethods.length} méthodes`);
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde du cache des méthodes de paiement:', error);
+  }
+};
+
+/**
+ * Récupère les méthodes de paiement depuis le cache
+ * @param {string} userId - ID de l'utilisateur
+ * @returns {Object|null} Données du cache ou null
+ */
+export const getPaymentMethodsFromCache = async (userId) => {
+  try {
+    if (!userId) {
+      console.log('❌ UserId requis pour récupérer le cache des méthodes de paiement');
+      return null;
+    }
+
+    const cacheKey = `${CACHE_KEYS.PAYMENT_METHODS}_${userId}`;
+    const timestampKey = `${CACHE_KEYS.PAYMENT_METHODS}_${userId}${CACHE_KEYS.CACHE_TIMESTAMP}`;
+
+    const cachedData = await AsyncStorage.getItem(cacheKey);
+
+    if (!cachedData) {
+      console.log(`📭 Pas de méthodes de paiement en cache pour user ${userId}`);
+      return null;
+    }
+
+    const parsedData = JSON.parse(cachedData);
+
+    // Vérifier la version du cache
+    if (parsedData.version !== CACHE_CONFIG.VERSION) {
+      console.log(`🔄 Version du cache des méthodes de paiement obsolète pour user ${userId}, suppression`);
+      await clearPaymentMethodsCache(userId);
+      return null;
+    }
+
+    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
+
+    console.log(`📖 Méthodes de paiement chargées depuis le cache pour user ${userId}: ${parsedData.paymentMethods.length} méthodes`);
+    return {
+      paymentMethods: parsedData.paymentMethods,
+      timestamp: parsedData.timestamp,
+      fromCache: true
+    };
+
+  } catch (error) {
+    console.error('❌ Erreur lors de la lecture du cache des méthodes de paiement:', error);
+    return null;
+  }
+};
+
+/**
+ * Supprime le cache des méthodes de paiement
+ * @param {string} userId - ID de l'utilisateur
+ */
+export const clearPaymentMethodsCache = async (userId) => {
+  try {
+    if (!userId) {
+      console.log('❌ UserId requis pour supprimer le cache des méthodes de paiement');
+      return;
+    }
+
+    const cacheKey = `${CACHE_KEYS.PAYMENT_METHODS}_${userId}`;
+    const timestampKey = `${CACHE_KEYS.PAYMENT_METHODS}_${userId}${CACHE_KEYS.CACHE_TIMESTAMP}`;
+
+    await AsyncStorage.removeItem(cacheKey);
+    await AsyncStorage.removeItem(timestampKey);
+
+    console.log(`🗑️ Cache des méthodes de paiement supprimé pour user ${userId}`);
+  } catch (error) {
+    console.error('❌ Erreur lors de la suppression du cache des méthodes de paiement:', error);
+  }
+};
+
+/**
+ * Charge les méthodes de paiement avec un cache intelligent
+ * 1. Lit d'abord le cache AsyncStorage
+ * 2. Affiche immédiatement si disponible
+ * 3. Fetch l'API en arrière-plan
+ * 4. Met à jour si les données ont changé
+ *
+ * @param {string} userId - ID de l'utilisateur
+ * @param {Function} apiFetcher - Fonction pour fetch l'API (getPaymentMethods)
+ * @param {Function} onDataLoaded - Callback quand les données sont prêtes (cache ou API)
+ * @param {Function} onDataUpdated - Callback quand les données sont mises à jour depuis l'API
+ * @param {Function} onLoadingStateChange - Callback pour l'état de chargement
+ * @param {Function} onError - Callback en cas d'erreur
+ */
+export const loadPaymentMethodsWithCache = async (
+  userId,
+  apiFetcher,
+  onDataLoaded,
+  onDataUpdated,
+  onLoadingStateChange,
+  onError
+) => {
+  if (!userId) {
+    console.error('❌ UserId requis pour le chargement des méthodes de paiement');
+    onError?.('UserId requis');
+    return;
+  }
+
+  try {
+    console.log(`🚀 Démarrage du chargement intelligent des méthodes de paiement pour user ${userId}`);
+
+    // 1. Essayer de charger depuis le cache
+    onLoadingStateChange?.(true);
+    const cachedData = await getPaymentMethodsFromCache(userId);
+
+    if (cachedData) {
+      // Si cache disponible, afficher immédiatement
+      console.log('📱 Affichage des méthodes de paiement depuis le cache');
+      onDataLoaded(cachedData.paymentMethods, true);
+
+      // 2. Vérifier si on doit rafraîchir depuis l'API
+      const cacheAge = Date.now() - cachedData.timestamp;
+      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+      if (cacheAge < CACHE_DURATION) {
+        console.log(`⏰ Cache des méthodes de paiement récent (${Math.round(cacheAge / 1000)}s), pas de rafraîchissement`);
+        onLoadingStateChange?.(false);
+        return;
+      }
+    }
+
+    // 3. Fetch depuis l'API
+    console.log('🌐 Fetch des méthodes de paiement depuis l\'API');
+    const apiData = await apiFetcher();
+
+    // 4. Sauvegarder dans le cache
+    await setPaymentMethodsCache(userId, apiData);
+
+    if (cachedData) {
+      // Si on avait du cache, vérifier si les données ont changé
+      const hasChanged = JSON.stringify(cachedData.paymentMethods) !== JSON.stringify(apiData);
+      if (hasChanged) {
+        console.log('🔄 Méthodes de paiement mises à jour, notification du changement');
+        onDataUpdated?.(apiData);
+      } else {
+        console.log('✅ Méthodes de paiement identiques, pas de mise à jour');
+      }
+    } else {
+      // Pas de cache, afficher les données de l'API
+      console.log('📱 Affichage des méthodes de paiement depuis l\'API (pas de cache)');
+      onDataLoaded(apiData, false);
+    }
+
+    onLoadingStateChange?.(false);
+
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement intelligent des méthodes de paiement:', error);
+    onError?.(error.message || 'Erreur de chargement');
+
+    // En cas d'erreur, essayer d'utiliser le cache comme fallback
+    const fallbackCache = await getPaymentMethodsFromCache(userId);
+    if (fallbackCache) {
+      console.log('🔄 Erreur API, utilisation du cache comme fallback');
+      onDataLoaded(fallbackCache.paymentMethods, true);
+    } else {
+      // Si pas de cache, retourner un tableau vide
+      console.log('🔄 Pas de cache disponible, utilisation d\'un tableau vide');
+      onDataLoaded([], false);
+    }
+
+    onLoadingStateChange?.(false);
   }
 };
 

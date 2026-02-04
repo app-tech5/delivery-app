@@ -135,6 +135,34 @@
     "totalRatedDeliveries": "Livraisons Notées",
     "earnings": "Gains"
   },
+  "payment": {
+    "paymentMethodsTitle": "Modes de Paiement",
+    "methodsAvailable": "méthodes disponibles",
+    "noPaymentMethods": "Aucun mode de paiement",
+    "addFirstPaymentMethod": "Ajoutez votre premier mode de paiement pour commencer à recevoir des paiements",
+    "creditCard": "Carte de Crédit",
+    "debitCard": "Carte de Débit",
+    "paypal": "PayPal",
+    "applePay": "Apple Pay",
+    "googlePay": "Google Pay",
+    "cashOnDelivery": "Paiement à la Livraison",
+    "bankTransfer": "Virement Bancaire",
+    "other": "Autre",
+    "default": "Par Défaut",
+    "setAsDefault": "Définir par Défaut",
+    "verified": "Vérifié",
+    "pending": "En Attente",
+    "failed": "Échec",
+    "unverified": "Non Vérifié",
+    "expires": "Expire",
+    "noDefaultMethod": "Aucune méthode par défaut",
+    "otherMethod": "Autre méthode",
+    "defaultMethod": "Méthode par défaut",
+    "addPaymentMethod": "Ajouter un Mode de Paiement"
+  },
+  "settings": {
+    "payment": "Paiement"
+  },
   "orderDetails": {
     "title": "Détails de la Commande",
     "orderNumber": "Commande #",

@@ -39,6 +39,12 @@ export { default as PerformanceScoreCard } from './PerformanceScoreCard';
 // RatingScreen components
 export { default as RatingStats } from './RatingStats';
 
+// PaymentMethodsScreen components
+export { default as PaymentMethodsList } from './PaymentMethodsList';
+
+// Settings components
+export { default as PaymentSettings } from './PaymentSettings';
+
 // OrderDetailsScreen components
 export { default as OrderHeaderCard } from './OrderHeaderCard';
 export { default as CustomerInfoCard } from './CustomerInfoCard';

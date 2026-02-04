@@ -9,7 +9,7 @@ import ReportsScreen from '../screens/ReportsScreen';
 import RatingScreen from '../screens/RatingScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import SettingsStackNavigator from './SettingsStackNavigator';
 import HistoryScreen from '../screens/HistoryScreen';
 import SupportScreen from '../screens/SupportScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
@@ -205,7 +205,7 @@ export default function DrawerNavigator() {
       />
 
       {/* ⭐ NOTES & ÉVALUATIONS */}
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Ratings"
         component={RatingScreen}
         options={{
@@ -218,7 +218,7 @@ export default function DrawerNavigator() {
             />
           ),
         }}
-      />
+      /> */}
 
       {/* 🔔 NOTIFICATIONS */}
       <Drawer.Screen
@@ -306,10 +306,29 @@ export default function DrawerNavigator() {
         }}
       />
 
+      {/* 💳 MÉTHODES DE PAIEMENT */}
+      {/* <Drawer.Screen
+        name="PaymentMethods"
+        component={PaymentMethodsScreen}
+        options={{
+          title: i18n.t('payment.paymentMethodsTitle'),
+          drawerIcon: ({ focused, size }) => (
+            <MaterialIcons
+              name="payment"
+              color={focused ? colors.primary : '#666'}
+              size={size}
+            />
+          ),
+          drawerItemStyle: {
+            display: 'none' // Masquer du drawer car accessible depuis les paramètres
+          }
+        }}
+      /> */}
+
       {/* ⚙️ PARAMÈTRES */}
       <Drawer.Screen
         name="Settings"
-        component={SettingsScreen}
+        component={SettingsStackNavigator}
         options={{
           title: i18n.t('navigation.settings'),
           drawerIcon: ({ focused, size }) => (
