@@ -41,6 +41,7 @@ export { default as RatingStats } from './RatingStats';
 
 // PaymentMethodsScreen components
 export { default as PaymentMethodsList } from './PaymentMethodsList';
+export { default as AddPaymentMethodModal } from './AddPaymentMethodModal';
 
 // Settings components
 export { default as PaymentSettings } from './PaymentSettings';

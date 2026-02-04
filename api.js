@@ -291,6 +291,60 @@ class ApiClient {
     }
   }
 
+  // Créer une nouvelle méthode de paiement
+  async createPaymentMethod(paymentMethodData) {
+    try {
+      const result = await this.apiCall('/resource/paymentmethods', {
+        method: 'POST',
+        body: JSON.stringify(paymentMethodData),
+      });
+      return result;
+    } catch (error) {
+      console.error('Error creating payment method:', error);
+      throw error;
+    }
+  }
+
+  // Mettre à jour une méthode de paiement
+  async updatePaymentMethod(paymentMethodId, paymentMethodData) {
+    try {
+      const result = await this.apiCall(`/resource/paymentmethods/${paymentMethodId}`, {
+        method: 'PUT',
+        body: JSON.stringify(paymentMethodData),
+      });
+      return result;
+    } catch (error) {
+      console.error('Error updating payment method:', error);
+      throw error;
+    }
+  }
+
+  // Supprimer une méthode de paiement
+  async deletePaymentMethod(paymentMethodId) {
+    try {
+      const result = await this.apiCall(`/resource/paymentmethods/${paymentMethodId}`, {
+        method: 'DELETE',
+      });
+      return result;
+    } catch (error) {
+      console.error('Error deleting payment method:', error);
+      throw error;
+    }
+  }
+
+  // Définir une méthode de paiement par défaut
+  async setDefaultPaymentMethod(paymentMethodId) {
+    try {
+      const result = await this.apiCall(`/resource/paymentmethods/${paymentMethodId}/set-default`, {
+        method: 'PUT',
+      });
+      return result;
+    } catch (error) {
+      console.error('Error setting default payment method:', error);
+      throw error;
+    }
+  }
+
   // Sauvegarder dans AsyncStorage (pour utilisateurs normaux)
   async saveToStorage() {
     try {
@@ -414,6 +468,10 @@ export const {
   updateDeliveryStatus,
   getDriverStats,
   getPaymentMethods,
+  createPaymentMethod,
+  updatePaymentMethod,
+  deletePaymentMethod,
+  setDefaultPaymentMethod,
   logout,
   getDriverProfile,
   updateDriverProfile,

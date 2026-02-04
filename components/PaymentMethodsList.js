@@ -4,7 +4,7 @@ import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
 
-const PaymentMethodsList = ({ paymentMethods, loading, onRefresh }) => {
+const PaymentMethodsList = ({ paymentMethods, loading, onRefresh, onEdit, onDelete, onSetDefault }) => {
   // Fonction pour obtenir l'icône selon le type de paiement
   const getPaymentIcon = (methodType) => {
     switch (methodType) {
@@ -106,20 +106,32 @@ const PaymentMethodsList = ({ paymentMethods, loading, onRefresh }) => {
             method.isDefault && styles.defaultItem
           ]}
           onPress={() => {
-            // Action à définir - peut-être ouvrir les détails ou changer la méthode par défaut
+            const actions = [
+              { text: i18n.t('common.cancel'), style: 'cancel' }
+            ];
+
+            if (!method.isDefault) {
+              actions.push({
+                text: i18n.t('payment.setAsDefault'),
+                onPress: () => onSetDefault?.(method)
+              });
+            }
+
+            actions.push({
+              text: i18n.t('common.edit'),
+              onPress: () => onEdit?.(method)
+            });
+
+            actions.push({
+              text: i18n.t('common.delete'),
+              style: 'destructive',
+              onPress: () => onDelete?.(method)
+            });
+
             Alert.alert(
               getPaymentTypeName(method.methodType),
               formatMaskedDetails(method),
-              [
-                { text: i18n.t('common.cancel'), style: 'cancel' },
-                method.isDefault ? null : {
-                  text: i18n.t('payment.setAsDefault'),
-                  onPress: () => {
-                    // Logique pour définir comme méthode par défaut
-                    console.log('Set as default:', method._id);
-                  }
-                }
-              ].filter(Boolean)
+              actions
             );
           }}
         >
