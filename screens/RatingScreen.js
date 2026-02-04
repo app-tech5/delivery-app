@@ -45,7 +45,7 @@ export default function RatingScreen() {
         }
       >
         {/* Cartes statistiques principales */}
-        <RatingStats stats={stats} currency={currency} />
+        {/* <RatingStats stats={stats} currency={currency} /> */}
 
         {/* Section des livraisons récentes */}
         {recentDeliveries.length > 0 && (
