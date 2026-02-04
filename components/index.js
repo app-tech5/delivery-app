@@ -36,6 +36,9 @@ export { default as ReportsMetricsGrid } from './ReportsMetricsGrid';
 export { default as AnalyticsCard } from './AnalyticsCard';
 export { default as PerformanceScoreCard } from './PerformanceScoreCard';
 
+// RatingScreen components
+export { default as RatingStats } from './RatingStats';
+
 // OrderDetailsScreen components
 export { default as OrderHeaderCard } from './OrderHeaderCard';
 export { default as CustomerInfoCard } from './CustomerInfoCard';

@@ -48,7 +48,11 @@
     "vsPrevious": "vs Previous",
     "performanceScore": "Performance Score",
     "efficiency": "Efficiency",
-    "consistency": "Consistency"
+    "consistency": "Consistency",
+    "ratingsTitle": "Ratings",
+    "deliveriesRated": "deliveries rated",
+    "totalRatedDeliveries": "Rated Deliveries",
+    "earnings": "Earnings"
   },
   "auth": {
     "welcome": "Welcome to Good Food Driver",

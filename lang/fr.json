@@ -129,7 +129,11 @@
     "vsPrevious": "vs Précédent",
     "performanceScore": "Score de Performance",
     "efficiency": "Efficacité",
-    "consistency": "Régularité"
+    "consistency": "Régularité",
+    "ratingsTitle": "Notes",
+    "deliveriesRated": "livraisons notées",
+    "totalRatedDeliveries": "Livraisons Notées",
+    "earnings": "Gains"
   },
   "orderDetails": {
     "title": "Détails de la Commande",

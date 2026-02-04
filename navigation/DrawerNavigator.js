@@ -6,6 +6,7 @@ import DeliveriesScreen from '../screens/DeliveriesScreen';
 import EarningsScreen from '../screens/EarningsScreen';
 import TransactionsScreen from '../screens/TransactionsScreen';
 import ReportsScreen from '../screens/ReportsScreen';
+import RatingScreen from '../screens/RatingScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
@@ -196,6 +197,22 @@ export default function DrawerNavigator() {
           drawerIcon: ({ focused, size }) => (
             <Ionicons
               name="bar-chart-outline"
+              color={focused ? colors.primary : '#666'}
+              size={size}
+            />
+          ),
+        }}
+      />
+
+      {/* ⭐ NOTES & ÉVALUATIONS */}
+      <Drawer.Screen
+        name="Ratings"
+        component={RatingScreen}
+        options={{
+          title: i18n.t('reports.ratingsTitle'),
+          drawerIcon: ({ focused, size }) => (
+            <MaterialIcons
+              name="star-outline"
               color={focused ? colors.primary : '#666'}
               size={size}
             />
