@@ -205,7 +205,7 @@ export default function DrawerNavigator() {
       />
 
       {/* ⭐ NOTES & ÉVALUATIONS */}
-      {/* <Drawer.Screen
+      <Drawer.Screen
         name="Ratings"
         component={RatingScreen}
         options={{
@@ -218,7 +218,7 @@ export default function DrawerNavigator() {
             />
           ),
         }}
-      /> */}
+      />
 
       {/* 🔔 NOTIFICATIONS */}
       <Drawer.Screen
