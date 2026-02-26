@@ -47,3 +47,5 @@ export const mapHistoryStatsToUI = (stats, currency) => ({
   // Données brutes pour logique métier
   rawStats: stats
 });
+
+

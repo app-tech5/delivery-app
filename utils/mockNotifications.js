@@ -117,3 +117,5 @@ export const NOTIFICATION_FILTERS = [
   { key: 'system', label: i18n.t('notifications.system'), icon: 'info' },
   { key: 'promotion', label: i18n.t('notifications.promotion'), icon: 'local-offer' }
 ];
+
+

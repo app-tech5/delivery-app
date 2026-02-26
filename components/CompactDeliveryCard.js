@@ -50,3 +50,5 @@ const CompactDeliveryCard = ({ delivery, currency, onAccept, onStartDelivery, on
 };
 
 export default CompactDeliveryCard;
+
+

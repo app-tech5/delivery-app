@@ -44,3 +44,5 @@ export const isLanguageSupported = (language) => !!i18n.translations[language];
 export const supportedLanguages = Object.keys(i18n.translations);
 
 export default i18n;
+
+

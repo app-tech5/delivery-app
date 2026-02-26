@@ -27,3 +27,5 @@ export const TRANSACTION_STATUSES = {
   PENDING: 'pending',
   FAILED: 'failed'
 };
+
+

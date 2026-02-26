@@ -25,3 +25,5 @@ export const getDriverLocation = (driver) => {
 export const getActiveDeliveries = (deliveries) => {
   return deliveries.filter(delivery => delivery.status === 'out_for_delivery');
 };
+
+

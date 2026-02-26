@@ -26,3 +26,5 @@ const DeliveryStatusBadge = ({ status, compact = false }) => {
 };
 
 export default DeliveryStatusBadge;
+
+

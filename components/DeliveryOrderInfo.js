@@ -19,3 +19,5 @@ const DeliveryOrderInfo = ({ delivery }) => {
 };
 
 export default DeliveryOrderInfo;
+
+

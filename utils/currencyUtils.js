@@ -71,3 +71,5 @@ export const findCurrencyByCode = (code) => {
 export const isCurrencySupported = (code) => {
   return SUPPORTED_CURRENCIES.some(currency => currency.key === code);
 };
+
+

@@ -208,3 +208,5 @@ export const timelineStyles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+

@@ -24,3 +24,5 @@ const DeliveryInfo = ({ delivery }) => (
 );
 
 export default DeliveryInfo;
+
+

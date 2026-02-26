@@ -127,3 +127,5 @@ export const deliveryCardStyles = StyleSheet.create({
     fontStyle: 'italic',
   },
 });
+
+

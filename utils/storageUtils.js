@@ -133,3 +133,5 @@ export const multiRemoveFromStorage = async (keys) => {
     console.error('Erreur lors de la suppression multiple:', error);
   }
 };
+
+
