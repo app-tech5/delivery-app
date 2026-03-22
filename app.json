@@ -7,11 +7,11 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "version": "1.0.0",
+    "version": "1.1.0",
     "slug": "good-food-driver",
     "ios": {
       "bundleIdentifier": "com.goodfood.driver",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.1.0"
     },
     "android": {
       "permissions": [
@@ -20,7 +20,7 @@
         "FOREGROUND_SERVICE"
       ],
       "package": "com.goodfood.driver",
-      "versionCode": 1
+      "versionCode": 2
     },
     "plugins": [
       "expo-font",
@@ -29,5 +29,6 @@
     ]
   }
 }
+
 
 

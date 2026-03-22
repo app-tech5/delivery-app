@@ -13,7 +13,7 @@ export const config = {
 
   // Informations de l'application
   APP_NAME: 'Good Food Driver',
-  VERSION: '1.0.0',
+  VERSION: '1.1.0',
 
   // Mode démonstration - préremplit les champs de connexion driver
   DEMO_MODE: true,

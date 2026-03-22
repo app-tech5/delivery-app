@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "Good Food Driver",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "navigation": {
     "home": "Home",
@@ -198,7 +198,8 @@
     "locationError": "Location access error",
     "permissionDenied": "Permission denied",
     "tryAgain": "Try again",
-    "checkConnection": "Check your internet connection"
+    "checkConnection": "Check your internet connection",
+    "settingsContext": "useSettings must be used within a SettingProvider"
   },
   "common": {
     "loading": "Loading...",
