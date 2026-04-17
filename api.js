@@ -203,6 +203,13 @@ class ApiClient {
     });
   }
 
+  async updateOrder(orderId, data) {
+    return await this.apiCall(`/resource/orders/${orderId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
   // Récupérer les statistiques du driver
   async getDriverStats() {
     try {
