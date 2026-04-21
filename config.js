@@ -2,11 +2,11 @@
 export const config = {
   // URL de votre serveur Express/MongoDB
   // Pour le développement local :
-  // API_BASE_URL: 'http://localhost:8080/api',
+  API_BASE_URL: 'http://localhost:5000/api',
 
   // Pour le développement avec ngrok (si nécessaire) :
   // API_BASE_URL: 'https://votre-ngrok-url.ngrok-free.dev/api',
-  API_BASE_URL: 'https://deshawn-athermanous-indefensibly.ngrok-free.dev/api',
+  // API_BASE_URL: 'https://deshawn-athermanous-indefensibly.ngrok-free.dev/api',
 
   // Configuration Google Maps (nécessaire pour la géolocalisation)
   GOOGLE_MAPS_API_KEY: 'YOUR_GOOGLE_MAPS_API_KEY',
@@ -16,7 +16,7 @@ export const config = {
   VERSION: '1.1.0',
 
   // Mode démonstration - préremplit les champs de connexion driver
-  DEMO_MODE: true,
+  DEMO_MODE: false,
 
   // Identifiants de démonstration (utilisés uniquement en mode DEMO_MODE)
   DEMO_EMAIL: 'driver@demo.com',

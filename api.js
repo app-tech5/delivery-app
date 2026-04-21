@@ -90,9 +90,13 @@ class ApiClient {
         this.token = response.token;
         this.user = response.user;
 
-        // Vérifier si cet utilisateur a un profil driver
+        // Vérifier si cet utilisateur a un profil driver via la route générique
         try {
-          const driverProfile = await this.apiCall('/drivers/profile');
+          const driverProfiles = await this.apiCall('/resource/drivers/byUserId');
+          const driverProfile = Array.isArray(driverProfiles) ? driverProfiles[0] : driverProfiles;
+          if (!driverProfile) {
+            throw new Error('Driver profile not found');
+          }
           this.driver = driverProfile;
         } catch (driverError) {
           // L'utilisateur n'a pas de profil driver
@@ -393,15 +397,30 @@ class ApiClient {
 
   // Récupérer le profil du driver
   async getDriverProfile() {
-    return await this.apiCall('/drivers/profile');
+    const driverProfiles = await this.apiCall('/resource/drivers/byUserId');
+    const driverProfile = Array.isArray(driverProfiles) ? driverProfiles[0] : driverProfiles;
+    if (!driverProfile) {
+      throw new Error('Profil driver introuvable');
+    }
+    this.driver = driverProfile;
+    return driverProfile;
   }
 
   // Mettre à jour le profil du driver
   async updateDriverProfile(profileData) {
-    return await this.apiCall('/drivers/profile', {
+    const driver = this.driver || await this.getDriverProfile();
+    const driverId = driver?._id || driver?.id;
+    if (!driverId) {
+      throw new Error('Profil driver introuvable');
+    }
+
+    const updatedDriver = await this.apiCall(`/resource/drivers/${driverId}`, {
       method: 'PUT',
       body: JSON.stringify(profileData),
     });
+    this.driver = updatedDriver;
+    await this.saveDriverToStorage();
+    return updatedDriver;
   }
 
   // Récupérer les settings de l'application
