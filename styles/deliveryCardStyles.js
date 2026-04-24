@@ -72,6 +72,10 @@ export const deliveryCardStyles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 8,
   },
+  outForDeliveryButton:{
+    backgroundColor: colors.rating,
+    borderRadius: 8,
+  },
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

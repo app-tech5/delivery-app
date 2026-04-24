@@ -91,7 +91,10 @@ export const useDriverOrders = (driver, isAuthenticated) => {
     }
 
     try {
-      const response = await apiClient.acceptOrder(orderId);
+      const response = await apiClient.updateOrder(orderId, {
+        driver: driver?._id,
+        status: 'accepted'
+      });
       await loadDriverOrders(); // Recharger les commandes
       return response;
     } catch (error) {
@@ -116,7 +119,7 @@ export const useDriverOrders = (driver, isAuthenticated) => {
     }
 
     try {
-      const response = await apiClient.updateOrderStatus(orderId, status);
+      const response = await apiClient.updateOrder(orderId, { status });
       // Invalider le cache après mise à jour pour forcer un rechargement frais
       if (driver?._id) {
         await clearDeliveriesCache(driver._id);

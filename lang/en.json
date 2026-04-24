@@ -17,7 +17,7 @@
     "logout": "Logout",
     "deliveryDetails": "Delivery Details"
   },
-  "reports": {
+  "reports1": {
     "title": "Reports",
     "performance": "Performance",
     "analytics": "Analytics",
@@ -317,7 +317,8 @@
     "daysAgo": "days ago",
     "noTransactionsForPeriod": "No transactions for this period",
     "deliveryDescription": "Delivery #",
-    "completedStatus": "Completed"
+    "completedStatus": "Completed",
+    "outForDeliveryButton": "Out for delivery"
   },
   "orderDetails": {
     "title": "Order Details",

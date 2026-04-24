@@ -39,9 +39,9 @@ const DeliveryActions = ({ delivery, onAccept, onStartDelivery, onMarkDelivered,
       case DELIVERY_STATUSES.OUT_FOR_DELIVERY:
         return (
           <Button
-            title={i18n.t('reports.deliveredButton')}
+            title={i18n.t('reports.outForDeliveryButton')}
             onPress={() => onMarkDelivered(delivery._id)}
-            buttonStyle={styles.deliveredButton}
+            buttonStyle={styles.outForDeliveryButton}
             icon={
               <Icon
                 name="check-circle"

@@ -179,17 +179,6 @@ class ApiClient {
     return await this.apiCall('/resource/orders?status=preparing');
   }
 
-  // Accepter une commande pour livraison
-  async acceptOrder(orderId) {
-    return await this.apiCall(`/resource/orders/${orderId}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        driver: this.driver._id,
-        status: 'out_for_delivery'
-      }),
-    });
-  }
-
   // Récupérer les commandes du driver
   async getDriverOrders(status = null) {
     let query = `driver=${this.driver._id}`;
@@ -199,14 +188,7 @@ class ApiClient {
     return await this.apiCall(`/resource/orders?${query}`);
   }
 
-  // Mettre à jour le statut d'une commande
-  async updateOrderStatus(orderId, status) {
-    return await this.apiCall(`/resource/orders/${orderId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ status }),
-    });
-  }
-
+  // Mettre à jour une commande (statut, driver, etc.)
   async updateOrder(orderId, data) {
     return await this.apiCall(`/resource/orders/${orderId}`, {
       method: 'PUT',
