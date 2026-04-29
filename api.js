@@ -404,6 +404,15 @@ class ApiClient {
     await this.saveDriverToStorage();
     return updatedDriver;
   }
+  
+  async updateDriver(data) {
+    this.driver = await this.apiCall(`/resource/drivers/${this.driver._id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    await this.saveDriverToStorage();
+    return this.driver;
+  }
 
   // Récupérer les settings de l'application
   async getSettings() {
@@ -483,6 +492,7 @@ export const {
   logout,
   getDriverProfile,
   updateDriverProfile,
+  updateDriver,
 } = apiClient;
 
 // Export séparé pour getSettings (comme dans customer-app)

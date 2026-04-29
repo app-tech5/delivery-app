@@ -93,7 +93,7 @@ export const useDriverOrders = (driver, isAuthenticated) => {
     try {
       const response = await apiClient.updateOrder(orderId, {
         driver: driver?._id,
-        status: 'accepted'
+        status: 'out_for_delivery'
       });
       await loadDriverOrders(); // Recharger les commandes
       return response;

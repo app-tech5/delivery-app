@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -29,6 +29,7 @@ import {
   DELIVERY_STATUSES,
   DELIVERY_STATUS_LABELS
 } from '../utils';
+import { OrdersContext } from '../contexts/OrdersContext';
 
 const { width } = Dimensions.get('window');
 
@@ -43,6 +44,8 @@ export default function DeliveriesScreen() {
     loadDriverOrders,
     invalidateDeliveriesCache
   } = useDriver();
+
+  const { orders, setOrders } = useContext(OrdersContext);
 
   const { currency } = useSettings();
 
@@ -65,10 +68,16 @@ export default function DeliveriesScreen() {
   ];
 
   // Filtrer les livraisons selon le filtre actif
-  const filteredDeliveries = deliveries.filter(delivery => {
+  const filteredDeliveries = orders.filter(delivery => {
     if (activeFilter === 'all') return true;
     return delivery.status === activeFilter;
   });
+
+  useEffect(() => {
+    if (orders.length === 0 && deliveries.length > 0) {
+      setOrders(deliveries);
+    }
+  }, [orders.length, deliveries, setOrders]);
 
   // Utiliser le hook pour les actions sur les livraisons
   const { handleAcceptDelivery, handleStartDelivery, handleMarkDelivered, handleStatusChange } = useDeliveryActions();
@@ -101,7 +110,7 @@ export default function DeliveriesScreen() {
         <>
           <ScreenHeader
             title={i18n.t('navigation.deliveries')}
-            subtitle={`${filteredDeliveries.length} ${filteredDeliveries.length === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')}`}
+            subtitle={`${orders.length} ${orders.length === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')}`}
           />
 
           {/* Filtres */}
