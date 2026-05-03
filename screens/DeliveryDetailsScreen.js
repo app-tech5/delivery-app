@@ -29,7 +29,8 @@ import {
   OrderItemsCard,
   OrderSummaryCard,
   CustomerInfoCard,
-  RestaurantInfoCard
+  RestaurantInfoCard,
+  DriverInfoCard
 } from '../components';
 
 // Import hooks
@@ -186,6 +187,8 @@ export default function DeliveryDetailsScreen() {
             order={order}
             onNavigate={handleNavigate}
           />
+
+          <DriverInfoCard order={order} />
 
           {/* Customer Info */}
           <CustomerInfoCard

@@ -51,6 +51,7 @@ export { default as VehicleInfoCard } from './VehicleInfoCard';
 export { default as OrderHeaderCard } from './OrderHeaderCard';
 export { default as CustomerInfoCard } from './CustomerInfoCard';
 export { default as RestaurantInfoCard } from './RestaurantInfoCard';
+export { default as DriverInfoCard } from './DriverInfoCard';
 export { default as OrderItemsCard } from './OrderItemsCard';
 export { default as OrderSummaryCard } from './OrderSummaryCard';
 export { default as OrderActionButtons } from './OrderActionButtons';

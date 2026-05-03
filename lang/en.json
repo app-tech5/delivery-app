@@ -367,7 +367,11 @@
     "delivered": "Delivered",
     "deliveryActions": "Delivery Actions",
     "navigateTo": "Navigate to",
-    "navigation": "Navigation"
+    "navigation": "Navigation",
+    "driverPhone": "Driver Phone",
+    "callDriver": "Call Driver",
+    "noDriverAssigned": "No driver assigned yet",
+    "vehicle": "Vehicle"
   },
   "notifications": {
     "title": "Notifications",
