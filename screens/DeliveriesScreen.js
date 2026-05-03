@@ -74,10 +74,10 @@ export default function DeliveriesScreen() {
   });
 
   useEffect(() => {
-    if (orders.length === 0 && deliveries.length > 0) {
+    if (deliveries.length > 0) {
       setOrders(deliveries);
     }
-  }, [orders.length, deliveries, setOrders]);
+  }, [deliveries, setOrders]);
 
   // Utiliser le hook pour les actions sur les livraisons
   const { handleAcceptDelivery, handleStartDelivery, handleMarkDelivered, handleStatusChange } = useDeliveryActions();
