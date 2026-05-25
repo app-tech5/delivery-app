@@ -22,6 +22,7 @@ import { ScreenHeader } from '../components';
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState(config.DEMO_MODE ? config.DEMO_EMAIL : '');
   const [password, setPassword] = useState(config.DEMO_MODE ? config.DEMO_PASSWORD : '');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useDriver();
 
@@ -139,13 +140,22 @@ export default function LoginScreen({ navigation }) {
               placeholder="Mot de passe"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
+              secureTextEntry={!showPassword}
               leftIcon={
                 <Icon
                   name="lock"
                   type="material"
                   size={20}
                   color={colors.primary}
+                />
+              }
+              rightIcon={
+                <Icon
+                  name={showPassword ? "visibility-off" : "visibility"}
+                  type="material"
+                  size={20}
+                  color={colors.grey[500]}
+                  onPress={() => setShowPassword(!showPassword)}
                 />
               }
               containerStyle={styles.inputContainer}

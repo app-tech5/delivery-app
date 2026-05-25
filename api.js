@@ -65,7 +65,9 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const error = new Error(`HTTP error! status: ${response.status}`);
+        error.status = response.status;
+        throw error;
       }
 
       return await response.json();
@@ -78,10 +80,10 @@ class ApiClient {
     }
   }
 
-  // Authentification driver - utilise la même route login que les utilisateurs
+  // Authentification driver
   async driverLogin(email, password) {
     try {
-      const response = await this.apiCall('/auth/login', {
+      const response = await this.apiCall('/auth/delivery-login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });

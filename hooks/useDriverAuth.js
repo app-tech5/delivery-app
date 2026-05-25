@@ -40,6 +40,14 @@ export const useDriverAuth = (onDriverLoaded, onStatsLoaded, onOrdersLoaded) => 
               await updateDriverCache(freshDriverData);
             }
           } catch (refreshError) {
+            if (refreshError.status === 403) {
+              await clearDriverCache();
+              setDriver(null);
+              setIsAuthenticated(false);
+              apiClient.token = null;
+              apiClient.driver = null;
+              return;
+            }
             console.log('Could not refresh driver data, using cached data:', refreshError.message);
           }
 
