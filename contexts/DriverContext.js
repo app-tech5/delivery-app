@@ -1,4 +1,6 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
+import { io } from 'socket.io-client';
+import { config } from '../config';
 import { useDriverAuth } from '../hooks/useDriverAuth';
 import { useDriverStats } from '../hooks/useDriverStats';
 import { useDriverOrders } from '../hooks/useDriverOrders';
@@ -65,6 +67,26 @@ export const DriverProvider = ({ children }) => {
       throw error;
     }
   };
+
+  useEffect(() => {
+    const userId = driver?.userId?._id || driver?.userId;
+    if (!isAuthenticated || !userId) return;
+
+    const url = String(config.API_BASE_URL).replace(/\/api\/?$/, '');
+    const socket = io(url);
+
+    socket.on('connect', () => {
+      socket.emit('joinUserRoom', String(userId));
+    });
+
+    socket.on('user-disabled', () => {
+      logout();
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [driver, isAuthenticated]);
 
   const value = {
     driver,
