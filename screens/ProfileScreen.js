@@ -3,16 +3,22 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Alert,
-  Dimensions
+  Dimensions,
+  Linking,
+  ActivityIndicator,
+  TextInput,
 } from 'react-native';
-import { Card, Icon, Button, Avatar, Badge } from 'react-native-elements';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Card, Icon, Button, Avatar } from 'react-native-elements';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../global';
 import i18n from '../i18n';
+import { DOCUMENT_TYPES } from '../config';
+import apiClient from '../api';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { useNavigation } from '@react-navigation/native';
@@ -22,30 +28,96 @@ const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
-  const { driver, isAuthenticated, stats, logout } = useDriver();
+  const insets = useSafeAreaInsets();
+  const { driver, isAuthenticated, stats, logout, setDriver } = useDriver();
   const { currency } = useSettings();
 
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploadingDocType, setUploadingDocType] = useState(null);
+  const [customDocType, setCustomDocType] = useState('');
   const [editData, setEditData] = useState({
     fullName: '',
     phone: '',
-    address: ''
+    address: '',
+    image: '',
+    licenseNumber: '',
+    vehicleType: '',
+    vehicleModel: '',
+    licensePlate: '',
   });
 
-  // Données simulées pour les documents et véhicule (en production viendrait du backend)
-  const mockVehicleData = {
-    type: 'Scooter',
-    model: 'Yamaha NMAX 125',
-    licensePlate: 'AB-123-CD',
-    insuranceExpiry: '2024-12-31'
+  const vehicle = driver?.vehicle || {};
+
+  const getDocumentLabel = (type) =>
+    i18n.t(type, { defaultValue: type.replace(/_/g, ' ') });
+
+  const normalizeDocType = (value) =>
+    value.trim().toLowerCase().replace(/\s+/g, '_');
+
+  const uploadedTypes = (driver?.documents || []).map((doc) => doc.type);
+  const documentTypes = [...new Set([...DOCUMENT_TYPES, ...uploadedTypes])];
+
+  const driverDocuments = documentTypes.map((type) => {
+    const uploaded = (driver?.documents || []).find((doc) => doc.type === type);
+    return {
+      type,
+      fileUrl: uploaded?.fileUrl,
+      canUpload: DOCUMENT_TYPES.includes(type),
+      status: uploaded?.fileUrl
+        ? (driver?.isApproved ? 'verified' : 'pending')
+        : null,
+    };
+  });
+
+  const pickAndUploadDocument = async (rawDocType) => {
+    const docType = normalizeDocType(rawDocType);
+
+    if (!docType) {
+      Alert.alert(i18n.t('profile.documentTypeRequired'));
+      return;
+    }
+
+    if ((driver?.documents || []).some((doc) => doc.type === docType)) {
+      Alert.alert(i18n.t('profile.documentAlreadyAdded'));
+      return;
+    }
+
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(i18n.t('profile.uploadError'));
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+    });
+
+    if (result.canceled) return;
+
+    setUploadingDocType(docType);
+    try {
+      const updatedDriver = await apiClient.uploadDriverDocument(
+        docType,
+        result.assets[0]
+      );
+      setDriver(updatedDriver);
+      setCustomDocType('');
+      Alert.alert(i18n.t('profile.uploadSuccess'));
+    } catch (error) {
+      console.error('Document upload error:', error);
+      Alert.alert(
+        error.message === 'Document already added'
+          ? i18n.t('profile.documentAlreadyAdded')
+          : i18n.t('profile.uploadError')
+      );
+    } finally {
+      setUploadingDocType(null);
+    }
   };
 
-  const mockDocuments = [
-    { id: 'license', name: 'Driver License', status: 'verified', expiry: '2025-06-15' },
-    { id: 'insurance', name: 'Vehicle Insurance', status: 'verified', expiry: '2024-12-31' },
-    { id: 'registration', name: 'Vehicle Registration', status: 'pending', expiry: null },
-    { id: 'background', name: 'Background Check', status: 'verified', expiry: null }
-  ];
+  const handleUploadDocument = (docType) => pickAndUploadDocument(docType);
 
   // Navigation vers les détails du véhicule
   const navigateToVehicleDetails = () => {
@@ -91,26 +163,84 @@ export default function ProfileScreen() {
     setEditData({
       fullName: driver?.userId?.name || '',
       phone: driver?.userId?.phone || '',
-      address: driver?.userId?.address || ''
+      address: driver?.userId?.address || '',
+      image: driver?.userId?.image || '',
+      licenseNumber: driver?.licenseNumber || '',
+      vehicleType: vehicle.type || '',
+      vehicleModel: vehicle.model || '',
+      licensePlate: vehicle.licensePlate || '',
     });
   };
 
-  // Gestionnaire de sauvegarde
-  const handleSave = () => {
-    // Simulation de sauvegarde
-    Alert.alert('Success', i18n.t('profile.updateSuccess'));
-    setIsEditing(false);
+  const handleChangePhoto = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(i18n.t('profile.uploadError'));
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+    });
+
+    if (result.canceled) return;
+
+    try {
+      const url = await apiClient.uploadFile(result.assets[0]);
+      setEditData((prev) => ({ ...prev, image: url }));
+    } catch (error) {
+      console.error('Photo upload error:', error);
+      Alert.alert(i18n.t('profile.uploadError'));
+    }
   };
 
-  // Gestionnaire d'annulation
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await apiClient.updateUser({
+        name: editData.fullName,
+        phone: editData.phone,
+        address: editData.address,
+        image: editData.image,
+      });
+      const updatedDriver = await apiClient.updateDriverProfile({
+        licenseNumber: editData.licenseNumber,
+        vehicle: {
+          type: editData.vehicleType,
+          model: editData.vehicleModel,
+          licensePlate: editData.licensePlate,
+        },
+      });
+      setDriver(updatedDriver);
+      setIsEditing(false);
+      Alert.alert(i18n.t('profile.updateSuccess'));
+    } catch (error) {
+      console.error('Profile update error:', error);
+      Alert.alert(i18n.t('profile.updateError'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleCancel = () => {
     setIsEditing(false);
-    setEditData({
-      fullName: '',
-      phone: '',
-      address: ''
-    });
   };
+
+  const renderField = (label, value, fieldKey, readOnly = false) => (
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      {isEditing && !readOnly ? (
+        <TextInput
+          style={styles.editInput}
+          value={editData[fieldKey]}
+          onChangeText={(text) => setEditData((prev) => ({ ...prev, [fieldKey]: text }))}
+        />
+      ) : (
+        <Text style={styles.infoValue}>{value || 'Not provided'}</Text>
+      )}
+    </View>
+  );
 
   // Obtenir la couleur du statut des documents
   const getDocumentStatusColor = (status) => {
@@ -138,30 +268,52 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
       <ScreenHeader
         title={i18n.t('navigation.profile')}
-        containerStyle={{ paddingTop: 10 }}
-        rightComponent={!isEditing ? (
+        containerStyle={{ paddingTop: Math.max(insets.top, 12) + 8 }}
+        leftComponent={isEditing ? (
+          <TouchableOpacity onPress={handleCancel} style={styles.headerAction}>
+            <Text style={styles.headerActionText}>{i18n.t('common.cancel')}</Text>
+          </TouchableOpacity>
+        ) : null}
+        rightComponent={isEditing ? (
+          <TouchableOpacity
+            onPress={handleSave}
+            disabled={saving}
+            style={styles.headerAction}
+          >
+            {saving ? (
+              <ActivityIndicator size="small" color={colors.white} />
+            ) : (
+              <Text style={styles.headerActionText}>{i18n.t('common.save')}</Text>
+            )}
+          </TouchableOpacity>
+        ) : (
           <TouchableOpacity onPress={handleEdit} style={styles.editButton}>
             <Icon name="edit" type="material" size={20} color={colors.white} />
           </TouchableOpacity>
-        ) : null}
+        )}
       />
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{ paddingBottom: 24 }}
+      >
         {/* Section Photo et Infos de Base */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             <Avatar
               size="xlarge"
               rounded
-              source={driver?.userId?.image ? { uri: driver.userId.image } : null}
+              source={(isEditing && editData.image) || driver?.userId?.image
+                ? { uri: (isEditing && editData.image) || driver?.userId?.image }
+                : null}
               title={driver?.userId?.name?.charAt(0)?.toUpperCase() || 'D'}
               containerStyle={styles.avatar}
             />
             {isEditing && (
-              <TouchableOpacity style={styles.changePhotoButton}>
+              <TouchableOpacity style={styles.changePhotoButton} onPress={handleChangePhoto}>
                 <Icon name="camera" type="material" size={16} color={colors.white} />
               </TouchableOpacity>
             )}
@@ -217,33 +369,10 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>{i18n.t('profile.personalInfo')}</Text>
 
           <Card containerStyle={styles.infoCard}>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>{i18n.t('profile.fullName')}</Text>
-              <Text style={styles.infoValue}>
-                {driver?.userId?.name || 'Not provided'}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>{i18n.t('profile.email')}</Text>
-              <Text style={styles.infoValue}>
-                {driver?.userId?.email || 'Not provided'}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>{i18n.t('profile.phone')}</Text>
-              <Text style={styles.infoValue}>
-                {driver?.userId?.phone || 'Not provided'}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>{i18n.t('profile.address')}</Text>
-              <Text style={styles.infoValue}>
-                {driver?.userId?.address || 'Not provided'}
-              </Text>
-            </View>
+            {renderField(i18n.t('profile.fullName'), driver?.userId?.name, 'fullName')}
+            {renderField(i18n.t('profile.email'), driver?.userId?.email, 'email', true)}
+            {renderField(i18n.t('profile.phone'), driver?.userId?.phone, 'phone')}
+            {renderField(i18n.t('profile.address'), driver?.userId?.address, 'address')}
 
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>{i18n.t('profile.memberSince')}</Text>
@@ -257,35 +386,20 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>{i18n.t('profile.vehicleInfo')}</Text>
 
           <Card containerStyle={styles.infoCard}>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>{i18n.t('profile.vehicleType')}</Text>
-              <Text style={styles.infoValue}>{mockVehicleData.type}</Text>
-            </View>
+            {renderField(i18n.t('profile.licenseNumber'), driver?.licenseNumber, 'licenseNumber')}
+            {renderField(i18n.t('profile.vehicleType'), vehicle.type, 'vehicleType')}
+            {renderField(i18n.t('profile.vehicleModel'), vehicle.model, 'vehicleModel')}
+            {renderField(i18n.t('profile.licensePlate'), vehicle.licensePlate, 'licensePlate')}
 
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>{i18n.t('profile.vehicleModel')}</Text>
-              <Text style={styles.infoValue}>{mockVehicleData.model}</Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>{i18n.t('profile.licensePlate')}</Text>
-              <Text style={styles.infoValue}>{mockVehicleData.licensePlate}</Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>{i18n.t('profile.insuranceExpiry')}</Text>
-              <Text style={styles.infoValue}>
-                {new Date(mockVehicleData.insuranceExpiry).toLocaleDateString('en-US')}
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.vehicleDetailsButton}
-              onPress={navigateToVehicleDetails}
-            >
-              <MaterialIcons name="expand-more" size={20} color={colors.primary} />
-              <Text style={styles.vehicleDetailsText}>{i18n.t('profile.viewVehicleDetails')}</Text>
-            </TouchableOpacity>
+            {!isEditing && (
+              <TouchableOpacity
+                style={styles.vehicleDetailsButton}
+                onPress={navigateToVehicleDetails}
+              >
+                <MaterialIcons name="expand-more" size={20} color={colors.primary} />
+                <Text style={styles.vehicleDetailsText}>{i18n.t('profile.viewVehicleDetails')}</Text>
+              </TouchableOpacity>
+            )}
           </Card>
         </View>
 
@@ -293,43 +407,83 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{i18n.t('profile.documents')}</Text>
 
-          {mockDocuments.map((doc) => (
-            <Card key={doc.id} containerStyle={styles.documentCard}>
-              <View style={styles.documentHeader}>
+          <Card containerStyle={styles.infoCard}>
+            {driverDocuments.map((doc) => (
+              <View key={doc.type} style={styles.documentRow}>
                 <View style={styles.documentInfo}>
-                  <Text style={styles.documentName}>{doc.name}</Text>
-                  {doc.expiry && (
-                    <Text style={styles.documentExpiry}>
-                      Expires: {new Date(doc.expiry).toLocaleDateString('en-US')}
-                    </Text>
+                  <Text style={styles.infoLabel}>{getDocumentLabel(doc.type)}</Text>
+                  {doc.fileUrl && (
+                    <TouchableOpacity onPress={() => Linking.openURL(doc.fileUrl)}>
+                      <Text style={styles.documentLink}>{i18n.t('viewDocument')}</Text>
+                    </TouchableOpacity>
                   )}
                 </View>
 
-                <Badge
-                  value={getDocumentStatusLabel(doc.status)}
-                  status={doc.status === 'verified' ? 'success' : doc.status === 'pending' ? 'warning' : 'error'}
-                  containerStyle={styles.documentBadge}
-                />
+                {doc.status ? (
+                  <View
+                    style={[
+                      styles.statusPill,
+                      { backgroundColor: `${getDocumentStatusColor(doc.status)}20` },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusPillText,
+                        { color: getDocumentStatusColor(doc.status) },
+                      ]}
+                    >
+                      {getDocumentStatusLabel(doc.status)}
+                    </Text>
+                  </View>
+                ) : doc.canUpload ? (
+                  <TouchableOpacity
+                    style={styles.uploadAction}
+                    onPress={() => handleUploadDocument(doc.type)}
+                    disabled={!!uploadingDocType}
+                  >
+                    {uploadingDocType === doc.type ? (
+                      <ActivityIndicator size="small" color={colors.primary} />
+                    ) : (
+                      <>
+                        <MaterialIcons name="cloud-upload" size={18} color={colors.primary} />
+                        <Text style={styles.uploadActionText}>
+                          {i18n.t('profile.uploadDocument')}
+                        </Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                ) : null}
               </View>
+            ))}
 
-              {doc.status !== 'verified' && (
-                <Button
-                  title={i18n.t('profile.uploadDocument')}
-                  buttonStyle={styles.uploadButton}
-                  titleStyle={styles.uploadButtonText}
-                  icon={
-                    <Icon
-                      name="upload"
-                      type="material"
-                      size={16}
-                      color={colors.primary}
-                      style={{ marginRight: 8 }}
-                    />
-                  }
-                />
-              )}
-            </Card>
-          ))}
+            <View style={[styles.documentRow, styles.documentRowLast, styles.customDocRow]}>
+              <TextInput
+                style={styles.customDocInput}
+                placeholder={i18n.t('profile.documentTypePlaceholder')}
+                placeholderTextColor={colors.text.secondary}
+                value={customDocType}
+                onChangeText={setCustomDocType}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <TouchableOpacity
+                style={styles.uploadAction}
+                onPress={() => pickAndUploadDocument(customDocType)}
+                disabled={!!uploadingDocType || !customDocType.trim()}
+              >
+                {uploadingDocType === normalizeDocType(customDocType) ? (
+                  <ActivityIndicator size="small" color={colors.primary} />
+                ) : (
+                  <>
+                    <MaterialIcons name="cloud-upload" size={18} color={colors.primary} />
+                    <Text style={styles.uploadActionText}>
+                      {i18n.t('profile.uploadDocument')}
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </Card>
         </View>
 
         {/* Actions */}
@@ -366,23 +520,6 @@ export default function ProfileScreen() {
           />
         </View>
 
-        {/* Boutons d'édition */}
-        {isEditing && (
-          <View style={styles.editActions}>
-            <Button
-              title={i18n.t('common.cancel')}
-              buttonStyle={styles.cancelButton}
-              onPress={handleCancel}
-            />
-            <Button
-              title={i18n.t('profile.saveChanges')}
-              buttonStyle={styles.saveButton}
-              onPress={handleSave}
-            />
-          </View>
-        )}
-
-        {/* Espace en bas pour le scroll */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </SafeAreaView>
@@ -399,6 +536,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+  },
+  headerAction: {
+    paddingHorizontal: 4,
+    paddingVertical: 6,
+  },
+  headerActionText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
 
   // ScrollView
@@ -539,42 +685,77 @@ const styles = StyleSheet.create({
     flex: 2,
     textAlign: 'right',
   },
-
-  // Document cards
-  documentCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
+  editInput: {
+    flex: 2,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    fontSize: 14,
+    color: colors.text.primary,
+    textAlign: 'right',
+    backgroundColor: colors.background.secondary,
   },
-  documentHeader: {
+
+  // Documents
+  documentRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.background.secondary,
+  },
+  documentRowLast: {
+    borderBottomWidth: 0,
   },
   documentInfo: {
     flex: 1,
+    marginRight: 12,
   },
-  documentName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: 2,
-  },
-  documentExpiry: {
+  documentLink: {
     fontSize: 12,
-    color: colors.text.secondary,
-  },
-  documentBadge: {
-    marginTop: -4,
-  },
-  uploadButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  uploadButtonText: {
     color: colors.primary,
+    marginTop: 4,
+  },
+  statusPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusPillText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  uploadAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: colors.background.secondary,
+  },
+  uploadActionText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.primary,
+    marginLeft: 6,
+  },
+  customDocRow: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: 10,
+  },
+  customDocInput: {
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: colors.text.primary,
+    backgroundColor: colors.background.secondary,
   },
 
   // Actions section
@@ -597,22 +778,6 @@ const styles = StyleSheet.create({
   },
   logoutButtonText: {
     color: colors.error,
-  },
-
-  // Edit actions
-  editActions: {
-    flexDirection: 'row',
-    padding: 16,
-    paddingTop: 0,
-  },
-  cancelButton: {
-    backgroundColor: colors.text.secondary,
-    marginRight: 8,
-    flex: 1,
-  },
-  saveButton: {
-    backgroundColor: colors.primary,
-    flex: 1,
   },
 
   // Vehicle details button

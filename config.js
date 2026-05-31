@@ -25,3 +25,5 @@ export const config = {
   // Timeout pour les requêtes API (en millisecondes)
   API_TIMEOUT: 10000,
 };
+
+export const DOCUMENT_TYPES = ['driver_license', 'insurance', 'identity_card'];

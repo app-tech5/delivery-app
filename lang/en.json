@@ -508,6 +508,9 @@
     "uploading": "Uploading...",
     "uploadSuccess": "Upload successful",
     "uploadError": "Upload failed",
+    "documentTypePlaceholder": "e.g. vehicle_registration",
+    "documentTypeRequired": "Enter a document name",
+    "documentAlreadyAdded": "This document is already added",
     "updateSuccess": "Profile updated successfully",
     "updateError": "Failed to update profile"
   },
@@ -563,5 +566,9 @@
     "cacheCleared": "Cache cleared successfully",
     "dataCleared": "All data cleared",
     "confirmDataClear": "This will delete all app data. Continue?"
-  }
+  },
+  "driver_license": "Driver's License",
+  "insurance": "Insurance",
+  "identity_card": "Identity Card",
+  "viewDocument": "View Document"
 }

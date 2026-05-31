@@ -103,6 +103,7 @@ export const DriverProvider = ({ children }) => {
     loadDriverOrders,
     invalidateDeliveriesCache,
     invalidateDriverStatsCache,
+    setDriver,
   };
 
   return (

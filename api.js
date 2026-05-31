@@ -55,10 +55,8 @@ class ApiClient {
         ...options,
       };
 
-      // Créer un AbortController pour le timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
-
       config.signal = controller.signal;
 
       const response = await fetch(url, config);
@@ -73,14 +71,45 @@ class ApiClient {
       return await response.json();
     } catch (error) {
       if (error.name === 'AbortError') {
-        throw new Error('Request timeout - vérifiez votre connexion');
+        throw new Error('Request timeout - check your connection');
       }
       console.error(`API call failed: ${endpoint}`, error);
       throw error;
     }
   }
 
-  // Authentification driver
+  async apiCallMultipart(endpoint, options = {}) {
+    try {
+      const url = `${API_BASE_URL}${endpoint}`;
+      const headers = {};
+      if (this.token) {
+        headers.Authorization = `Bearer ${this.token}`;
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+      const response = await fetch(url, {
+        ...options,
+        headers: { ...headers, ...options.headers },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout - check your connection');
+      }
+      console.error(`API call failed: ${endpoint}`, error);
+      throw error;
+    }
+  }
+
   async driverLogin(email, password) {
     try {
       const response = await this.apiCall('/auth/delivery-login', {
@@ -379,26 +408,26 @@ class ApiClient {
     await AsyncStorage.removeItem('driverData');
   }
 
-  // Récupérer le profil du driver
+  // Get driver profile
   async getDriverProfile() {
-    const driverProfiles = await this.apiCall('/resource/drivers/byUserId');
-    const driverProfile = Array.isArray(driverProfiles) ? driverProfiles[0] : driverProfiles;
+    const driverProfile = await this.apiCall('/drivers/profile');
     if (!driverProfile) {
-      throw new Error('Profil driver introuvable');
+      throw new Error('Driver profile not found');
     }
     this.driver = driverProfile;
     return driverProfile;
   }
 
-  // Mettre à jour le profil du driver
-  async updateDriverProfile(profileData) {
-    const driver = this.driver || await this.getDriverProfile();
-    const driverId = driver?._id || driver?.id;
-    if (!driverId) {
-      throw new Error('Profil driver introuvable');
-    }
+  async updateUser(userData) {
+    return await this.apiCall('/users/me', {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+  }
 
-    const updatedDriver = await this.apiCall(`/resource/drivers/${driverId}`, {
+  // Update driver profile
+  async updateDriverProfile(profileData) {
+    const updatedDriver = await this.apiCall('/drivers/profile', {
       method: 'PUT',
       body: JSON.stringify(profileData),
     });
@@ -414,6 +443,36 @@ class ApiClient {
     });
     await this.saveDriverToStorage();
     return this.driver;
+  }
+
+  async uploadFile(asset) {
+    const uri = typeof asset === 'string' ? asset : asset.uri;
+    const formData = new FormData();
+    formData.append('image', {
+      uri,
+      type: typeof asset === 'string' ? 'image/jpeg' : (asset.mimeType || 'image/jpeg'),
+      name: typeof asset === 'string' ? 'upload.jpg' : (asset.fileName || 'upload.jpg'),
+    });
+
+    const data = await this.apiCallMultipart('/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    return data.url;
+  }
+
+  async uploadDriverDocument(docType, asset) {
+    const driver = this.driver || await this.getDriverProfile();
+    const documents = driver.documents || [];
+
+    if (documents.some((doc) => doc.type === docType)) {
+      throw new Error('Document already added');
+    }
+
+    const fileUrl = await this.uploadFile(asset);
+    return await this.updateDriverProfile({
+      documents: [...documents, { type: docType, fileUrl }],
+    });
   }
 
   // Récupérer les settings de l'application
@@ -493,8 +552,10 @@ export const {
   setDefaultPaymentMethod,
   logout,
   getDriverProfile,
+  updateUser,
   updateDriverProfile,
   updateDriver,
+  uploadDriverDocument,
 } = apiClient;
 
 // Export séparé pour getSettings (comme dans customer-app)
