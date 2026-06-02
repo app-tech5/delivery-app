@@ -27,3 +27,12 @@ export const config = {
 };
 
 export const DOCUMENT_TYPES = ['driver_license', 'insurance', 'identity_card'];
+
+export const PUBLIC_UPLOAD_FOLDERS = {
+  AVATARS: 'avatars',
+  RESTAURANTS: 'restaurants',
+  PRODUCTS: 'products',
+  MENU: 'menu',
+  BANNERS: 'banners',
+  CATEGORIES: 'categories',
+};

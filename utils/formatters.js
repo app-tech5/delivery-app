@@ -8,8 +8,10 @@ import { colors } from '../global';
  * @returns {string} Montant formaté
  */
 export const formatCurrency = (amount, currency = null) => {
+  const value = Number(amount);
+  const safeAmount = Number.isFinite(value) ? value : 0;
   const currencyObj = currency || { symbol: '€' };
-  return `${amount?.toFixed(2) || '0.00'}${currencyObj.symbol || '€'}`;
+  return `${safeAmount.toFixed(2)}${currencyObj.symbol || '€'}`;
 };
 
 /**

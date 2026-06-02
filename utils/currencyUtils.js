@@ -20,9 +20,11 @@ export const SUPPORTED_CURRENCIES = [
  * @returns {string} Montant formaté
  */
 export const formatCurrency = (amount, currency = null) => {
+  const value = Number(amount);
+  const safeAmount = Number.isFinite(value) ? value : 0;
   const currencyObj = currency || DEFAULT_CURRENCY;
   const symbol = typeof currencyObj === 'string' ? currencyObj : currencyObj?.symbol || '€';
-  return `${amount?.toFixed(2) || '0.00'}${symbol}`;
+  return `${safeAmount.toFixed(2)}${symbol}`;
 };
 
 /**

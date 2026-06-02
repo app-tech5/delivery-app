@@ -4,6 +4,20 @@ export { default as SettingRow } from './SettingRow';
 export { default as DeliveryCard } from './DeliveryCard';
 export { default as NotificationItem } from './NotificationItem';
 
+export { default as UserAvatar } from './UserAvatar';
+export { default as ProfileHeaderCard } from './ProfileHeaderCard';
+export { default as ProfileStatsGrid } from './ProfileStatsGrid';
+export { default as ProfileInfoField } from './ProfileInfoField';
+export { default as ProfileInfoCard, ProfileVehicleDetailsLink } from './ProfileInfoCard';
+export { default as ProfileDocumentsCard } from './ProfileDocumentsCard';
+export {
+  default as ProfileActionsSection,
+  ProfileEditButton,
+  ProfileCancelButton,
+  ProfileSaveButton,
+  confirmLogout,
+} from './ProfileActionsSection';
+
 // Shared components
 export { default as ScreenHeader } from './ScreenHeader';
 export { default as EmptyState } from './EmptyState';

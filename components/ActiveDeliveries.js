@@ -31,7 +31,7 @@ const DeliveryCard = ({ order, currency, onOrderDelivered, isLoading }) => (
     )}
     <View style={styles.amountSection}>
       <Text style={styles.amountLabel}>{i18n.t('common.amount')}:</Text>
-      <Text style={styles.amountValue}>{order.totalPrice}{currency.symbol}</Text>
+      <Text style={styles.amountValue}>{formatCurrency(order.totalPrice, currency)}</Text>
     </View>
     <View style={styles.deliveryActions}>
       <Button

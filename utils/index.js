@@ -62,6 +62,23 @@ export {
   STORAGE_KEYS
 } from './storageUtils';
 
+export { resolveUploadUrl } from './imageUtils';
+export {
+  normalizeDocType,
+  getDocumentLabel,
+  buildDriverDocuments,
+  getDocumentStatusColor,
+  getDocumentStatusLabel,
+} from './documentUtils';
+export {
+  EMPTY_PROFILE_EDIT_DATA,
+  buildProfileEditData,
+  buildProfileStats,
+  mergeDriverWithUser,
+} from './profileUtils';
+export { pickImageFromLibrary } from './pickImage';
+export { pickDriverDocument } from './pickDriverFile';
+
 // Legacy utilities (pour compatibilité)
 export {
   getStatusLabel,

@@ -9,3 +9,5 @@ export { useRecentDeliveries } from './useRecentDeliveries';
 export { useEarningsRefresh } from './useEarningsRefresh';
 export { useReportsData } from './useReportsData';
 export { usePaymentMethods } from './usePaymentMethods';
+export { useProfileEdit } from './useProfileEdit';
+export { useProfileDocuments } from './useProfileDocuments';

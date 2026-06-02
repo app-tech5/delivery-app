@@ -481,6 +481,8 @@
     "pending": "Pending",
     "rejected": "Rejected",
     "uploadDocument": "Upload Document",
+    "pickImage": "Photo",
+    "pickPdf": "PDF file",
     "totalDeliveries": "Total Deliveries",
     "totalEarnings": "Total Earnings",
     "averageRating": "Average Rating",
