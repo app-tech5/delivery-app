@@ -24,7 +24,7 @@ import { getDriverLocation, getActiveDeliveries, getStatusColor } from '../utils
 
 function HomeScreen() {
   const navigation = useNavigation();
-  const { driver, stats, deliveries, loadDriverStats, loadDriverOrders, isAuthenticated } = useDriver();
+  const { driver, stats, deliveries, loadDriverStats, loadDriverOrders, hasCompletedOnboarding } = useDriver();
   const { currency } = useSettings();
 
   // Hooks personnalisés
@@ -38,11 +38,11 @@ function HomeScreen() {
 
   // Charger les données du driver
   useEffect(() => {
-    if (isAuthenticated) {
+    if (hasCompletedOnboarding) {
       loadDriverStats();
       loadDriverOrders();
     }
-  }, [isAuthenticated]);
+  }, [hasCompletedOnboarding]);
 
   // Commandes actives (en livraison)
   const activeDeliveries = getActiveDeliveries(deliveries);
@@ -54,7 +54,7 @@ function HomeScreen() {
         onLoginPress={() => navigation.navigate('Login')}
       />
 
-      {isAuthenticated && driver && (
+      {hasCompletedOnboarding && driver && (
         <>
           <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
 

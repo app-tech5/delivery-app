@@ -5,16 +5,15 @@ import { loadPaymentMethodsWithCache, clearPaymentMethodsCache } from '../utils/
 /**
  * Hook personnalisé pour gérer les méthodes de paiement
  * @param {Object} driver - Objet driver
- * @param {boolean} isAuthenticated - État d'authentification
- * @returns {Object} État et fonctions des méthodes de paiement
+ * @param {boolean} hasCompletedOnboarding - Auth + driver profile complete
  */
-export const usePaymentMethods = (driver, isAuthenticated) => {
+export const usePaymentMethods = (driver, hasCompletedOnboarding) => {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // Charger les méthodes de paiement avec cache intelligent
   const loadPaymentMethods = async () => {
-    if (!isAuthenticated || !driver?._id) {
+    if (!hasCompletedOnboarding || !driver?._id) {
       console.log('❌ Driver non authentifié, impossible de charger les méthodes de paiement');
       return;
     }
@@ -68,10 +67,10 @@ export const usePaymentMethods = (driver, isAuthenticated) => {
 
   // Charger automatiquement les méthodes de paiement quand le driver change
   useEffect(() => {
-    if (isAuthenticated && driver?._id) {
+    if (hasCompletedOnboarding && driver?._id) {
       loadPaymentMethods();
     }
-  }, [driver?._id, isAuthenticated]);
+  }, [driver?._id, hasCompletedOnboarding]);
 
   return {
     paymentMethods,

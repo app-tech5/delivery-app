@@ -19,14 +19,14 @@ import {
 import apiClient from '../api';
 
 export default function PaymentMethodsScreen() {
-  const { driver, isAuthenticated } = useDriver();
+  const { driver, hasCompletedOnboarding } = useDriver();
 
   // États pour le modal
   const [modalVisible, setModalVisible] = useState(false);
   const [editingMethod, setEditingMethod] = useState(null);
 
   // Hook personnalisé pour les méthodes de paiement
-  const { paymentMethods, loading, invalidatePaymentMethodsCache } = usePaymentMethods(driver, isAuthenticated);
+  const { paymentMethods, loading, invalidatePaymentMethodsCache } = usePaymentMethods(driver, hasCompletedOnboarding);
 
   // Gestionnaire de pull-to-refresh
   const onRefresh = async () => {

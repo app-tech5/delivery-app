@@ -1,20 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import apiClient from '../api';
 import { loadDriverStatsWithSmartCache, clearDriverStatsCache } from '../utils/cacheUtils';
 import { isDriverAuthenticated, INITIAL_STATS } from '../utils/driverUtils';
 
-/**
- * Hook personnalisé pour gérer les statistiques du driver
- * @param {Object} driver - Objet driver
- * @param {boolean} isAuthenticated - État d'authentification
- * @returns {Object} État et fonctions des statistiques
- */
-export const useDriverStats = (driver, isAuthenticated) => {
+export const useDriverStats = (driver, hasCompletedOnboarding) => {
   const [stats, setStats] = useState(INITIAL_STATS);
 
-  // Charger les statistiques du driver avec cache intelligent
+  useEffect(() => {
+    if (!hasCompletedOnboarding) {
+      setStats(INITIAL_STATS);
+    }
+  }, [hasCompletedOnboarding]);
+
   const loadDriverStats = async () => {
-    if (!isAuthenticated || !driver?._id) {
+    if (!hasCompletedOnboarding || !driver?._id) {
       console.log('❌ Driver non authentifié, impossible de charger les stats');
       return;
     }

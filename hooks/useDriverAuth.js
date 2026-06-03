@@ -1,103 +1,88 @@
 import { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert } from 'react-native';
 import apiClient from '../api';
-import { updateDriverCache, clearDriverCache, INITIAL_STATS } from '../utils/driverUtils';
+import { clearAllDriverSessionCaches } from '../utils/cacheUtils';
+import { updateDriverCache, getDriverSessionFromCache } from '../utils/driverUtils';
 
-/**
- * Hook personnalisé pour gérer l'authentification du driver
- * @param {Function} onDriverLoaded - Callback appelé quand le driver est chargé
- * @param {Function} onStatsLoaded - Callback appelé quand les stats sont chargées
- * @param {Function} onOrdersLoaded - Callback appelé quand les commandes sont chargées
- * @returns {Object} État et fonctions d'authentification
- */
-export const useDriverAuth = (onDriverLoaded, onStatsLoaded, onOrdersLoaded) => {
+export const useDriverAuth = () => {
   const [driver, setDriver] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  // Initialisation du driver depuis AsyncStorage et refresh depuis API
+  const applyDriverProfile = async (profileData, accountUser, authToken) => {
+    if (profileData?._id || profileData?.id) {
+      apiClient.driver = profileData;
+      setDriver(profileData);
+      setNeedsOnboarding(false);
+      if (authToken) {
+        await updateDriverCache(profileData, authToken, accountUser);
+      }
+      return profileData;
+    }
+
+    apiClient.driver = null;
+    setDriver(null);
+    setNeedsOnboarding(true);
+    if (authToken && accountUser) {
+      await updateDriverCache(null, authToken, accountUser);
+    }
+    return null;
+  };
+
+  const refreshDriverProfile = async (accountUser, token) => {
+    if (!accountUser || !token) {
+      setNeedsOnboarding(true);
+      return null;
+    }
+
+    apiClient.token = token;
+    apiClient.user = accountUser;
+
+    const profileData = await apiClient.fetchDriverByUserId();
+    return applyDriverProfile(profileData, accountUser, token);
+  };
+
   useEffect(() => {
     const initializeDriver = async () => {
       try {
-        const driverData = await AsyncStorage.getItem('driverData');
-        const token = await AsyncStorage.getItem('driverToken');
+        const cached = await getDriverSessionFromCache();
+        if (!cached?.token) return;
 
-        if (driverData && token) {
-          // Charger d'abord les données du cache
-          const parsedDriver = JSON.parse(driverData);
-          setDriver(parsedDriver);
-          setIsAuthenticated(true);
-          apiClient.token = token;
-          apiClient.driver = parsedDriver;
+        apiClient.token = cached.token;
+        apiClient.user = cached.user;
+        apiClient.driver = cached.driver;
 
-          // Puis rafraîchir avec les données les plus récentes de l'API
-          try {
-            const freshDriverData = await apiClient.getDriverProfile();
-            if (freshDriverData) {
-              setDriver(freshDriverData);
-              // Mettre à jour le cache avec les nouvelles données
-              await updateDriverCache(freshDriverData);
-            }
-          } catch (refreshError) {
-            if (refreshError.status === 403) {
-              await clearDriverCache();
-              setDriver(null);
-              setIsAuthenticated(false);
-              apiClient.token = null;
-              apiClient.driver = null;
-              return;
-            }
-            console.log('Could not refresh driver data, using cached data:', refreshError.message);
-          }
+        const cachedDriverId = cached.driver?._id || cached.driver?.id;
+        setNeedsOnboarding(!cached.user || !cachedDriverId);
+        if (cachedDriverId) {
+          setDriver(cached.driver);
+        }
 
-          // Charger les stats et commandes
-          if (onStatsLoaded) await onStatsLoaded();
-          if (onOrdersLoaded) await onOrdersLoaded();
+        setIsAuthenticated(true);
+
+        if (cached.user) {
+          await refreshDriverProfile(cached.user, cached.token);
         }
       } catch (error) {
         console.error('Error initializing driver:', error);
+        setNeedsOnboarding(true);
       } finally {
         setIsLoading(false);
       }
     };
 
     initializeDriver();
-  }, [onDriverLoaded, onStatsLoaded, onOrdersLoaded]);
+  }, []);
 
-  // Connexion du driver
   const login = async (email, password) => {
     try {
       setIsLoading(true);
       const response = await apiClient.driverLogin(email, password);
 
       if (response.user && response.token) {
-        // Le driver a déjà été vérifié et stocké dans apiClient.driver lors de driverLogin()
-        // On peut l'utiliser directement
-        if (apiClient.driver) {
-          setDriver(apiClient.driver);
-          setIsAuthenticated(true);
-
-          // Sauvegarder dans le cache
-          await updateDriverCache(apiClient.driver, response.token);
-
-          // Charger les données initiales
-          if (onStatsLoaded) await onStatsLoaded();
-          if (onOrdersLoaded) await onOrdersLoaded();
-
-          // Essayer de rafraîchir les données driver en arrière-plan (sans bloquer)
-          try {
-            const freshDriverData = await apiClient.getDriverProfile();
-            if (freshDriverData) {
-              setDriver(freshDriverData);
-            }
-          } catch (refreshError) {
-            // Ne pas échouer si le refresh échoue, on garde les données existantes
-            console.log('Could not refresh driver data, using existing data');
-          }
-        } else {
-          throw new Error('Données driver non disponibles');
-        }
+        setNeedsOnboarding(!(apiClient.driver?._id || apiClient.driver?.id));
+        setIsAuthenticated(true);
+        await applyDriverProfile(apiClient.driver, response.user, response.token);
       }
 
       return response;
@@ -109,13 +94,54 @@ export const useDriverAuth = (onDriverLoaded, onStatsLoaded, onOrdersLoaded) => 
     }
   };
 
-  // Déconnexion
+  const register = async (signupData) => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.driverRegister(signupData);
+      if (response.user && response.token) {
+        setDriver(null);
+        setNeedsOnboarding(true);
+        setIsAuthenticated(true);
+        await updateDriverCache(null, response.token, response.user);
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Register error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const completeOnboarding = async (profileData) => {
+    try {
+      const profile = await apiClient.createDriverProfile(profileData);
+      await updateDriverCache(profile, apiClient.token, apiClient.user);
+      setDriver(profile);
+      setNeedsOnboarding(false);
+      return { success: true, driver: profile };
+    } catch (error) {
+      console.error('Onboarding error:', error);
+      return { success: false, message: error.message || 'Failed to create driver profile' };
+    }
+  };
+
   const logout = async () => {
     try {
+      const driverId = driver?._id || driver?.id;
+      const userId =
+        apiClient.user?._id ||
+        apiClient.user?.id ||
+        driver?.userId?._id ||
+        driver?.userId ||
+        driver?.users?.value;
+
+      await clearAllDriverSessionCaches(driverId, userId);
       await apiClient.logout();
       setDriver(null);
       setIsAuthenticated(false);
-      await clearDriverCache();
+      setNeedsOnboarding(false);
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -126,11 +152,12 @@ export const useDriverAuth = (onDriverLoaded, onStatsLoaded, onOrdersLoaded) => 
     driver,
     isLoading,
     isAuthenticated,
+    needsOnboarding,
     login,
+    register,
+    completeOnboarding,
     logout,
     setDriver,
-    setIsAuthenticated
+    setIsAuthenticated,
   };
 };
-
-

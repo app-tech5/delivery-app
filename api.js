@@ -1,6 +1,7 @@
 // API Client pour l'application delivery
 import { config } from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearDriverCache } from './utils/storageUtils';
 
 // Fonction utilitaire pour vérifier si on est en mode démo
 const isDemoMode = () => config.DEMO_MODE === true;
@@ -11,20 +12,23 @@ const API_TIMEOUT = config.API_TIMEOUT;
 class ApiClient {
   constructor() {
     this.token = null;
+    this.user = null;
     this.driver = null;
     this.initializeFromStorage();
   }
 
-  // Initialisation automatique depuis AsyncStorage
   async initializeFromStorage() {
     try {
       const token = await AsyncStorage.getItem('driverToken');
       const driverData = await AsyncStorage.getItem('driverData');
+      const userData = await AsyncStorage.getItem('userData');
 
       if (token) {
         this.token = token;
       }
-
+      if (userData) {
+        this.user = JSON.parse(userData);
+      }
       if (driverData) {
         this.driver = JSON.parse(driverData);
       }
@@ -63,7 +67,12 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const error = new Error(`HTTP error! status: ${response.status}`);
+        let message = `HTTP error! status: ${response.status}`;
+        try {
+          const data = await response.json();
+          if (data.message) message = data.message;
+        } catch (_) { }
+        const error = new Error(message);
         error.status = response.status;
         throw error;
       }
@@ -121,25 +130,19 @@ class ApiClient {
         this.token = response.token;
         this.user = response.user;
 
-        // Vérifier si cet utilisateur a un profil driver via la route générique
+        // Try loading driver profile (may not exist yet)
         try {
-          const driverProfiles = await this.apiCall('/resource/drivers/byUserId');
-          const driverProfile = Array.isArray(driverProfiles) ? driverProfiles[0] : driverProfiles;
-          if (!driverProfile) {
-            throw new Error('Driver profile not found');
-          }
-          this.driver = driverProfile;
+          this.driver = await this.fetchDriverByUserId();
         } catch (driverError) {
-          // L'utilisateur n'a pas de profil driver
-          console.log('Utilisateur connecté mais pas de profil driver:', driverError);
-          throw new Error('Vous n\'êtes pas enregistré en tant que livreur');
+          console.log('No driver profile yet:', driverError);
+          this.driver = null;
         }
 
         await this.saveDriverToStorage();
         return response;
       }
 
-      throw new Error('Authentification échouée');
+      throw new Error('Authentication failed');
     } catch (error) {
       console.error('Driver login error:', error);
       throw error;
@@ -148,7 +151,7 @@ class ApiClient {
 
   async driverRegister(driverData) {
     try {
-      // D'abord créer un compte utilisateur normal
+      // Create user account only. Driver profile is created in onboarding.
       const userResponse = await this.apiCall('/auth/signup', {
         method: 'POST',
         body: JSON.stringify({
@@ -156,37 +159,50 @@ class ApiClient {
           password: driverData.password,
           name: driverData.name,
           phone: driverData.phone,
+          role: 'delivery',
         }),
       });
 
       if (userResponse.token && userResponse.user) {
         this.token = userResponse.token;
         this.user = userResponse.user;
-
-        // Ensuite créer le profil driver
-        const driverProfile = await this.apiCall('/drivers', {
-          method: 'POST',
-          body: JSON.stringify({
-            userId: userResponse.user.id,
-            licenseNumber: driverData.licenseNumber,
-            vehicle: driverData.vehicle,
-          }),
-        });
-
-        this.driver = driverProfile;
+        this.driver = null;
         await this.saveDriverToStorage();
-
-        return {
-          ...userResponse,
-          driver: driverProfile
-        };
+        return userResponse;
       }
 
-      throw new Error('Erreur lors de l\'inscription');
+      throw new Error('Registration failed');
     } catch (error) {
       console.error('Driver register error:', error);
       throw error;
     }
+  }
+
+  async createDriverProfile(profileData) {
+    if (!this.user?.id && !this.user?._id) {
+      throw new Error('Missing authenticated user');
+    }
+
+    const userId = this.user.id || this.user._id;
+    const driverProfile = await this.apiCall('/resource/drivers', {
+      method: 'POST',
+      body: JSON.stringify({
+        users: {
+          value: userId,
+          label: this.user.name || this.user.email || '',
+        },
+        licenseNumber: profileData.licenseNumber,
+        vehicle: {
+          type: profileData.vehicleType || '',
+          model: profileData.vehicleModel || '',
+          licensePlate: profileData.licensePlate || '',
+        },
+      }),
+    });
+
+    this.driver = driverProfile;
+    await this.saveDriverToStorage();
+    return driverProfile;
   }
 
   // Gestion du statut du driver
@@ -400,21 +416,34 @@ class ApiClient {
     }
   }
 
-  // Déconnexion
   async logout() {
     this.token = null;
+    this.user = null;
     this.driver = null;
-    await AsyncStorage.removeItem('driverToken');
-    await AsyncStorage.removeItem('driverData');
+    await clearDriverCache();
   }
 
-  // Get driver profile
+  async fetchDriverByUserId() {
+    try {
+      const result = await this.apiCall('/resource/drivers/byUserId');
+      const profile = Array.isArray(result) ? result[0] : result;
+      if (profile?._id || profile?.id) {
+        this.driver = profile;
+        return profile;
+      }
+      this.driver = null;
+      return null;
+    } catch (error) {
+      this.driver = null;
+      return null;
+    }
+  }
+
   async getDriverProfile() {
-    const driverProfile = await this.apiCall('/drivers/profile');
+    const driverProfile = await this.fetchDriverByUserId();
     if (!driverProfile) {
       throw new Error('Driver profile not found');
     }
-    this.driver = driverProfile;
     return driverProfile;
   }
 
@@ -435,7 +464,7 @@ class ApiClient {
     await this.saveDriverToStorage();
     return updatedDriver;
   }
-  
+
   async updateDriver(data) {
     this.driver = await this.apiCall(`/resource/drivers/${this.driver._id}`, {
       method: 'PUT',
@@ -541,10 +570,10 @@ class ApiClient {
     const dLat = this.toRadians(lat2 - lat1);
     const dLon = this.toRadians(lon2 - lon1);
     const a =
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }
 
@@ -575,6 +604,7 @@ export const {
   setDefaultPaymentMethod,
   logout,
   getDriverProfile,
+  createDriverProfile,
   updateUser,
   updateDriverProfile,
   updateDriver,

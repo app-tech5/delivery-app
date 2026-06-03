@@ -4,7 +4,6 @@ import { config } from '../config';
 import { useDriverAuth } from '../hooks/useDriverAuth';
 import { useDriverStats } from '../hooks/useDriverStats';
 import { useDriverOrders } from '../hooks/useDriverOrders';
-import { INITIAL_STATS } from '../utils/driverUtils';
 
 const DriverContext = createContext();
 
@@ -17,51 +16,46 @@ export const useDriver = () => {
 };
 
 export const DriverProvider = ({ children }) => {
-  // Hook d'authentification
   const {
     driver,
     isLoading,
     isAuthenticated,
+    needsOnboarding,
     login,
+    register,
+    completeOnboarding,
     logout: authLogout,
     setDriver,
-    setIsAuthenticated
   } = useDriverAuth();
 
-  // Hook des statistiques
+  const hasCompletedOnboarding = !isLoading && isAuthenticated && !needsOnboarding;
+
   const {
     stats,
     loadDriverStats,
-    invalidateDriverStatsCache
-  } = useDriverStats(driver, isAuthenticated);
+    invalidateDriverStatsCache,
+  } = useDriverStats(driver, hasCompletedOnboarding);
 
-  // Hook des commandes
   const {
     deliveries,
     loadDriverOrders,
     updateStatus: ordersUpdateStatus,
     acceptDelivery,
     updateDeliveryStatus,
-    invalidateDeliveriesCache
-  } = useDriverOrders(driver, isAuthenticated);
+    invalidateDeliveriesCache,
+  } = useDriverOrders(driver, hasCompletedOnboarding);
 
-  // Wrapper pour updateStatus qui met à jour l'état du driver
   const updateStatus = async (status, location = null) => {
     const result = await ordersUpdateStatus(status, location);
-
-    // En mode démo, mettre à jour l'état du driver localement
-    if (result && result.driver) {
+    if (result?.driver) {
       setDriver(result.driver);
     }
-
     return result;
   };
 
-  // Wrapper pour le logout qui nettoie tous les états
   const logout = async () => {
     try {
       await authLogout();
-      // Les autres états seront remis à zéro par les hooks
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -69,8 +63,8 @@ export const DriverProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const userId = driver?.userId?._id || driver?.userId;
-    if (!isAuthenticated || !userId) return;
+    const userId = driver?.userId?._id || driver?.userId || driver?.users?.value;
+    if (!hasCompletedOnboarding || !userId) return;
 
     const url = String(config.API_BASE_URL).replace(/\/api\/?$/, '');
     const socket = io(url);
@@ -86,15 +80,19 @@ export const DriverProvider = ({ children }) => {
     return () => {
       socket.disconnect();
     };
-  }, [driver, isAuthenticated]);
+  }, [driver, hasCompletedOnboarding]);
 
   const value = {
     driver,
+    needsOnboarding,
+    hasCompletedOnboarding,
     isLoading,
     isAuthenticated,
     deliveries,
     stats,
     login,
+    register,
+    completeOnboarding,
     logout,
     updateStatus,
     acceptDelivery,

@@ -859,6 +859,23 @@ export const clearPaymentMethodsCache = async (userId) => {
   }
 };
 
+const clearCachesByPrefix = async (prefix) => {
+  const keys = await AsyncStorage.getAllKeys();
+  const matching = keys.filter((key) => key.startsWith(prefix));
+  if (matching.length) {
+    await AsyncStorage.multiRemove(matching);
+  }
+};
+
+export const clearAllDriverSessionCaches = async (driverId, userId) => {
+  await Promise.all([
+    driverId ? clearDeliveriesCache(driverId) : Promise.resolve(),
+    driverId ? clearDriverStatsCache(driverId) : Promise.resolve(),
+    userId ? clearPaymentMethodsCache(userId) : Promise.resolve(),
+    clearCachesByPrefix(CACHE_KEYS.NEARBY_RESTAURANTS),
+  ]);
+};
+
 /**
  * Charge les méthodes de paiement avec un cache intelligent
  * 1. Lit d'abord le cache AsyncStorage

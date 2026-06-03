@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import apiClient from '../api';
 import { config } from '../config';
@@ -6,18 +6,17 @@ import { loadDeliveriesWithSmartCache, clearDeliveriesCache } from '../utils/cac
 import { isDriverAuthenticated } from '../utils/driverUtils';
 import { getDriverStatusLabel } from '../utils/statusUtils';
 
-/**
- * Hook personnalisé pour gérer les commandes du driver
- * @param {Object} driver - Objet driver
- * @param {boolean} isAuthenticated - État d'authentification
- * @returns {Object} État et fonctions des commandes
- */
-export const useDriverOrders = (driver, isAuthenticated) => {
+export const useDriverOrders = (driver, hasCompletedOnboarding) => {
   const [deliveries, setDeliveries] = useState([]);
 
-  // Charger les commandes du driver avec cache intelligent
+  useEffect(() => {
+    if (!hasCompletedOnboarding) {
+      setDeliveries([]);
+    }
+  }, [hasCompletedOnboarding]);
+
   const loadDriverOrders = async (status = null) => {
-    if (!isAuthenticated || !driver?._id) {
+    if (!hasCompletedOnboarding || !driver?._id) {
       console.log('❌ Driver non authentifié, impossible de charger les livraisons');
       return;
     }

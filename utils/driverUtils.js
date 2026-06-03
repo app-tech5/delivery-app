@@ -22,4 +22,8 @@ export const isDriverAuthenticated = (driver) => {
 
 // Réexport des fonctions depuis les modules spécialisés
 export { getDriverStatusLabel as getStatusLabel };
-export { updateDriverCache, clearDriverCache };
+export {
+  updateDriverCache,
+  clearDriverCache,
+  getDriverSessionFromCache,
+} from './storageUtils';

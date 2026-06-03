@@ -12,12 +12,12 @@ export const OrdersContext = createContext({
 export const OrdersProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [socket, setSocket] = useState(null);
-  const { driver, isAuthenticated } = useDriver();
+  const { driver, hasCompletedOnboarding } = useDriver();
 
   const userId = useMemo(() => driver?.userId?._id || driver?.userId || null, [driver?.userId]);
 
   useEffect(() => {
-    if (!isAuthenticated || !userId) return;
+    if (!hasCompletedOnboarding || !userId) return;
 
     const url = String(config.API_BASE_URL).replace(/\/api\/?$/, '');
     const s = io(url);
@@ -44,7 +44,7 @@ export const OrdersProvider = ({ children }) => {
       s.disconnect();
       setSocket(null);
     };
-  }, [isAuthenticated, userId]);
+  }, [hasCompletedOnboarding, userId]);
 
   return (
     <OrdersContext.Provider value={{ orders, setOrders, socket }}>

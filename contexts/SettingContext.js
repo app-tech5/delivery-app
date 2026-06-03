@@ -7,10 +7,10 @@ const SettingContext = createContext();
 
 // Provider du contexte
 export function SettingProvider({ children }) {
-  const { isAuthenticated } = useDriver();
-
-  // Utiliser le hook personnalisé pour gérer la logique des paramètres
-  const settingsData = useSettingsManager(isAuthenticated);
+  const { isAuthenticated, needsOnboarding, isLoading } = useDriver();
+  const settingsData = useSettingsManager(
+    !isLoading && isAuthenticated && !needsOnboarding
+  );
 
   const value = {
     ...settingsData

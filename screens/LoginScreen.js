@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   StatusBar,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
 } from 'react-native';
 import { Input, Button, Icon } from 'react-native-elements';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '../global';
 import { config } from '../config';
-import apiClient from '../api';
 import { useDriver } from '../contexts/DriverContext';
 import { ScreenHeader } from '../components';
+import i18n from '../i18n';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState(config.DEMO_MODE ? config.DEMO_EMAIL : '');
@@ -26,48 +24,26 @@ export default function LoginScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useDriver();
 
-  // Vérifier si l'utilisateur est déjà connecté au démarrage
-  useEffect(() => {
-    const checkExistingLogin = async () => {
-      try {
-        const token = await AsyncStorage.getItem('driverToken');
-        const driverData = await AsyncStorage.getItem('driverData');
-
-        if (token && driverData) {
-          // L'utilisateur est déjà connecté, aller directement au Home
-          navigation.replace('DrawerNavigator');
-        }
-      } catch (error) {
-        console.error('Error checking existing login:', error);
-      }
-    };
-
-    checkExistingLogin();
-  }, []);
-
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      Alert.alert(i18n.t('auth.emailAndPasswordRequired'));
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Utiliser la fonction login du DriverContext pour gérer l'état d'authentification
       const response = await login(email, password);
 
       if (response.token && response.user) {
-        Alert.alert('Succès', 'Connexion réussie !');
-        // La navigation est maintenant gérée automatiquement par AppNavigator.js
-        // basé sur l'état d'authentification du DriverContext
+        Alert.alert(i18n.t('auth.loginSuccessful'));
       }
     } catch (error) {
       console.error('Login error:', error);
-      Alert.alert(
-        'Erreur de connexion',
-        error.message || 'Email ou mot de passe incorrect'
-      );
+      const message = error.message === 'Driver profile not found'
+        ? i18n.t('auth.driverNotFound')
+        : (error.message || i18n.t('auth.loginFailedDefault'));
+      Alert.alert(i18n.t('auth.loginError'), message);
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +53,6 @@ export default function LoginScreen({ navigation }) {
     <View style={styles.container}>
       <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
 
-      {/* Header avec dégradé */}
       <LinearGradient
         colors={colors.auth.gradient1}
         style={styles.header}
@@ -91,20 +66,19 @@ export default function LoginScreen({ navigation }) {
           />
           <ScreenHeader
             title={config.APP_NAME}
-            subtitle="Connectez-vous à votre compte"
+            subtitle={i18n.t('auth.signInSubtitle')}
             containerStyle={styles.screenHeader}
             contentStyle={styles.screenHeaderContent}
             titleStyle={styles.title}
             subtitleStyle={styles.subtitle}
           >
             {config.DEMO_MODE && (
-              <Text style={styles.demoText}>🚗 Mode démonstration activé</Text>
+              <Text style={styles.demoText}>{i18n.t('auth.demoMode')}</Text>
             )}
           </ScreenHeader>
         </View>
       </LinearGradient>
 
-      {/* Formulaire */}
       <Animatable.View
         style={styles.footer}
         animation="fadeInUpBig"
@@ -115,10 +89,10 @@ export default function LoginScreen({ navigation }) {
           style={styles.keyboardView}
         >
           <View style={styles.form}>
-            <Text style={styles.formTitle}>Connexion</Text>
+            <Text style={styles.formTitle}>{i18n.t('auth.signIn')}</Text>
 
             <Input
-              placeholder="Email"
+              placeholder={i18n.t('auth.email')}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -137,7 +111,7 @@ export default function LoginScreen({ navigation }) {
             />
 
             <Input
-              placeholder="Mot de passe"
+              placeholder={i18n.t('auth.password')}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -151,7 +125,7 @@ export default function LoginScreen({ navigation }) {
               }
               rightIcon={
                 <Icon
-                  name={showPassword ? "visibility-off" : "visibility"}
+                  name={showPassword ? 'visibility-off' : 'visibility'}
                   type="material"
                   size={20}
                   color={colors.grey[500]}
@@ -164,7 +138,7 @@ export default function LoginScreen({ navigation }) {
             />
 
             <Button
-              title="Se connecter"
+              title={i18n.t('auth.signIn')}
               onPress={handleLogin}
               loading={isLoading}
               buttonStyle={styles.loginButton}
@@ -173,9 +147,17 @@ export default function LoginScreen({ navigation }) {
             />
 
             <Button
-              title="Mot de passe oublié ?"
+              title={i18n.t('auth.noAccountSignUp')}
               type="clear"
-              onPress={() => Alert.alert('Info', 'Fonctionnalité à venir')}
+              onPress={() => navigation.navigate('SignUp')}
+              titleStyle={styles.signUpText}
+              containerStyle={styles.signUpContainer}
+            />
+
+            <Button
+              title={i18n.t('auth.forgotPassword')}
+              type="clear"
+              onPress={() => Alert.alert(i18n.t('auth.comingSoon'))}
               titleStyle={styles.forgotPasswordText}
               containerStyle={styles.forgotPasswordContainer}
             />
@@ -279,6 +261,14 @@ const styles = StyleSheet.create({
   },
   forgotPasswordContainer: {
     marginTop: 15,
+  },
+  signUpContainer: {
+    marginTop: 10,
+  },
+  signUpText: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
   },
   forgotPasswordText: {
     color: colors.primary,

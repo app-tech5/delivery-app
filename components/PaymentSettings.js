@@ -9,8 +9,8 @@ import { usePaymentMethods } from '../hooks';
 
 const PaymentSettings = () => {
   const navigation = useNavigation();
-  const { driver, isAuthenticated } = useDriver();
-  const { paymentMethods, loading } = usePaymentMethods(driver, isAuthenticated);
+  const { driver, hasCompletedOnboarding } = useDriver();
+  const { paymentMethods, loading } = usePaymentMethods(driver, hasCompletedOnboarding);
 
   const handlePaymentMethodsPress = () => {
     // Naviguer vers un écran de méthodes de paiement (qu'on va créer)
