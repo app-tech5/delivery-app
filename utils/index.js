@@ -120,7 +120,9 @@ export {
 // Location utilities
 export {
   getDriverLocation,
-  getActiveDeliveries
+  getActiveDeliveries,
+  getCurrentDriverCoordinates,
+  watchDriverLocation,
 } from './locationUtils';
 
 // Delivery adapters

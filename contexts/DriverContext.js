@@ -4,6 +4,7 @@ import { config } from '../config';
 import { useDriverAuth } from '../hooks/useDriverAuth';
 import { useDriverStats } from '../hooks/useDriverStats';
 import { useDriverOrders } from '../hooks/useDriverOrders';
+import { useDriverLocationWatch } from '../hooks/useDriverLocationWatch';
 
 const DriverContext = createContext();
 
@@ -45,10 +46,13 @@ export const DriverProvider = ({ children }) => {
     invalidateDeliveriesCache,
   } = useDriverOrders(driver, hasCompletedOnboarding);
 
+  useDriverLocationWatch(driver, hasCompletedOnboarding, setDriver);
+
   const updateStatus = async (status, location = null) => {
     const result = await ordersUpdateStatus(status, location);
-    if (result?.driver) {
-      setDriver(result.driver);
+    const updatedDriver = result?.driver ?? (result?._id || result?.id ? result : null);
+    if (updatedDriver) {
+      setDriver(updatedDriver);
     }
     return result;
   };

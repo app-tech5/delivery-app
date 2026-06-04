@@ -207,18 +207,48 @@ class ApiClient {
 
   // Gestion du statut du driver
   async updateDriverStatus(status, location = null) {
+    const driverId = this.driver?._id || this.driver?.id;
+    if (!driverId) {
+      throw new Error('Missing driver profile');
+    }
+
     const updateData = { status };
     if (location) {
       updateData.location = {
         type: 'Point',
-        coordinates: [location.longitude, location.latitude]
+        coordinates: [location.longitude, location.latitude],
       };
     }
 
-    return await this.apiCall('/drivers/status', {
+    const updatedDriver = await this.apiCall(`/resource/drivers/${driverId}`, {
       method: 'PUT',
       body: JSON.stringify(updateData),
     });
+
+    this.driver = updatedDriver;
+    await this.saveDriverToStorage();
+    return { driver: updatedDriver };
+  }
+
+  async updateDriverLocation(location) {
+    const driverId = this.driver?._id || this.driver?.id;
+    if (!driverId || !location) {
+      throw new Error('Missing driver or location');
+    }
+
+    const updatedDriver = await this.apiCall(`/resource/drivers/${driverId}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        location: {
+          type: 'Point',
+          coordinates: [location.longitude, location.latitude],
+        },
+      }),
+    });
+
+    this.driver = updatedDriver;
+    await this.saveDriverToStorage();
+    return updatedDriver;
   }
 
   // Récupération des commandes disponibles pour livraison
@@ -434,7 +464,6 @@ class ApiClient {
       this.driver = null;
       return null;
     } catch (error) {
-      this.driver = null;
       return null;
     }
   }

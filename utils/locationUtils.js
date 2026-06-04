@@ -1,3 +1,47 @@
+import * as Location from 'expo-location';
+
+/**
+ * Récupère la position GPS actuelle du driver (permission foreground requise).
+ * @returns {Promise<{ latitude: number, longitude: number } | null>}
+ */
+export const getCurrentDriverCoordinates = async () => {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    return null;
+  }
+
+  const position = await Location.getCurrentPositionAsync({});
+  return {
+    latitude: position.coords.latitude,
+    longitude: position.coords.longitude,
+  };
+};
+
+const LOCATION_WATCH_OPTIONS = {
+  accuracy: Location.Accuracy.Balanced,
+  distanceInterval: 50,
+  timeInterval: 30000,
+};
+
+/**
+ * Surveille la position GPS du driver (foreground).
+ * @param {Function} onLocationUpdate - callback({ latitude, longitude })
+ * @returns {Promise<Location.LocationSubscription | null>}
+ */
+export const watchDriverLocation = async (onLocationUpdate) => {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    return null;
+  }
+
+  return Location.watchPositionAsync(LOCATION_WATCH_OPTIONS, (position) => {
+    onLocationUpdate({
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    });
+  });
+};
+
 /**
  * Calcule la position du driver pour la carte
  * @param {Object} driver - Objet driver avec location

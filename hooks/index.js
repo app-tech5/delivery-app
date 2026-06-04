@@ -4,6 +4,7 @@ export { useAuthGuard } from './useAuthGuard';
 export { useDeliveryActions } from './useDeliveryActions';
 export { useNearbyRestaurants } from './useNearbyRestaurants';
 export { useDriverStatus } from './useDriverStatus';
+export { useDriverLocationWatch } from './useDriverLocationWatch';
 export { useHistoryRefresh } from './useHistoryRefresh';
 export { useRecentDeliveries } from './useRecentDeliveries';
 export { useEarningsRefresh } from './useEarningsRefresh';

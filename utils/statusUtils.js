@@ -145,6 +145,19 @@ export const isDriverStatusActive = (status) => {
 };
 
 /**
+ * Vérifie si le driver est en ligne (hors offline)
+ * @param {string} status - Statut du driver
+ * @returns {boolean}
+ */
+export const isDriverOnline = (status) => {
+  return [
+    DRIVER_STATUSES.AVAILABLE,
+    DRIVER_STATUSES.BUSY,
+    DRIVER_STATUSES.ON_DELIVERY,
+  ].includes(status);
+};
+
+/**
  * Obtient le statut d'affichage pour une transaction
  * @param {string} status - Statut de la transaction
  * @returns {string} Label du statut

@@ -20,12 +20,16 @@ export const useDriverAuth = () => {
       return profileData;
     }
 
+    const existing = apiClient.driver;
+    if (existing?._id || existing?.id) {
+      setDriver(existing);
+      setNeedsOnboarding(false);
+      return existing;
+    }
+
     apiClient.driver = null;
     setDriver(null);
     setNeedsOnboarding(true);
-    if (authToken && accountUser) {
-      await updateDriverCache(null, authToken, accountUser);
-    }
     return null;
   };
 
@@ -59,10 +63,6 @@ export const useDriverAuth = () => {
         }
 
         setIsAuthenticated(true);
-
-        if (cached.user) {
-          await refreshDriverProfile(cached.user, cached.token);
-        }
       } catch (error) {
         console.error('Error initializing driver:', error);
         setNeedsOnboarding(true);
