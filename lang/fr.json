@@ -74,6 +74,11 @@
     "availableOrders": "Commandes disponibles",
     "driverStatus": "Statut du livreur",
     "currentLocation": "Position actuelle",
+    "loadingRestaurants": "Chargement des restaurants à proximité…",
+    "deliveryAvailable": "Livraison disponible",
+    "deliveryUnavailable": "Livraison indisponible",
+    "mapMarkerDriver": "Votre position",
+    "mapMarkerDriverSubtitle": "Position du livreur en direct",
     "reconnect": "Veuillez vous reconnecter",
     "demoSimulation": "Mode démo - simulation",
     "realTimeUpdate": "Mise à jour en temps réel"
@@ -92,7 +97,8 @@
     "loadingOrders": "Chargement des commandes...",
     "statusUpdateError": "Impossible de mettre à jour le statut",
     "driver": "Livreur",
-    "id": "ID"
+    "id": "ID",
+    "backgroundLocationNotificationBody": "Localisation active pour les livraisons"
   },
   "errors": {
     "networkError": "Erreur réseau",

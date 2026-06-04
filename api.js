@@ -230,11 +230,15 @@ class ApiClient {
     return { driver: updatedDriver };
   }
 
-  async updateDriverLocation(location) {
+  async updateDriverLocation(location, source = 'app') {
     const driverId = this.driver?._id || this.driver?.id;
     if (!driverId || !location) {
       throw new Error('Missing driver or location');
     }
+
+    console.log(
+      `📍 [${source}] Envoi backend → lat: ${location.latitude}, lon: ${location.longitude}`
+    );
 
     const updatedDriver = await this.apiCall(`/resource/drivers/${driverId}`, {
       method: 'PUT',

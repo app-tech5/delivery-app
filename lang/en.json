@@ -186,6 +186,11 @@
     "availableOrders": "Available Orders",
     "driverStatus": "Driver Status",
     "currentLocation": "Current Location",
+    "loadingRestaurants": "Loading nearby restaurants…",
+    "deliveryAvailable": "Delivery available",
+    "deliveryUnavailable": "Delivery unavailable",
+    "mapMarkerDriver": "Your position",
+    "mapMarkerDriverSubtitle": "Live driver location",
     "reconnect": "Please reconnect",
     "demoSimulation": "Demo mode - simulation",
     "realTimeUpdate": "Real-time update"
@@ -213,7 +218,8 @@
     "loadingOrders": "Loading orders...",
     "statusUpdateError": "Unable to update status",
     "driver": "Driver",
-    "id": "ID"
+    "id": "ID",
+    "backgroundLocationNotificationBody": "Location active for deliveries"
   },
   "errors": {
     "networkError": "Network error",

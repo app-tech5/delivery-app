@@ -123,6 +123,9 @@ export {
   getActiveDeliveries,
   getCurrentDriverCoordinates,
   watchDriverLocation,
+  requestDriverLocationPermissions,
+  startDriverBackgroundLocation,
+  stopDriverBackgroundLocation,
 } from './locationUtils';
 
 // Delivery adapters

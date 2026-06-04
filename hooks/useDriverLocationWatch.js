@@ -1,6 +1,11 @@
 import { useEffect, useRef } from 'react';
 import apiClient from '../api';
-import { watchDriverLocation } from '../utils/locationUtils';
+import {
+  watchDriverLocation,
+  requestDriverLocationPermissions,
+  startDriverBackgroundLocation,
+  stopDriverBackgroundLocation,
+} from '../utils/locationUtils';
 import { isDriverOnline } from '../utils/statusUtils';
 
 const LOCATION_UPDATE_INTERVAL_MS = 30000;
@@ -21,9 +26,17 @@ export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver
       subscriptionRef.current = null;
     };
 
-    if (!hasCompletedOnboarding || !driver?._id || !isDriverOnline(driver.status)) {
+    const stopAll = async () => {
       stopWatch();
-      return stopWatch;
+      await stopDriverBackgroundLocation();
+    };
+
+    if (!hasCompletedOnboarding || !driver?._id || !isDriverOnline(driver.status)) {
+      stopAll();
+      return () => {
+        cancelled = true;
+        stopAll();
+      };
     }
 
     const sendLocation = async (coords) => {
@@ -34,7 +47,7 @@ export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver
 
       inFlightRef.current = true;
       try {
-        const updatedDriver = await apiClient.updateDriverLocation(coords);
+        const updatedDriver = await apiClient.updateDriverLocation(coords, 'foreground');
         lastSentAtRef.current = Date.now();
         if (!cancelled && updatedDriver) {
           setDriver(updatedDriver);
@@ -49,6 +62,8 @@ export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver
     const startWatch = async () => {
       if (subscriptionRef.current) return;
 
+      await requestDriverLocationPermissions();
+
       const subscription = await watchDriverLocation((coords) => {
         sendLocation(coords);
       });
@@ -56,13 +71,15 @@ export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver
       if (!cancelled && subscription) {
         subscriptionRef.current = subscription;
       }
+
+      await startDriverBackgroundLocation();
     };
 
     startWatch();
 
     return () => {
       cancelled = true;
-      stopWatch();
+      stopAll();
     };
   }, [driver?._id, driver?.status, hasCompletedOnboarding, setDriver]);
 };

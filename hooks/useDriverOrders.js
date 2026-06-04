@@ -62,11 +62,6 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
 
     try {
       const response = await apiClient.updateDriverStatus(status, location);
-      if (response.driver) {
-        console.log('🔄 API - Driver mis à jour:', response.driver);
-      } else {
-        console.warn('⚠️ API - Pas de driver dans la réponse:', response);
-      }
       return response;
     } catch (error) {
       console.error('Update status error:', error);

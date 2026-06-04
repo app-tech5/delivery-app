@@ -203,8 +203,6 @@ export const saveNearbyRestaurantsToCache = async (restaurants, latitude, longit
 
     await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
     await AsyncStorage.setItem(timestampKey, cacheData.timestamp.toString());
-
-    console.log(`💾 Restaurants proches sauvegardés en cache: ${restaurants.length} restaurants (${locationKey})`);
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde des restaurants proches en cache:', error);
   }
@@ -360,7 +358,6 @@ export const getNearbyRestaurantsFromCache = async (latitude, longitude, radius 
     const cachedData = await AsyncStorage.getItem(cacheKey);
 
     if (!cachedData) {
-      console.log(`📭 Pas de restaurants proches en cache pour ${locationKey}`);
       return null;
     }
 
@@ -368,14 +365,12 @@ export const getNearbyRestaurantsFromCache = async (latitude, longitude, radius 
 
     // Vérifier la version du cache
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
-      console.log(`🔄 Version du cache des restaurants proches obsolète pour ${locationKey}, suppression`);
       await clearNearbyRestaurantsCache(latitude, longitude, radius);
       return null;
     }
 
     // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
 
-    console.log(`📖 Restaurants proches chargés depuis le cache: ${parsedData.restaurants.length} restaurants (${locationKey})`);
     return {
       restaurants: parsedData.restaurants,
       timestamp: parsedData.timestamp,
@@ -465,8 +460,6 @@ export const clearNearbyRestaurantsCache = async (latitude, longitude, radius = 
 
     await AsyncStorage.removeItem(cacheKey);
     await AsyncStorage.removeItem(timestampKey);
-
-    console.log(`🗑️ Cache des restaurants proches supprimé pour ${locationKey}`);
   } catch (error) {
     console.error('❌ Erreur lors de la suppression du cache des restaurants proches:', error);
   }
@@ -1003,48 +996,29 @@ export const loadNearbyRestaurantsWithSmartCache = async (
   }
 
   try {
-    console.log(`🚀 Démarrage du chargement intelligent des restaurants proches (${latitude.toFixed(4)}, ${longitude.toFixed(4)}, ${radius}km)`);
-
-    // 1. Essayer de charger depuis le cache
     onLoadingStateChange?.(true);
     const cachedData = await getNearbyRestaurantsFromCache(latitude, longitude, radius);
 
     if (cachedData && cachedData.restaurants) {
-      console.log('⚡ Restaurants proches affichés depuis le cache');
-      onDataLoaded(cachedData.restaurants, true); // true = fromCache
+      onDataLoaded(cachedData.restaurants, true);
       onLoadingStateChange?.(false);
     } else {
-      console.log('📭 Pas de cache disponible, attente des données API');
       onLoadingStateChange?.(true);
     }
 
-    // 2. Fetch l'API en arrière-plan (toujours, même si cache disponible)
-    console.log('🌐 Fetch API en arrière-plan pour les restaurants proches...');
     const freshData = await apiFetcher(latitude, longitude, radius);
 
     if (freshData && Array.isArray(freshData)) {
-      console.log(`📡 Restaurants proches API reçus: ${freshData.length} restaurants`);
-
-      // 3. Vérifier si les données ont changé
       const hasChanged = !cachedData || hasNearbyRestaurantsChanged(cachedData.restaurants, freshData);
 
       if (hasChanged) {
-        console.log('🔄 Restaurants proches mis à jour, sauvegarde en cache et affichage');
-
-        // Sauvegarder en cache
         await saveNearbyRestaurantsToCache(freshData, latitude, longitude, radius);
-
-        // Mettre à jour l'affichage
         onDataUpdated(freshData);
-      } else {
-        console.log('✅ Restaurants proches identiques, pas de mise à jour nécessaire');
       }
     } else {
-      console.warn('⚠️ Données restaurants proches API invalides ou vides');
       onError?.('Données restaurants invalides');
     }
 
-    // Fin du chargement
     onLoadingStateChange?.(false);
 
   } catch (error) {
@@ -1052,14 +1026,10 @@ export const loadNearbyRestaurantsWithSmartCache = async (
     onLoadingStateChange?.(false);
     onError?.(error.message);
 
-    // En cas d'erreur, essayer quand même d'utiliser le cache si disponible
     const fallbackCache = await getNearbyRestaurantsFromCache(latitude, longitude, radius);
     if (fallbackCache && fallbackCache.restaurants) {
-      console.log('🔄 Erreur API, utilisation du cache comme fallback');
       onDataLoaded(fallbackCache.restaurants, true);
     } else {
-      // Si pas de cache, retourner un tableau vide
-      console.log('🔄 Pas de cache disponible, utilisation d\'un tableau vide');
       onDataLoaded([], false);
     }
   }

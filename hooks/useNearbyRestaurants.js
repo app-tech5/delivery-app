@@ -23,16 +23,10 @@ export const useNearbyRestaurants = (driverLocation) => {
         10, // rayon de 10km
         getNearbyRestaurants, // apiFetcher
         (data, fromCache) => {
-          // onDataLoaded - appelé quand les données sont prêtes (cache ou API)
           setNearbyRestaurants(data);
-          if (fromCache) {
-            console.log('🔄 Restaurants proches chargés depuis le cache dans HomeScreen');
-          }
         },
         (data) => {
-          // onDataUpdated - appelé quand les données sont mises à jour depuis l'API
           setNearbyRestaurants(data);
-          console.log('🔄 Restaurants proches mis à jour depuis l\'API dans HomeScreen');
         },
         (loading) => {
           // onLoadingStateChange

@@ -17,7 +17,9 @@
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
-        "FOREGROUND_SERVICE"
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION"
       ],
       "package": "com.goodfood.driver",
       "versionCode": 2
@@ -25,10 +27,17 @@
     "plugins": [
       "expo-font",
       "expo-localization",
-      "expo-location"
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Good Food Driver utilise votre position pour les livraisons.",
+          "locationAlwaysAndWhenInUsePermission": "Good Food Driver utilise votre position pour les livraisons, y compris en arrière-plan.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      "@maplibre/maplibre-react-native"
     ]
   }
 }
-
-
-
