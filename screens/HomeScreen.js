@@ -46,7 +46,6 @@ function HomeScreen() {
 
   // Commandes actives (en livraison)
   const activeDeliveries = getActiveDeliveries(deliveries);
-
   return (
     <SafeAreaView style={styles.container}>
       <AuthGuard

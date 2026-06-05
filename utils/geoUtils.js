@@ -4,7 +4,7 @@ export const bearing = (φ1, λ1, φ2, λ2) => {
     Math.cos(φ1 * Math.PI / 180) * Math.sin(φ2 * Math.PI / 180) -
     Math.sin(φ1 * Math.PI / 180) * Math.cos(φ2 * Math.PI / 180) * Math.cos((λ2 - λ1) * Math.PI / 180);
   const θ = Math.atan2(x, y);
-  return (θ * 180) / Math.PI + 360) % 360;
+  return ((θ * 180) / Math.PI + 360) % 360;
 };
 
 function deg2rad(deg) {

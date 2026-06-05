@@ -9,6 +9,7 @@
     },
     "version": "1.1.0",
     "slug": "good-food-driver",
+    "scheme": "goodfooddriver",
     "ios": {
       "bundleIdentifier": "com.goodfood.driver",
       "buildNumber": "1.1.0"
