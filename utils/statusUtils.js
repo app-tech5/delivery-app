@@ -157,6 +157,8 @@ export const isDriverOnline = (status) => {
   ].includes(status);
 };
 
+export const isDriverApproved = (driver) => Boolean(driver?.isApproved);
+
 /**
  * Obtient le statut d'affichage pour une transaction
  * @param {string} status - Statut de la transaction

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { Alert } from 'react-native';
 import { useDriver } from '../contexts/DriverContext';
 import { requestDriverLocationPermissions } from '../utils/locationUtils';
-import { isDriverOnline } from '../utils/statusUtils';
+import { isDriverOnline, isDriverApproved } from '../utils/statusUtils';
 import i18n from '../i18n';
 
 /**
@@ -27,6 +27,11 @@ export const useDriverStatus = () => {
 
     try {
       const goingOnline = isDriverOnline(newStatus) && !isDriverOnline(driver?.status);
+
+      if (goingOnline && !isDriverApproved(driver)) {
+        Alert.alert(i18n.t('errors.permissionDenied'), i18n.t('driver.notApprovedError'));
+        return;
+      }
 
       if (goingOnline) {
         const { foreground } = await requestDriverLocationPermissions();

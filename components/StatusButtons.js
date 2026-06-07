@@ -20,7 +20,7 @@ const StatusButton = ({ status, label, icon, isActive, onPress, disabled }) => (
   </TouchableOpacity>
 );
 
-const StatusButtons = ({ currentStatus, onStatusChange, isLoading }) => {
+const StatusButtons = ({ currentStatus, onStatusChange, isLoading, isApproved = false }) => {
   const statusConfig = [
     {
       status: 'available',

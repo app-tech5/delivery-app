@@ -217,6 +217,7 @@
     "noAvailableOrders": "No available orders",
     "loadingOrders": "Loading orders...",
     "statusUpdateError": "Unable to update status",
+    "notApprovedError": "Your account must be approved before going online.",
     "driver": "Driver",
     "id": "ID",
     "backgroundLocationNotificationBody": "Location active for deliveries"

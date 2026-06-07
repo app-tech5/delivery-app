@@ -96,6 +96,7 @@
     "noAvailableOrders": "Aucune commande disponible",
     "loadingOrders": "Chargement des commandes...",
     "statusUpdateError": "Impossible de mettre à jour le statut",
+    "notApprovedError": "Votre compte doit être approuvé avant de vous mettre en ligne.",
     "driver": "Livreur",
     "id": "ID",
     "backgroundLocationNotificationBody": "Localisation active pour les livraisons"

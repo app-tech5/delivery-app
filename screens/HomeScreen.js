@@ -99,6 +99,7 @@ function HomeScreen() {
               currentStatus={driver.status}
               onStatusChange={handleStatusChange}
               isLoading={isLoading}
+              isApproved={Boolean(driver.isApproved)}
             />
             <DriverStats stats={stats} currency={currency} />
             <ActiveDeliveries

@@ -6,7 +6,7 @@ import {
   startDriverBackgroundLocation,
   stopDriverBackgroundLocation,
 } from '../utils/locationUtils';
-import { isDriverOnline } from '../utils/statusUtils';
+import { isDriverOnline, isDriverApproved } from '../utils/statusUtils';
 
 const LOCATION_UPDATE_INTERVAL_MS = 30000;
 
@@ -31,7 +31,12 @@ export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver
       await stopDriverBackgroundLocation();
     };
 
-    if (!hasCompletedOnboarding || !driver?._id || !isDriverOnline(driver.status)) {
+    if (
+      !hasCompletedOnboarding ||
+      !driver?._id ||
+      !isDriverApproved(driver) ||
+      !isDriverOnline(driver.status)
+    ) {
       stopAll();
       return () => {
         cancelled = true;
