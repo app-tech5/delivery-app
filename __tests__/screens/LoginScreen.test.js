@@ -131,9 +131,12 @@ describe('LoginScreen', () => {
     goBack: jest.fn(),
   };
 
+  const { config } = require('../../config');
+
   const mockAlert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
   beforeEach(() => {
+    config.DEMO_MODE = false;
     jest.clearAllMocks();
     mockLogin.mockReset();
   });
@@ -271,24 +274,14 @@ describe('LoginScreen', () => {
   });
 
   it('prefills credentials and shows demo banner in demo mode', () => {
-    jest.isolateModules(() => {
-      jest.doMock('../../config', () => ({
-        config: {
-          APP_NAME: 'Good Food Driver',
-          DEMO_MODE: true,
-          DEMO_EMAIL: 'driver@demo.com',
-          DEMO_PASSWORD: 'driver123',
-        },
-      }));
+    config.DEMO_MODE = true;
 
-      const LoginScreenDemo = require('../../screens/LoginScreen').default;
-      const { getByDisplayValue, getByText } = render(
-        <LoginScreenDemo navigation={mockNavigation} />
-      );
+    const { getByDisplayValue, getByText } = render(
+      <LoginScreen navigation={mockNavigation} />
+    );
 
-      expect(getByDisplayValue('driver@demo.com')).toBeTruthy();
-      expect(getByDisplayValue('driver123')).toBeTruthy();
-      expect(getByText('Demo Mode Active')).toBeTruthy();
-    });
+    expect(getByDisplayValue('driver@demo.com')).toBeTruthy();
+    expect(getByDisplayValue('driver123')).toBeTruthy();
+    expect(getByText('Demo Mode Active')).toBeTruthy();
   });
 });
