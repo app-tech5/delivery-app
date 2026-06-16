@@ -104,6 +104,22 @@ jest.mock('react-native-elements', () => {
   return { Input, Button, Icon };
 });
 
+jest.mock('../../components', () => {
+  const mockReact = require('react');
+  const { View, Text } = require('react-native');
+
+  const ScreenHeader = ({ title, subtitle, children, titleStyle, subtitleStyle }) =>
+    mockReact.createElement(
+      View,
+      { testID: 'screen-header' },
+      title ? mockReact.createElement(Text, { style: titleStyle }, title) : null,
+      subtitle ? mockReact.createElement(Text, { style: subtitleStyle }, subtitle) : null,
+      children
+    );
+
+  return { ScreenHeader };
+});
+
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
