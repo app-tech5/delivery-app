@@ -16,7 +16,7 @@ export const config = {
   VERSION: '1.1.0',
 
   // Mode démonstration - préremplit les champs de connexion driver
-  DEMO_MODE: false,
+  DEMO_MODE: true,
 
   // Identifiants de démonstration (utilisés uniquement en mode DEMO_MODE)
   DEMO_EMAIL: 'driver@demo.com',
