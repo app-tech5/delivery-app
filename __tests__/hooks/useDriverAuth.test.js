@@ -5,15 +5,13 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   multiRemove: jest.fn(() => Promise.resolve()),
 }));
 
-const mockApiClient = {
-  driver: null,
-  driverLogin: jest.fn(),
-  driverRegister: jest.fn(),
-};
-
 jest.mock('../../api', () => ({
   __esModule: true,
-  default: mockApiClient,
+  default: {
+    driver: null,
+    driverLogin: jest.fn(),
+    driverRegister: jest.fn(),
+  },
 }));
 
 jest.mock('../../utils/driverUtils', () => ({
@@ -26,15 +24,16 @@ jest.mock('../../utils/cacheUtils', () => ({
 }));
 
 import { renderHook, act, waitFor } from '@testing-library/react-native';
+import apiClient from '../../api';
 import { useDriverAuth } from '../../hooks/useDriverAuth';
 import { updateDriverCache } from '../../utils/driverUtils';
 
 describe('useDriverAuth', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockApiClient.driver = null;
-    mockApiClient.driverLogin.mockReset();
-    mockApiClient.driverRegister.mockReset();
+    apiClient.driver = null;
+    apiClient.driverLogin.mockReset();
+    apiClient.driverRegister.mockReset();
   });
 
   const waitForHookReady = async (result) => {
@@ -47,8 +46,8 @@ describe('useDriverAuth', () => {
     it('authenticates and loads driver profile when login succeeds', async () => {
       const user = { _id: 'user-1', email: 'driver@test.com' };
       const driver = { _id: 'driver-1' };
-      mockApiClient.driverLogin.mockResolvedValue({ token: 'token-1', user });
-      mockApiClient.driver = driver;
+      apiClient.driverLogin.mockResolvedValue({ token: 'token-1', user });
+      apiClient.driver = driver;
 
       const { result } = renderHook(() => useDriverAuth());
       await waitForHookReady(result);
@@ -58,7 +57,7 @@ describe('useDriverAuth', () => {
         response = await result.current.login('driver@test.com', 'secret123');
       });
 
-      expect(mockApiClient.driverLogin).toHaveBeenCalledWith('driver@test.com', 'secret123');
+      expect(apiClient.driverLogin).toHaveBeenCalledWith('driver@test.com', 'secret123');
       expect(response).toEqual({ token: 'token-1', user });
       expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.needsOnboarding).toBe(false);
@@ -68,8 +67,8 @@ describe('useDriverAuth', () => {
 
     it('requires onboarding when login succeeds without a driver profile', async () => {
       const user = { _id: 'user-1', email: 'driver@test.com' };
-      mockApiClient.driverLogin.mockResolvedValue({ token: 'token-1', user });
-      mockApiClient.driver = null;
+      apiClient.driverLogin.mockResolvedValue({ token: 'token-1', user });
+      apiClient.driver = null;
 
       const { result } = renderHook(() => useDriverAuth());
       await waitForHookReady(result);
@@ -85,7 +84,7 @@ describe('useDriverAuth', () => {
     });
 
     it('rethrows when login fails', async () => {
-      mockApiClient.driverLogin.mockRejectedValue(new Error('Incorrect email or password'));
+      apiClient.driverLogin.mockRejectedValue(new Error('Incorrect email or password'));
 
       const { result } = renderHook(() => useDriverAuth());
       await waitForHookReady(result);
@@ -109,7 +108,7 @@ describe('useDriverAuth', () => {
         password: 'secret123',
       };
       const user = { _id: 'user-2', email: signupData.email };
-      mockApiClient.driverRegister.mockResolvedValue({ token: 'token-2', user });
+      apiClient.driverRegister.mockResolvedValue({ token: 'token-2', user });
 
       const { result } = renderHook(() => useDriverAuth());
       await waitForHookReady(result);
@@ -119,7 +118,7 @@ describe('useDriverAuth', () => {
         response = await result.current.register(signupData);
       });
 
-      expect(mockApiClient.driverRegister).toHaveBeenCalledWith(signupData);
+      expect(apiClient.driverRegister).toHaveBeenCalledWith(signupData);
       expect(response).toEqual({ token: 'token-2', user });
       expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.needsOnboarding).toBe(true);
@@ -128,7 +127,7 @@ describe('useDriverAuth', () => {
     });
 
     it('rethrows when registration fails', async () => {
-      mockApiClient.driverRegister.mockRejectedValue(new Error('Email already exists'));
+      apiClient.driverRegister.mockRejectedValue(new Error('Email already exists'));
 
       const { result } = renderHook(() => useDriverAuth());
       await waitForHookReady(result);

@@ -144,12 +144,12 @@ describe('SignUpScreen', () => {
   });
 
   it('renders the sign-up form with app title and fields', () => {
-    const { getByText, getByTestId } = render(
+    const { getByText, getByTestId, getAllByText } = render(
       <SignUpScreen navigation={mockNavigation} />
     );
 
     expect(getByText('Good Food Driver')).toBeTruthy();
-    expect(getByText('Create your driver account')).toBeTruthy();
+    expect(getAllByText('Create your driver account').length).toBeGreaterThan(0);
     expect(getByTestId('text-input-Full Name')).toBeTruthy();
     expect(getByTestId('text-input-Email')).toBeTruthy();
     expect(getByTestId('text-input-Phone')).toBeTruthy();
