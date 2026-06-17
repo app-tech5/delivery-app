@@ -89,7 +89,7 @@ function HomeScreen() {
                       { backgroundColor: getStatusColor(driver?.status, 'driver') }
                     ]}
                   />
-                  <Text style={styles.statusText}>
+                  <Text style={styles.statusText} testID="driver-status-badge">
                     {driver?.status || 'unknown'}
                   </Text>
                 </View>

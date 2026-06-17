@@ -296,11 +296,14 @@ const waitForActiveDeliveryButton = async (utils) => {
   );
 };
 
-// queryBy* + expect : pas de dump JSX géant (contrairement à getBy* qui lance une erreur avec l'arbre complet)
+// queryBy* : pas de dump JSX géant (contrairement à getBy* qui imprime tout l'arbre)
 const expectDriverStatus = (utils, status) => {
   const badge = utils.queryByTestId('driver-status-badge');
-  expect(badge).not.toBeNull();
-  expect(badge.props.children).toBe(status);
+  expect(badge?.props?.children ?? null).toBe(status);
+};
+
+const expectNoDeliveryButton = (utils, orderId = ORDER_ID) => {
+  expect(utils.queryByTestId(`delivery-delivered-${orderId}`) != null).toBe(false);
 };
 
 describe('HomeScreen integration (demo mode, real hooks)', () => {
@@ -444,7 +447,7 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
       fireEvent.press(utils.getByTestId(`delivery-delivered-${ORDER_ID}`));
 
       await waitFor(() => {
-        expect(utils.queryByTestId(`delivery-delivered-${ORDER_ID}`)).toBeNull();
+        expectNoDeliveryButton(utils);
       });
     });
 
@@ -457,7 +460,7 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
       fireEvent.press(utils.getByTestId(`delivery-delivered-${ORDER_ID}`));
 
       await waitFor(() => {
-        expect(utils.queryByTestId(`delivery-delivered-${ORDER_ID}`)).toBeNull();
+        expectNoDeliveryButton(utils);
       });
 
       const demoState = await getDemoState();
@@ -472,7 +475,7 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
 
       fireEvent.press(first.getByTestId(`delivery-delivered-${ORDER_ID}`));
       await waitFor(() => {
-        expect(first.queryByTestId(`delivery-delivered-${ORDER_ID}`)).toBeNull();
+        expectNoDeliveryButton(first);
       });
 
       first.unmount();
@@ -481,7 +484,7 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
       await waitForHomeDashboard(second);
 
       await waitFor(() => {
-        expect(second.queryByTestId(`delivery-delivered-${ORDER_ID}`)).toBeNull();
+        expectNoDeliveryButton(second);
       });
     });
   });
