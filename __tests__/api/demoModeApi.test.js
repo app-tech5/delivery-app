@@ -145,6 +145,41 @@ describe('api demo mode (offline local)', () => {
     expect(refreshedOrders.find((item) => item._id === orders[0]._id)?.status).toBe('delivered');
   });
 
+  it('keeps updateDriverLocation local without backend call', async () => {
+    const apiClient = loadDemoApiClient();
+    await apiClient.driverLogin('driver@demo.com', 'driver123');
+    await apiClient.createDriverProfile({
+      licenseNumber: 'DL-LOC',
+      vehicleType: 'Moto',
+      vehicleModel: 'Yamaha',
+      licensePlate: 'LO-123-CA',
+    });
+
+    const fetchCountBefore = global.fetch.mock.calls.length;
+    const coords = { latitude: 4.0982637, longitude: 9.6576275 };
+
+    const updatedDriver = await apiClient.updateDriverLocation(coords, 'foreground');
+    const fetchCountAfter = global.fetch.mock.calls.length;
+
+    expect(fetchCountAfter - fetchCountBefore).toBe(0);
+    expect(updatedDriver.location).toEqual({
+      type: 'Point',
+      coordinates: [coords.longitude, coords.latitude],
+    });
+    expect(apiClient.driver.location.coordinates).toEqual([
+      coords.longitude,
+      coords.latitude,
+    ]);
+
+    const { getDemoState } = require('../../api/demo/localStore');
+    const state = await getDemoState();
+    const userId = apiClient.user._id;
+    expect(state.driverProfiles[userId].location.coordinates).toEqual([
+      coords.longitude,
+      coords.latitude,
+    ]);
+  });
+
   it('persists local demo state across module reloads', async () => {
     const firstClient = loadDemoApiClient();
     await firstClient.driverRegister({
