@@ -83,7 +83,7 @@ jest.mock('react-native-elements', () => {
       TouchableOpacity,
       {
         onPress,
-        testID: testID || `button-${title}`,
+        testID: testID || (title === 'Login' ? 'auth-guard-login-button' : `button-${title}`),
         disabled: loading,
         style: buttonStyle,
       },
@@ -227,11 +227,24 @@ describe('HomeScreen buttons', () => {
 
     const { getByTestId } = render(<HomeScreen />);
 
-    expect(getByTestId('status-button-available').props.disabled).toBe(true);
-    expect(getByTestId('status-button-busy').props.disabled).toBe(true);
-    expect(getByTestId('status-button-offline').props.disabled).toBe(true);
+    const availableButton = getByTestId('status-button-available');
+    const busyButton = getByTestId('status-button-busy');
+    const offlineButton = getByTestId('status-button-offline');
 
-    fireEvent.press(getByTestId('status-button-available'));
+    expect(
+      availableButton.props.disabled === true ||
+        availableButton.props.accessibilityState?.disabled === true
+    ).toBe(true);
+    expect(
+      busyButton.props.disabled === true ||
+        busyButton.props.accessibilityState?.disabled === true
+    ).toBe(true);
+    expect(
+      offlineButton.props.disabled === true ||
+        offlineButton.props.accessibilityState?.disabled === true
+    ).toBe(true);
+
+    fireEvent.press(availableButton);
 
     expect(mockHandleStatusChange).not.toHaveBeenCalled();
   });

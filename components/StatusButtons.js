@@ -15,6 +15,7 @@ const StatusButton = ({ status, label, icon, isActive, onPress, disabled }) => (
     ]}
     onPress={() => onPress(status)}
     disabled={disabled}
+    accessibilityState={{ disabled: Boolean(disabled) }}
   >
     <Icon name={icon} type="material" size={24} color={colors.white} />
     <Text style={styles.statusButtonText}>{label}</Text>
