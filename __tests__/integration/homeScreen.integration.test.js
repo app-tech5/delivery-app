@@ -195,6 +195,39 @@ const mockNetworkReads = () => {
   global.fetch = jest.fn().mockImplementation((url) => {
     const path = String(url);
 
+    if (path.includes('/auth/delivery-login')) {
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          token: 'integration-jwt',
+          user: {
+            _id: 'user-int-01',
+            id: 'user-int-01',
+            email: 'driver@demo.com',
+            name: 'Integration Driver',
+            role: 'delivery',
+          },
+        }),
+      });
+    }
+
+    if (path.includes('/resource/drivers/byUserId')) {
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          _id: 'driver-int-base',
+          id: 'driver-int-base',
+          userId: 'user-int-01',
+          licenseNumber: 'DL-INT-01',
+          status: 'offline',
+          isApproved: true,
+          vehicle: { type: 'Moto', model: 'Integration', licensePlate: 'INT-001' },
+        }),
+      });
+    }
+
     if (path.includes('/resource/orders')) {
       return Promise.resolve({
         ok: true,
@@ -219,14 +252,6 @@ const mockNetworkReads = () => {
       });
     }
 
-    if (path.includes('/resource/drivers/byUserId')) {
-      return Promise.resolve({
-        ok: false,
-        status: 404,
-        json: async () => ({ message: 'not found' }),
-      });
-    }
-
     return Promise.resolve({
       ok: false,
       status: 404,
@@ -239,12 +264,7 @@ const seedApprovedDriverSession = async () => {
   const apiClient = require('../../api').default;
 
   await apiClient.driverLogin('driver@demo.com', 'driver123');
-  const profile = await apiClient.createDriverProfile({
-    licenseNumber: 'DL-INT-01',
-    vehicleType: 'Moto',
-    vehicleModel: 'Integration',
-    licensePlate: 'INT-001',
-  });
+  const profile = await apiClient.fetchDriverByUserId();
 
   const approvedDriver = {
     ...profile,

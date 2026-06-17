@@ -2,10 +2,7 @@
 import { config } from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearDriverCache } from './utils/storageUtils';
-import { handleDemoWrite, handleDemoRead, mergeDemoRead } from './api/demo/handlers';
-
-// Fonction utilitaire pour vérifier si on est en mode démo
-const isDemoMode = () => config.DEMO_MODE === true;
+import { handleDemoWrite, mergeDemoRead, getLocalDemoDriverProfile } from './api/demo/handlers';
 
 const API_BASE_URL = config.API_BASE_URL;
 const API_TIMEOUT = config.API_TIMEOUT;
@@ -60,13 +57,6 @@ class ApiClient {
         if (localWrite !== null) {
           return localWrite;
         }
-
-        if (method === 'GET') {
-          const localRead = await handleDemoRead(this, endpoint, method);
-          if (localRead !== null) {
-            return localRead;
-          }
-        }
       }
 
       const url = `${API_BASE_URL}${endpoint}`;
@@ -95,7 +85,7 @@ class ApiClient {
 
       const data = await response.json();
       if (config.DEMO_MODE && method === 'GET') {
-        return mergeDemoRead(endpoint, data);
+        return mergeDemoRead(endpoint, data, this);
       }
       return data;
     } catch (error) {
@@ -308,19 +298,6 @@ class ApiClient {
   // Récupérer les statistiques du driver
   async getDriverStats() {
     try {
-      // Vérification du mode démo via la configuration
-      if (isDemoMode()) {
-        // Retourner des statistiques mockées pour le mode démo
-        console.log('🔄 Mode démo détecté - Retour des statistiques mockées');
-        return {
-          todayDeliveries: 3, // 3 livraisons aujourd'hui
-          totalEarnings: 12.50, // 12.50€ gagnés aujourd'hui
-          rating: 4.8, // Note du driver
-          completedOrders: 42 // Total des livraisons (comme dans la DB)
-        };
-      }
-
-      // Mode normal : calculer les stats depuis les orders du driver
       const orders = await this.getDriverOrders();
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -353,37 +330,6 @@ class ApiClient {
   // Récupérer les méthodes de paiement de l'utilisateur
   async getPaymentMethods() {
     try {
-      // Vérification du mode démo via la configuration
-      if (isDemoMode()) {
-        // Retourner des méthodes de paiement mockées pour le mode démo
-        console.log('🔄 Mode démo détecté - Retour des méthodes de paiement mockées');
-        return [
-          {
-            _id: 'demo_card_1',
-            methodType: 'credit_card',
-            isDefault: true,
-            isActive: true,
-            cardBrand: 'visa',
-            last4: '4242',
-            expiryMonth: 12,
-            expiryYear: 2025,
-            cardholderName: 'John Doe',
-            verificationStatus: 'verified',
-            createdAt: new Date().toISOString()
-          },
-          {
-            _id: 'demo_paypal_1',
-            methodType: 'paypal',
-            isDefault: false,
-            isActive: true,
-            paypalEmail: 'john.doe@example.com',
-            verificationStatus: 'verified',
-            createdAt: new Date().toISOString()
-          }
-        ];
-      }
-
-      // Mode normal : récupérer depuis l'API
       const paymentMethods = await this.apiCall('/resource/paymentmethods');
       return paymentMethods || [];
 
@@ -493,11 +439,23 @@ class ApiClient {
         this.driver = profile;
         return profile;
       }
-      this.driver = null;
-      return null;
     } catch (error) {
-      return null;
+      if (!config.DEMO_MODE) {
+        return null;
+      }
     }
+
+    if (config.DEMO_MODE) {
+      const userId = this.user?._id || this.user?.id;
+      const localProfile = await getLocalDemoDriverProfile(userId);
+      if (localProfile?._id || localProfile?.id) {
+        this.driver = localProfile;
+        return localProfile;
+      }
+    }
+
+    this.driver = null;
+    return null;
   }
 
   async getDriverProfile() {

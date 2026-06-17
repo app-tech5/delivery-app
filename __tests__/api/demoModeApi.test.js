@@ -35,31 +35,66 @@ const loadDemoApiClient = () => {
   return require('../../api').default;
 };
 
-describe('api demo mode (offline local)', () => {
+const jsonResponse = (data, ok = true, status = 200) => ({
+  ok,
+  status,
+  json: jest.fn(() => Promise.resolve(data)),
+});
+
+const DB_DEMO_USER = {
+  _id: 'user-db-demo',
+  id: 'user-db-demo',
+  email: 'driver@demo.com',
+  name: 'Demo Driver',
+  role: 'delivery',
+};
+
+const DB_DEMO_DRIVER = {
+  _id: 'driver-db-demo',
+  id: 'driver-db-demo',
+  userId: 'user-db-demo',
+  licenseNumber: 'DL-DB-01',
+  status: 'offline',
+  isApproved: true,
+  vehicle: { type: 'Moto', model: 'Yamaha', licensePlate: 'DB-001' },
+};
+
+const mockBuiltinDemoLogin = () => {
+  global.fetch
+    .mockResolvedValueOnce(jsonResponse({ token: 'jwt-from-db', user: DB_DEMO_USER }))
+    .mockResolvedValueOnce(jsonResponse(DB_DEMO_DRIVER));
+};
+
+describe('api demo mode (reads backend, writes local)', () => {
   beforeEach(() => {
     Object.keys(storage).forEach((key) => delete storage[key]);
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      status: 404,
-      json: jest.fn(() => Promise.resolve({ message: 'not found' })),
-    });
+    global.fetch = jest.fn().mockResolvedValue(jsonResponse({ message: 'not found' }, false, 404));
   });
 
-  it('logs in demo user locally without backend call', async () => {
+  it('logs in the builtin demo user against the backend and loads the driver profile', async () => {
     const apiClient = loadDemoApiClient();
+    mockBuiltinDemoLogin();
 
     const response = await apiClient.driverLogin('driver@demo.com', 'driver123');
 
-    expect(response.token).toContain('demo_driver_token');
+    expect(response.token).toBe('jwt-from-db');
     expect(response.user.email).toBe('driver@demo.com');
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      1,
+      'http://localhost:5000/api/auth/delivery-login',
+      expect.objectContaining({ method: 'POST' })
+    );
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      2,
       'http://localhost:5000/api/resource/drivers/byUserId',
       expect.any(Object)
     );
+    expect(apiClient.driver?.licenseNumber).toBe('DL-DB-01');
+    expect(apiClient.driver?.isApproved).toBe(true);
   });
 
-  it('registers and logs in a demo driver locally', async () => {
+  it('registers and logs in a locally tracked demo driver without backend auth', async () => {
     const apiClient = loadDemoApiClient();
 
     await apiClient.driverRegister({
@@ -71,24 +106,28 @@ describe('api demo mode (offline local)', () => {
 
     const loginResponse = await apiClient.driverLogin('john.demo@test.com', 'secret123');
     expect(loginResponse.user.email).toBe('john.demo@test.com');
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/resource/drivers/byUserId',
-      expect.any(Object)
-    );
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  it('rejects local login when password is wrong', async () => {
+  it('rejects local login when password is wrong for a locally tracked driver', async () => {
     const apiClient = loadDemoApiClient();
 
+    await apiClient.driverRegister({
+      name: 'John Driver',
+      email: 'john.demo@test.com',
+      phone: '0612345678',
+      password: 'secret123',
+    });
+
     await expect(
-      apiClient.driverLogin('driver@demo.com', 'wrong-password')
+      apiClient.driverLogin('john.demo@test.com', 'wrong-password')
     ).rejects.toThrow('Incorrect email or password');
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  it('creates and reads driver profile locally', async () => {
+  it('creates a driver profile locally and overlays it on backend reads', async () => {
     const apiClient = loadDemoApiClient();
+    mockBuiltinDemoLogin();
     await apiClient.driverLogin('driver@demo.com', 'driver123');
 
     const profile = await apiClient.createDriverProfile({
@@ -98,24 +137,20 @@ describe('api demo mode (offline local)', () => {
       licensePlate: 'AB-123-CD',
     });
 
+    global.fetch.mockResolvedValueOnce(jsonResponse(DB_DEMO_DRIVER));
     const loaded = await apiClient.getDriverProfile();
 
     expect(profile._id).toBeDefined();
+    expect(profile.licenseNumber).toBe('DL-12345');
     expect(loaded.licenseNumber).toBe('DL-12345');
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledTimes(3);
   });
 
   it('keeps write actions local and allows read from backend', async () => {
     const apiClient = loadDemoApiClient();
+    mockBuiltinDemoLogin();
     await apiClient.driverLogin('driver@demo.com', 'driver123');
-    const profile = await apiClient.createDriverProfile({
-      licenseNumber: 'DL-999',
-      vehicleType: 'Scooter',
-      vehicleModel: 'Nmax',
-      licensePlate: 'DE-456-FG',
-    });
-    expect(profile._id).toBeDefined();
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    const profile = apiClient.driver;
 
     global.fetch.mockResolvedValue({
       ok: true,
@@ -147,13 +182,8 @@ describe('api demo mode (offline local)', () => {
 
   it('keeps updateDriverLocation local without backend call', async () => {
     const apiClient = loadDemoApiClient();
+    mockBuiltinDemoLogin();
     await apiClient.driverLogin('driver@demo.com', 'driver123');
-    await apiClient.createDriverProfile({
-      licenseNumber: 'DL-LOC',
-      vehicleType: 'Moto',
-      vehicleModel: 'Yamaha',
-      licensePlate: 'LO-123-CA',
-    });
 
     const fetchCountBefore = global.fetch.mock.calls.length;
     const coords = { latitude: 4.0982637, longitude: 9.6576275 };
@@ -166,10 +196,6 @@ describe('api demo mode (offline local)', () => {
       type: 'Point',
       coordinates: [coords.longitude, coords.latitude],
     });
-    expect(apiClient.driver.location.coordinates).toEqual([
-      coords.longitude,
-      coords.latitude,
-    ]);
 
     const { getDemoState } = require('../../api/demo/localStore');
     const state = await getDemoState();
@@ -180,7 +206,7 @@ describe('api demo mode (offline local)', () => {
     ]);
   });
 
-  it('persists local demo state across module reloads', async () => {
+  it('persists local demo state across module reloads for locally registered drivers', async () => {
     const firstClient = loadDemoApiClient();
     await firstClient.driverRegister({
       name: 'Persist Driver',

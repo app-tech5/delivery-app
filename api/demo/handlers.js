@@ -28,6 +28,19 @@ const demoUserFromRecord = (record) => ({
   role: 'delivery',
 });
 
+const isBuiltinDemoEmail = (email) =>
+  String(email || '')
+    .trim()
+    .toLowerCase() === String(config.DEMO_EMAIL || '').trim().toLowerCase();
+
+export async function getLocalDemoDriverProfile(userId) {
+  if (!config.DEMO_MODE || !userId) {
+    return null;
+  }
+  const state = await getDemoState();
+  return state.driverProfiles[String(userId)] || null;
+}
+
 export async function handleDemoWrite(client, endpoint, method, options = {}) {
   if (!config.DEMO_MODE || !WRITE_METHODS.has(method)) {
     return null;
@@ -36,7 +49,12 @@ export async function handleDemoWrite(client, endpoint, method, options = {}) {
   const endpointPath = pathOnly(endpoint);
   const body = parseBody(options);
 
+  // Auth : compte démo officiel → backend réel (token JWT valide, lecture base)
   if (endpointPath === '/auth/delivery-login' && method === 'POST') {
+    if (isBuiltinDemoEmail(body.email)) {
+      return null;
+    }
+
     const state = await getDemoState();
     const email = String(body.email || '').trim().toLowerCase();
     const record = state.registeredDrivers.find(
@@ -44,26 +62,7 @@ export async function handleDemoWrite(client, endpoint, method, options = {}) {
     );
 
     if (!record) {
-      if (
-        email === String(config.DEMO_EMAIL || '').trim().toLowerCase() &&
-        body.password === config.DEMO_PASSWORD
-      ) {
-        const id = 'demo_driver_user';
-        const token = `demo_driver_token_${id}`;
-        const user = {
-          _id: id,
-          id,
-          email: config.DEMO_EMAIL,
-          name: 'Demo Driver',
-          role: 'delivery',
-        };
-        client.token = token;
-        client.user = user;
-        client.driver = null;
-        await client.saveDriverToStorage();
-        return { token, user };
-      }
-      throw new Error('Incorrect email or password');
+      return null;
     }
 
     if (record.password !== body.password) {
@@ -108,7 +107,7 @@ export async function handleDemoWrite(client, endpoint, method, options = {}) {
       registeredDrivers: [...current.registeredDrivers, record],
     }));
 
-    const token = `demo_driver_token_${id}`;
+    const token = `demo_driver_token_${record.id}`;
     const user = demoUserFromRecord(record);
     client.token = token;
     client.user = user;
@@ -191,28 +190,39 @@ export async function handleDemoWrite(client, endpoint, method, options = {}) {
   return null;
 }
 
-export async function handleDemoRead(client, endpoint, method) {
-  if (!config.DEMO_MODE || method !== 'GET') {
-    return null;
+const mergeDriverWithLocalPatch = (data, userId, state) => {
+  if (!userId) {
+    return data;
   }
-
-  const endpointPath = pathOnly(endpoint);
-
-  if (endpointPath === '/resource/drivers/byUserId') {
-    const userId = client.user?._id || client.user?.id;
-    if (!userId) return null;
-    const state = await getDemoState();
-    return state.driverProfiles[String(userId)] || null;
+  const patch = state.driverProfiles[String(userId)];
+  if (!patch) {
+    return data;
   }
+  if (Array.isArray(data)) {
+    if (!data.length) {
+      return [patch];
+    }
+    return data.map((item, index) => (index === 0 ? { ...item, ...patch } : item));
+  }
+  return data ? { ...data, ...patch } : patch;
+};
 
-  return null;
-}
-
-export async function mergeDemoRead(endpoint, data) {
-  if (!config.DEMO_MODE) return data;
+export async function mergeDemoRead(endpoint, data, client) {
+  if (!config.DEMO_MODE) {
+    return data;
+  }
 
   const endpointPath = pathOnly(endpoint);
   const state = await getDemoState();
+  const userId = client?.user?._id || client?.user?.id;
+
+  if (endpointPath === '/resource/drivers/byUserId') {
+    return mergeDriverWithLocalPatch(data, userId, state);
+  }
+
+  if (endpointPath.startsWith('/resource/drivers/') && endpointPath !== '/resource/drivers/byUserId') {
+    return mergeDriverWithLocalPatch(data, userId, state);
+  }
 
   if (endpointPath === '/resource/orders') {
     const orders = Array.isArray(data) ? data : [];
@@ -232,4 +242,3 @@ export async function mergeDemoRead(endpoint, data) {
 
   return data;
 }
-
