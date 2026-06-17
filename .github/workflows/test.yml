@@ -24,4 +24,6 @@ jobs:
         run: npm install
 
       - name: Run tests
-        run: npm test -- --verbose
+        env:
+          CI: true
+        run: npm test -- --ci --silent --reporters=default
