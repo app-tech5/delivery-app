@@ -35,6 +35,7 @@ const DeliveryCard = ({ order, currency, onOrderDelivered, isLoading }) => (
     </View>
     <View style={styles.deliveryActions}>
       <Button
+        testID={`delivery-delivered-${order._id}`}
         title={i18n.t('driver.orderDelivered')}
         onPress={() => onOrderDelivered(order._id, 'delivered')}
         loading={isLoading}

@@ -6,6 +6,7 @@ import i18n from '../i18n';
 
 const StatusButton = ({ status, label, icon, isActive, onPress, disabled }) => (
   <TouchableOpacity
+    testID={`status-button-${status}`}
     style={[
       styles.statusButton,
       isActive && styles.statusButtonActive,
