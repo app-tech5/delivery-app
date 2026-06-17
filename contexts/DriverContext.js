@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { config } from '../config';
+import apiClient from '../api';
+import { updateDriverCache } from '../utils/storageUtils';
 import { useDriverAuth } from '../hooks/useDriverAuth';
 import { useDriverStats } from '../hooks/useDriverStats';
 import { useDriverOrders } from '../hooks/useDriverOrders';
@@ -53,6 +55,7 @@ export const DriverProvider = ({ children }) => {
     const updatedDriver = result?.driver ?? (result?._id || result?.id ? result : null);
     if (updatedDriver) {
       setDriver(updatedDriver);
+      await updateDriverCache(updatedDriver, apiClient.token, apiClient.user);
     }
     return result;
   };

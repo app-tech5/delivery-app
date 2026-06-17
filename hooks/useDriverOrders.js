@@ -3,8 +3,6 @@ import { Alert } from 'react-native';
 import apiClient from '../api';
 import { config } from '../config';
 import { loadDeliveriesWithSmartCache, clearDeliveriesCache } from '../utils/cacheUtils';
-import { isDriverAuthenticated } from '../utils/driverUtils';
-import { getDriverStatusLabel } from '../utils/statusUtils';
 
 export const useDriverOrders = (driver, hasCompletedOnboarding) => {
   const [deliveries, setDeliveries] = useState([]);
@@ -54,15 +52,8 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
 
   // Mettre à jour le statut du driver
   const updateStatus = async (status, location = null) => {
-    if (config.DEMO_MODE) {
-      // Mode démo : simulation locale uniquement
-      // Alert.alert('Mode Démo', `Statut changé à "${getDriverStatusLabel(status)}" (simulation)`);
-      return { driver: { ...(driver || {}), status } };
-    }
-
     try {
-      const response = await apiClient.updateDriverStatus(status, location);
-      return response;
+      return await apiClient.updateDriverStatus(status, location);
     } catch (error) {
       console.error('Update status error:', error);
       throw error;
@@ -100,29 +91,22 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
 
   // Mettre à jour le statut d'une commande
   const updateDeliveryStatus = async (orderId, status, location = null) => {
-    if (config.DEMO_MODE) {
-      // Mode démo : simulation locale
-      setDeliveries(prevDeliveries =>
-        prevDeliveries.map(delivery =>
-          delivery._id === orderId
-            ? { ...delivery, status: status }
-            : delivery
-        )
-      );
-      Alert.alert('Mode Démo', `Commande marquée comme "${status === 'delivered' ? 'livrée' : status}" (simulation)`);
-      return { success: true };
-    }
-
     try {
       const response = await apiClient.updateOrder(orderId, { status });
       if (status === 'delivered' || status === 'cancelled') {
         await apiClient.updateDriver({ currentOrder: null });
       }
-      // Invalider le cache après mise à jour pour forcer un rechargement frais
+      setDeliveries((prevDeliveries) =>
+        prevDeliveries.map((delivery) =>
+          delivery._id === orderId || delivery.id === orderId
+            ? { ...delivery, status }
+            : delivery
+        )
+      );
       if (driver?._id) {
         await clearDeliveriesCache(driver._id);
       }
-      await loadDriverOrders(); // Recharger les commandes
+      await loadDriverOrders();
       return response;
     } catch (error) {
       console.error('Update order status error:', error);
