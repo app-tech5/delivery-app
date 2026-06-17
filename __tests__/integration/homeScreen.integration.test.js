@@ -6,6 +6,30 @@
  * (statut driver, commande livrée) dans le stockage local.
  */
 
+jest.mock('expo-task-manager', () => ({
+  isTaskDefined: jest.fn(() => true),
+  defineTask: jest.fn(),
+}));
+
+jest.mock('expo-location', () => ({
+  Accuracy: { Balanced: 3 },
+  requestForegroundPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted' })),
+  requestBackgroundPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted' })),
+  getForegroundPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted' })),
+  getBackgroundPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted' })),
+  getCurrentPositionAsync: jest.fn(() =>
+    Promise.resolve({ coords: { latitude: 4.0982637, longitude: 9.6576275 } })
+  ),
+  watchPositionAsync: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+  hasStartedLocationUpdatesAsync: jest.fn(() => Promise.resolve(false)),
+  startLocationUpdatesAsync: jest.fn(() => Promise.resolve()),
+  stopLocationUpdatesAsync: jest.fn(() => Promise.resolve()),
+}));
+
+jest.mock('../../tasks/driverLocationTask', () => ({
+  DRIVER_LOCATION_TASK: 'driver-background-location',
+}));
+
 const storage = {};
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -50,12 +74,27 @@ jest.mock('../../hooks/useDriverLocationWatch', () => ({
 }));
 
 jest.mock('../../utils/locationUtils', () => ({
-  ...jest.requireActual('../../utils/locationUtils'),
   requestDriverLocationPermissions: jest.fn(() =>
     Promise.resolve({ foreground: true, background: false })
   ),
   startDriverBackgroundLocation: jest.fn(() => Promise.resolve(true)),
   stopDriverBackgroundLocation: jest.fn(() => Promise.resolve(true)),
+  getDriverLocation: (driver) =>
+    driver?.location?.coordinates
+      ? {
+          latitude: driver.location.coordinates[1],
+          longitude: driver.location.coordinates[0],
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }
+      : {
+          latitude: 48.8566,
+          longitude: 2.3522,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+  getActiveDeliveries: (deliveries) =>
+    (deliveries || []).filter((delivery) => delivery.status === 'out_for_delivery'),
 }));
 
 jest.mock('../../components/RestaurantMap', () => {
