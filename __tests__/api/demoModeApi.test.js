@@ -38,7 +38,11 @@ const loadDemoApiClient = () => {
 describe('api demo mode (offline local)', () => {
   beforeEach(() => {
     Object.keys(storage).forEach((key) => delete storage[key]);
-    global.fetch = jest.fn();
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      json: jest.fn(() => Promise.resolve({ message: 'not found' })),
+    });
   });
 
   it('logs in demo user locally without backend call', async () => {
@@ -48,7 +52,11 @@ describe('api demo mode (offline local)', () => {
 
     expect(response.token).toContain('demo_driver_token');
     expect(response.user.email).toBe('driver@demo.com');
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:5000/api/resource/drivers/byUserId',
+      expect.any(Object)
+    );
   });
 
   it('registers and logs in a demo driver locally', async () => {
@@ -63,7 +71,11 @@ describe('api demo mode (offline local)', () => {
 
     const loginResponse = await apiClient.driverLogin('john.demo@test.com', 'secret123');
     expect(loginResponse.user.email).toBe('john.demo@test.com');
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:5000/api/resource/drivers/byUserId',
+      expect.any(Object)
+    );
   });
 
   it('rejects local login when password is wrong', async () => {
@@ -90,7 +102,7 @@ describe('api demo mode (offline local)', () => {
 
     expect(profile._id).toBeDefined();
     expect(loaded.licenseNumber).toBe('DL-12345');
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
   it('keeps write actions local and allows read from backend', async () => {
@@ -103,7 +115,7 @@ describe('api demo mode (offline local)', () => {
       licensePlate: 'DE-456-FG',
     });
     expect(profile._id).toBeDefined();
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
 
     global.fetch.mockResolvedValue({
       ok: true,
