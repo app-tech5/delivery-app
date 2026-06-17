@@ -80,7 +80,7 @@ describe('useDriverAuth', () => {
       expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.needsOnboarding).toBe(true);
       expect(result.current.driver).toBeNull();
-      expect(updateDriverCache).toHaveBeenCalledWith(null, 'token-1', user);
+      expect(updateDriverCache).not.toHaveBeenCalled();
     });
 
     it('rethrows when login fails', async () => {
