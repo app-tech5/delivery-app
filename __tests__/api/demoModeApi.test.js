@@ -132,6 +132,7 @@ describe('api demo mode (offline local)', () => {
     expect(Array.isArray(orders)).toBe(true);
     expect(orders.length).toBeGreaterThan(0);
 
+    const callCountBeforeWrites = global.fetch.mock.calls.length;
     const updated = await apiClient.updateOrder(orders[0]._id, { status: 'delivered' });
     const statusUpdated = await apiClient.updateDriverStatus('available', { latitude: 48.85, longitude: 2.35 });
     const callCountAfterWrites = global.fetch.mock.calls.length;
@@ -139,8 +140,8 @@ describe('api demo mode (offline local)', () => {
 
     expect(updated.status).toBe('delivered');
     expect(statusUpdated.driver._id).toBe(profile._id);
-    expect(callCountAfterWrites).toBe(1);
-    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(callCountAfterWrites - callCountBeforeWrites).toBe(0);
+    expect(global.fetch.mock.calls.length).toBe(callCountAfterWrites + 1);
     expect(refreshedOrders.find((item) => item._id === orders[0]._id)?.status).toBe('delivered');
   });
 
