@@ -296,6 +296,13 @@ const waitForActiveDeliveryButton = async (utils) => {
   );
 };
 
+// queryBy* + expect : pas de dump JSX géant (contrairement à getBy* qui lance une erreur avec l'arbre complet)
+const expectDriverStatus = (utils, status) => {
+  const badge = utils.queryByTestId('driver-status-badge');
+  expect(badge).not.toBeNull();
+  expect(badge.props.children).toBe(status);
+};
+
 describe('HomeScreen integration (demo mode, real hooks)', () => {
   let alertSpy;
 
@@ -333,7 +340,7 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
       fireEvent.press(utils.getByTestId('status-button-available'));
 
       await waitFor(() => {
-        expect(utils.getByText('available')).toBeTruthy();
+        expectDriverStatus(utils, 'available');
       });
     });
 
@@ -345,7 +352,7 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
       fireEvent.press(utils.getByTestId('status-button-available'));
 
       await waitFor(() => {
-        expect(utils.getByText('available')).toBeTruthy();
+        expectDriverStatus(utils, 'available');
       });
 
       const session = await getDriverSessionFromCache();
@@ -358,14 +365,14 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
       await waitForHomeDashboard(first);
 
       fireEvent.press(first.getByTestId('status-button-available'));
-      await waitFor(() => expect(first.getByText('available')).toBeTruthy());
+      await waitFor(() => expectDriverStatus(first, 'available'));
 
       first.unmount();
 
       const second = renderHomeScreen();
       await waitForHomeDashboard(second);
 
-      expect(second.getByText('available')).toBeTruthy();
+      expectDriverStatus(second, 'available');
     });
 
     it('persists Busy status after simulated app restart', async () => {
@@ -374,14 +381,14 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
       await waitForHomeDashboard(first);
 
       fireEvent.press(first.getByTestId('status-button-busy'));
-      await waitFor(() => expect(first.getByText('busy')).toBeTruthy());
+      await waitFor(() => expectDriverStatus(first, 'busy'));
 
       first.unmount();
 
       const second = renderHomeScreen();
       await waitForHomeDashboard(second);
 
-      expect(second.getByText('busy')).toBeTruthy();
+      expectDriverStatus(second, 'busy');
     });
 
     it('persists Offline status after simulated app restart', async () => {
@@ -390,17 +397,17 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
       await waitForHomeDashboard(first);
 
       fireEvent.press(first.getByTestId('status-button-available'));
-      await waitFor(() => expect(first.getByText('available')).toBeTruthy());
+      await waitFor(() => expectDriverStatus(first, 'available'));
 
       fireEvent.press(first.getByTestId('status-button-offline'));
-      await waitFor(() => expect(first.getByText('offline')).toBeTruthy());
+      await waitFor(() => expectDriverStatus(first, 'offline'));
 
       first.unmount();
 
       const second = renderHomeScreen();
       await waitForHomeDashboard(second);
 
-      expect(second.getByText('offline')).toBeTruthy();
+      expectDriverStatus(second, 'offline');
     });
 
     it('blocks going online when driver is not approved', async () => {
@@ -421,7 +428,7 @@ describe('HomeScreen integration (demo mode, real hooks)', () => {
         expect(alertSpy).toHaveBeenCalledWith('Permission denied', 'Driver not approved');
       });
 
-      expect(utils.getByText('offline')).toBeTruthy();
+      expectDriverStatus(utils, 'offline');
       const reloaded = await getDriverSessionFromCache();
       expect(reloaded?.driver?.status).toBe('offline');
     });
