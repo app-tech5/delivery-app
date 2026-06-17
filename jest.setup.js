@@ -1,7 +1,12 @@
+// Limite la taille des arbres React affichés quand un test échoue
+global.DEBUG_PRINT_LIMIT = 12;
+
+let consoleLogSpy;
+
 beforeEach(() => {
-  jest.spyOn(console, 'log').mockImplementation(() => {});
+  consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  consoleLogSpy?.mockRestore();
 });
