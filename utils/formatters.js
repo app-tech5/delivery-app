@@ -1,12 +1,6 @@
 import i18n from '../i18n';
 import { colors } from '../global';
 
-/**
- * Formate un montant avec la devise
- * @param {number} amount - Montant à formater
- * @param {Object} currency - Objet devise avec symbol
- * @returns {string} Montant formaté
- */
 export const formatCurrency = (amount, currency = null) => {
   const value = Number(amount);
   const safeAmount = Number.isFinite(value) ? value : 0;
@@ -14,11 +8,6 @@ export const formatCurrency = (amount, currency = null) => {
   return `${safeAmount.toFixed(2)}${currencyObj.symbol || '€'}`;
 };
 
-/**
- * Formate une date selon les règles métier
- * @param {Date} date - Date à formater
- * @returns {string} Date formatée
- */
 export const formatDate = (date) => {
   const locale = i18n.locale;
   const now = new Date();
@@ -36,11 +25,6 @@ export const formatDate = (date) => {
   });
 };
 
-/**
- * Formate une heure
- * @param {Date|string} date - Date/heure à formater
- * @returns {string} Heure formatée
- */
 export const formatTime = (date) => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   return dateObj.toLocaleTimeString(i18n.locale, {
@@ -49,12 +33,6 @@ export const formatTime = (date) => {
   });
 };
 
-/**
- * Retourne la couleur associée à un statut
- * @param {string} status - Statut du driver ou de la livraison
- * @param {string} type - Type d'élément ('driver' ou 'delivery')
- * @returns {string} Couleur hex
- */
 export const getStatusColor = (status, type = 'delivery') => {
   if (type === 'driver') {
     switch (status) {
@@ -65,7 +43,7 @@ export const getStatusColor = (status, type = 'delivery') => {
       default: return colors.grey[500];
     }
   } else {
-    // Pour les livraisons
+    
     switch (status) {
       case 'delivered': return colors.success;
       case 'cancelled': return colors.error;
@@ -77,11 +55,6 @@ export const getStatusColor = (status, type = 'delivery') => {
   }
 };
 
-/**
- * Retourne le label associé à un statut
- * @param {string} status - Statut du driver
- * @returns {string} Label du statut
- */
 export const getStatusLabel = (status) => {
   switch (status) {
     case 'available': return i18n.t('driver.available');
@@ -92,12 +65,6 @@ export const getStatusLabel = (status) => {
   }
 };
 
-/**
- * Calcule les statistiques pour une période donnée
- * @param {Array} deliveries - Liste des livraisons
- * @param {Function} periodFilter - Fonction de filtrage pour la période
- * @returns {Object} Statistiques calculées
- */
 export const calculatePeriodStats = (deliveries, periodFilter = null) => {
   const filteredDeliveries = periodFilter ? deliveries.filter(periodFilter) : deliveries;
 
@@ -112,50 +79,25 @@ export const calculatePeriodStats = (deliveries, periodFilter = null) => {
   };
 };
 
-/**
- * Formate un numéro de commande
- * @param {string} orderId - ID de la commande
- * @returns {string} Numéro formaté
- */
 export const formatOrderNumber = (orderId) => {
   return orderId ? orderId.slice(-6) : 'N/A';
 };
 
-/**
- * Tronque un texte avec des points de suspension
- * @param {string} text - Texte à tronquer
- * @param {number} maxLength - Longueur maximale
- * @returns {string} Texte tronqué
- */
 export const truncateText = (text, maxLength = 50) => {
   if (!text || text.length <= maxLength) return text;
   return `${text.substring(0, maxLength)}...`;
 };
 
-/**
- * Retourne la couleur associée à une note
- * @param {number} rating - Note (0-5)
- * @returns {string} Couleur hex
- */
 export const getRatingColor = (rating) => {
   if (rating >= 4.5) return colors.success;
   if (rating >= 4.0) return colors.warning;
   return colors.error;
 };
 
-/**
- * Retourne l'icône et la couleur de tendance
- * @param {number} value - Valeur à comparer
- * @param {number} threshold - Seuil de comparaison
- * @returns {Object} {name, color} de l'icône
- */
 export const getTrendIcon = (value, threshold = 0) => {
   if (value > threshold) return { name: 'trending-up', color: colors.success };
   if (value < threshold) return { name: 'trending-down', color: colors.error };
   return { name: 'trending-flat', color: colors.text.secondary };
 };
 
-// formatTimeAgo a été déplacé vers utils/dateUtils.js
-
-// Les fonctions de notification ont été déplacées vers statusUtils.js
 export { getTransactionTypeColor as getNotificationColor, getTransactionTypeIcon as getNotificationIcon } from './statusUtils';

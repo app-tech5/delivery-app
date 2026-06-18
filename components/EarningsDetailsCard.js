@@ -106,4 +106,3 @@ const styles = {
 
 export default EarningsDetailsCard;
 
-

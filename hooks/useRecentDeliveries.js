@@ -1,14 +1,5 @@
 import { useState, useEffect } from 'react';
 
-/**
- * Hook personnalisé pour gérer les livraisons récentes
- * @param {Array} deliveries - Liste complète des livraisons
- * @param {Object} options - Options de filtrage
- * @param {number} options.days - Nombre de jours à remonter (défaut: 7)
- * @param {number} options.limit - Nombre maximum de livraisons (défaut: 10)
- * @param {string} options.status - Statut des livraisons à filtrer (défaut: 'delivered')
- * @returns {Array} Livraisons récentes filtrées et triées
- */
 export const useRecentDeliveries = (deliveries, options = {}) => {
   const { days = 7, limit = 10, status = 'delivered' } = options;
   const [recentDeliveries, setRecentDeliveries] = useState([]);
@@ -34,5 +25,4 @@ export const useRecentDeliveries = (deliveries, options = {}) => {
 
   return recentDeliveries;
 };
-
 

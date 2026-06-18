@@ -5,47 +5,38 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 
-// Import hooks
 import { usePaymentMethods } from '../hooks';
 
-// Import components
 import {
   ScreenLayout,
   PaymentMethodsList,
   AddPaymentMethodModal
 } from '../components';
 
-// Import API
 import apiClient from '../api';
 
 export default function PaymentMethodsScreen() {
   const { driver, hasCompletedOnboarding } = useDriver();
-
-  // États pour le modal
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [editingMethod, setEditingMethod] = useState(null);
-
-  // Hook personnalisé pour les méthodes de paiement
+  
   const { paymentMethods, loading, invalidatePaymentMethodsCache } = usePaymentMethods(driver, hasCompletedOnboarding);
-
-  // Gestionnaire de pull-to-refresh
+  
   const onRefresh = async () => {
     await invalidatePaymentMethodsCache();
   };
-
-  // Ouvrir le modal pour ajouter
+  
   const handleAddPaymentMethod = () => {
     setEditingMethod(null);
     setModalVisible(true);
   };
-
-  // Ouvrir le modal pour modifier
+  
   const handleEditPaymentMethod = (method) => {
     setEditingMethod(method);
     setModalVisible(true);
   };
-
-  // Supprimer une méthode de paiement
+  
   const handleDeletePaymentMethod = (method) => {
     Alert.alert(
       i18n.t('payment.deletePaymentMethod'),
@@ -68,8 +59,7 @@ export default function PaymentMethodsScreen() {
       ]
     );
   };
-
-  // Définir comme méthode par défaut
+  
   const handleSetDefault = async (method) => {
     try {
       await apiClient.setDefaultPaymentMethod(method._id);
@@ -79,8 +69,7 @@ export default function PaymentMethodsScreen() {
       Alert.alert(i18n.t('common.error'), error.message || i18n.t('payment.setDefaultError'));
     }
   };
-
-  // Callback après ajout/modification réussie
+  
   const handleModalSuccess = async (result) => {
     await invalidatePaymentMethodsCache();
   };
@@ -117,7 +106,7 @@ export default function PaymentMethodsScreen() {
           onSetDefault={handleSetDefault}
         />
 
-        {/* Espace en bas pour le scroll */}
+        {}
         <View style={styles.bottomSpacer} />
       </ScrollView>
 

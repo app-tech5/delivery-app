@@ -4,18 +4,10 @@ import i18n from '../i18n';
 import { PERIOD_FILTERS } from '../utils/transactionsData';
 import { calculateTransactionStats, filterTransactionsByPeriod } from '../utils/transactionUtils';
 
-/**
- * Hook personnalisé pour gérer les transactions
- * @param {Array} deliveries - Liste des livraisons
- * @param {Function} loadDriverOrders - Fonction pour charger les commandes du driver
- * @param {Function} invalidateDeliveriesCache - Fonction pour invalider le cache des livraisons
- * @returns {Object} État et fonctions pour gérer les transactions
- */
 export const useTransactions = (deliveries, loadDriverOrders, invalidateDeliveriesCache) => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
-
-  // Calculer les transactions depuis les livraisons
+  
   const transactions = useMemo(() => {
     const completedDeliveries = deliveries.filter(delivery => delivery.status === 'delivered');
 
@@ -33,20 +25,17 @@ export const useTransactions = (deliveries, loadDriverOrders, invalidateDeliveri
           restaurant: delivery.restaurant?.name
         }
       }))
-      .sort((a, b) => b.date - a.date); // Plus récent en premier
+      .sort((a, b) => b.date - a.date); 
   }, [deliveries]);
-
-  // Filtrer les transactions selon la période
+  
   const filteredTransactions = useMemo(() => {
     return filterTransactionsByPeriod(transactions, activeFilter);
   }, [transactions, activeFilter]);
-
-  // Calculer les statistiques des transactions filtrées
+  
   const transactionStats = useMemo(() => {
     return calculateTransactionStats(filteredTransactions);
   }, [filteredTransactions]);
-
-  // Gestionnaire de pull-to-refresh
+  
   const onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -71,5 +60,4 @@ export const useTransactions = (deliveries, loadDriverOrders, invalidateDeliveri
     periodFilters: PERIOD_FILTERS
   };
 };
-
 

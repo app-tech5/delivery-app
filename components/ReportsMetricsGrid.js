@@ -11,7 +11,7 @@ const ReportsMetricsGrid = ({ performanceStats, trendStats, currency, deliveries
 
   return (
     <View style={styles.metricsGrid}>
-      {/* Revenue Card */}
+      {}
       <EnhancedStatCard
         value={formatCurrency(performanceStats.totalRevenue, currency)}
         label={i18n.t('reports.totalRevenue')}
@@ -34,7 +34,7 @@ const ReportsMetricsGrid = ({ performanceStats, trendStats, currency, deliveries
         )}
       </EnhancedStatCard>
 
-      {/* Deliveries Card */}
+      {}
       <EnhancedStatCard
         value={performanceStats.totalDeliveries}
         label={i18n.t('reports.totalDeliveries')}
@@ -57,7 +57,7 @@ const ReportsMetricsGrid = ({ performanceStats, trendStats, currency, deliveries
         )}
       </EnhancedStatCard>
 
-      {/* Rating Card */}
+      {}
       <EnhancedStatCard
         value={performanceStats.avgRating.toFixed(1)}
         label={i18n.t('reports.averageRating')}
@@ -66,7 +66,7 @@ const ReportsMetricsGrid = ({ performanceStats, trendStats, currency, deliveries
         stars={performanceStats.avgRating}
       />
 
-      {/* Efficiency Card */}
+      {}
       <EnhancedStatCard
         value={formatPercentage(performanceStats.completionRate)}
         label={i18n.t('reports.completionRate')}
@@ -74,7 +74,10 @@ const ReportsMetricsGrid = ({ performanceStats, trendStats, currency, deliveries
         backgroundColor={colors.info}
       >
         <Text style={styles.metricSubtext}>
-          {performanceStats.totalDeliveries}/{deliveries.length} completed
+          {i18n.t('reports.completedOfTotal', {
+            completed: performanceStats.totalDeliveries,
+            total: deliveries.length,
+          })}
         </Text>
       </EnhancedStatCard>
     </View>
@@ -111,5 +114,4 @@ const styles = StyleSheet.create({
 });
 
 export default ReportsMetricsGrid;
-
 

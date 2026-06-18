@@ -4,7 +4,6 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 
-// Import components
 import {
   ScreenLayout,
   VehicleInfoCard
@@ -12,8 +11,7 @@ import {
 
 export default function VehicleDetailsScreen() {
   const { driver, isAuthenticated } = useDriver();
-
-  // Informations du véhicule depuis le driver
+  
   const vehicle = driver?.vehicle || {};
 
   return (
@@ -32,7 +30,7 @@ export default function VehicleDetailsScreen() {
       >
         <VehicleInfoCard vehicle={vehicle} />
 
-        {/* Section des statistiques du véhicule */}
+        {}
         <View style={styles.statsSection}>
           <Text style={styles.sectionTitle}>{i18n.t('vehicle.vehicleStats')}</Text>
 
@@ -54,7 +52,7 @@ export default function VehicleDetailsScreen() {
           </View>
         </View>
 
-        {/* Section des conseils de maintenance */}
+        {}
         <View style={styles.tipsSection}>
           <Text style={styles.sectionTitle}>{i18n.t('vehicle.maintenanceTips')}</Text>
 
@@ -81,7 +79,7 @@ export default function VehicleDetailsScreen() {
           </View>
         </View>
 
-        {/* Espace en bas pour le scroll */}
+        {}
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </ScreenLayout>
@@ -161,5 +159,4 @@ const styles = StyleSheet.create({
     height: 20,
   },
 });
-
 

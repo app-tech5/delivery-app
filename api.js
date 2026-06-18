@@ -1,9 +1,8 @@
-// API Client pour l'application delivery
+
 import { config } from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearDriverCache } from './utils/storageUtils';
 
-// Fonction utilitaire pour vérifier si on est en mode démo
 const isDemoMode = () => config.DEMO_MODE === true;
 
 const API_BASE_URL = config.API_BASE_URL;
@@ -36,8 +35,7 @@ class ApiClient {
       console.error('Error initializing driver from storage:', error);
     }
   }
-
-  // Configuration des headers avec token si disponible
+  
   getHeaders() {
     const headers = {
       'Content-Type': 'application/json',
@@ -49,8 +47,7 @@ class ApiClient {
 
     return headers;
   }
-
-  // Méthode générique pour les appels API
+  
   async apiCall(endpoint, options = {}) {
     try {
       const url = `${API_BASE_URL}${endpoint}`;
@@ -129,8 +126,7 @@ class ApiClient {
       if (response.token && response.user) {
         this.token = response.token;
         this.user = response.user;
-
-        // Try loading driver profile (may not exist yet)
+        
         try {
           this.driver = await this.fetchDriverByUserId();
         } catch (driverError) {
@@ -151,7 +147,7 @@ class ApiClient {
 
   async driverRegister(driverData) {
     try {
-      // Create user account only. Driver profile is created in onboarding.
+      
       const userResponse = await this.apiCall('/auth/signup', {
         method: 'POST',
         body: JSON.stringify({
@@ -204,8 +200,7 @@ class ApiClient {
     await this.saveDriverToStorage();
     return driverProfile;
   }
-
-  // Gestion du statut du driver
+  
   async updateDriverStatus(status, location = null) {
     const driverId = this.driver?._id || this.driver?.id;
     if (!driverId) {
@@ -254,13 +249,11 @@ class ApiClient {
     await this.saveDriverToStorage();
     return updatedDriver;
   }
-
-  // Récupération des commandes disponibles pour livraison
+  
   async getAvailableOrders() {
     return await this.apiCall('/resource/orders?status=preparing');
   }
-
-  // Récupérer les commandes du driver
+  
   async getDriverOrders(status = null) {
     let query = `driver=${this.driver._id}`;
     if (status) {
@@ -268,31 +261,28 @@ class ApiClient {
     }
     return await this.apiCall(`/resource/orders?${query}`);
   }
-
-  // Mettre à jour une commande (statut, driver, etc.)
+  
   async updateOrder(orderId, data) {
     return await this.apiCall(`/resource/orders/${orderId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
-
-  // Récupérer les statistiques du driver
+  
   async getDriverStats() {
     try {
-      // Vérification du mode démo via la configuration
+      
       if (isDemoMode()) {
-        // Retourner des statistiques mockées pour le mode démo
+        
         console.log('🔄 Mode démo détecté - Retour des statistiques mockées');
         return {
-          todayDeliveries: 3, // 3 livraisons aujourd'hui
-          totalEarnings: 12.50, // 12.50€ gagnés aujourd'hui
-          rating: 4.8, // Note du driver
-          completedOrders: 42 // Total des livraisons (comme dans la DB)
+          todayDeliveries: 3, 
+          totalEarnings: 12.50, 
+          rating: 4.8, 
+          completedOrders: 42 
         };
       }
-
-      // Mode normal : calculer les stats depuis les orders du driver
+      
       const orders = await this.getDriverOrders();
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -321,13 +311,12 @@ class ApiClient {
       };
     }
   }
-
-  // Récupérer les méthodes de paiement de l'utilisateur
+  
   async getPaymentMethods() {
     try {
-      // Vérification du mode démo via la configuration
+      
       if (isDemoMode()) {
-        // Retourner des méthodes de paiement mockées pour le mode démo
+        
         console.log('🔄 Mode démo détecté - Retour des méthodes de paiement mockées');
         return [
           {
@@ -354,8 +343,7 @@ class ApiClient {
           }
         ];
       }
-
-      // Mode normal : récupérer depuis l'API
+      
       const paymentMethods = await this.apiCall('/resource/paymentmethods');
       return paymentMethods || [];
 
@@ -364,8 +352,7 @@ class ApiClient {
       return [];
     }
   }
-
-  // Créer une nouvelle méthode de paiement
+  
   async createPaymentMethod(paymentMethodData) {
     try {
       const result = await this.apiCall('/resource/paymentmethods', {
@@ -378,8 +365,7 @@ class ApiClient {
       throw error;
     }
   }
-
-  // Mettre à jour une méthode de paiement
+  
   async updatePaymentMethod(paymentMethodId, paymentMethodData) {
     try {
       const result = await this.apiCall(`/resource/paymentmethods/${paymentMethodId}`, {
@@ -392,8 +378,7 @@ class ApiClient {
       throw error;
     }
   }
-
-  // Supprimer une méthode de paiement
+  
   async deletePaymentMethod(paymentMethodId) {
     try {
       const result = await this.apiCall(`/resource/paymentmethods/${paymentMethodId}`, {
@@ -405,8 +390,7 @@ class ApiClient {
       throw error;
     }
   }
-
-  // Définir une méthode de paiement par défaut
+  
   async setDefaultPaymentMethod(paymentMethodId) {
     try {
       const result = await this.apiCall(`/resource/paymentmethods/${paymentMethodId}/set-default`, {
@@ -418,8 +402,7 @@ class ApiClient {
       throw error;
     }
   }
-
-  // Sauvegarder dans AsyncStorage (pour utilisateurs normaux)
+  
   async saveToStorage() {
     try {
       if (this.token) {
@@ -432,8 +415,7 @@ class ApiClient {
       console.error('Error saving to storage:', error);
     }
   }
-
-  // Sauvegarder les données driver dans AsyncStorage
+  
   async saveDriverToStorage() {
     try {
       if (this.token) {
@@ -486,8 +468,7 @@ class ApiClient {
       body: JSON.stringify(userData),
     });
   }
-
-  // Update driver profile
+  
   async updateDriverProfile(profileData) {
     const updatedDriver = await this.apiCall('/drivers/profile', {
       method: 'PUT',
@@ -559,20 +540,16 @@ class ApiClient {
       documents: [...documents, { type: docType, fileUrl }],
     });
   }
-
-  // Récupérer les settings de l'application
+  
   async getSettings() {
     return await this.apiCall('/resource/settings');
   }
-
-  // Récupérer les restaurants proches
+  
   async getNearbyRestaurants(latitude, longitude, radius = 10) {
     try {
-      // Pour l'instant, récupérer tous les restaurants et filtrer côté client
-      // TODO: Implémenter une route API côté serveur pour calculer la distance
+      
       const restaurants = await this.apiCall('/resource/restaurants');
-
-      // Filtrer les restaurants avec des coordonnées valides
+      
       const nearbyRestaurants = restaurants.filter(restaurant => {
         if (!restaurant.latitude || !restaurant.longitude) return false;
 
@@ -580,11 +557,9 @@ class ApiClient {
         const restaurantLng = parseFloat(restaurant.longitude);
 
         if (isNaN(restaurantLat) || isNaN(restaurantLng)) return false;
-
-        // Calcul de distance simple (en km) - approximation
+        
         const distance = this.calculateDistance(latitude, longitude, restaurantLat, restaurantLng);
-
-        // Ajouter la distance calculée au restaurant
+        
         restaurant.distance = distance;
 
         return distance <= radius && restaurant.isActivated;
@@ -596,10 +571,9 @@ class ApiClient {
       return [];
     }
   }
-
-  // Fonction utilitaire pour calculer la distance entre deux points (formule de Haversine)
+  
   calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Rayon de la Terre en km
+    const R = 6371; 
     const dLat = this.toRadians(lat2 - lat1);
     const dLon = this.toRadians(lon2 - lon1);
     const a =
@@ -615,12 +589,10 @@ class ApiClient {
   }
 }
 
-// Instance unique de l'API client
 const apiClient = new ApiClient();
 
 export default apiClient;
 
-// Fonctions d'export pour faciliter l'utilisation
 export const {
   driverLogin,
   driverRegister,
@@ -644,6 +616,5 @@ export const {
   uploadDriverDocument,
 } = apiClient;
 
-// Export séparé pour getSettings (comme dans customer-app)
 export const getSettings = () => apiClient.getSettings();
 export const getNearbyRestaurants = (latitude, longitude, radius) => apiClient.getNearbyRestaurants(latitude, longitude, radius);

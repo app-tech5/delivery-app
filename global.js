@@ -1,89 +1,80 @@
 import * as Location from 'expo-location';
 
-// PALETTE DE COULEURS GLOBALE - APPLICATION COMPLÈTE
 export const colors = {
-  // === COULEURS DE BASE ===
+  
   white: '#ffffff',
   black: '#000000',
-
-  // === ÉCHELLE DE GRIS ===
+  
   grey: {
-    50: '#f8f9fa',    // Très clair
-    100: '#eee',      // Très clair - vraie valeur originale
-    200: '#d9d9d9',   // Clair - vraie valeur originale
-    300: '#ced4da',   // Moyen
-    400: '#ccc',      // Moyen-clair - vraie valeur originale
-    500: '#6c757d',   // Standard
-    600: '#5e6977',   // Fonçé
-    700: '#43484d',   // Très foncé
-    800: '#2d3436',   // Extra foncé
-    900: '#111111',   // Quasi noir
+    50: '#f8f9fa',    
+    100: '#eee',      
+    200: '#d9d9d9',   
+    300: '#ced4da',   
+    400: '#ccc',      
+    500: '#6c757d',   
+    600: '#5e6977',   
+    700: '#43484d',   
+    800: '#2d3436',   
+    900: '#111111',   
   },
-
-  // === COULEURS D'ACCENT ===
-  primary: '#000000',     // Noir - vraie couleur principale originale
-  secondary: '#ffffff',   // Blanc - vraie couleur secondaire originale
-  accent: '#FFD700',      // Doré - conservé pour les ratings
-
-  // === PALETTE FONCTIONNELLE ===
-  success: '#3d5c5c',     // Vert - couleur cohérente avec auth
-  warning: '#FF9800',     // Avertissement
-  error: '#800000',       // Rouge foncé - couleur cohérente avec ads
-  info: '#2196F3',        // Information
-
-  // === COULEURS SPÉCIFIQUES UI ===
+  
+  primary: '#000000',     
+  secondary: '#ffffff',   
+  accent: '#FFD700',      
+  
+  success: '#3d5c5c',     
+  warning: '#FF9800',     
+  error: '#800000',       
+  info: '#2196F3',        
+  
   background: {
-    primary: '#ffffff',   // Fond principal
-    secondary: '#f8f9fa', // Fond secondaire
-    card: '#ffffff',      // Cartes
-    modal: 'rgba(0,0,0,0.5)', // Overlay
+    primary: '#ffffff',   
+    secondary: '#f8f9fa', 
+    card: '#ffffff',      
+    modal: 'rgba(0,0,0,0.5)', 
   },
 
   text: {
-    primary: '#111111',   // Texte principal
-    secondary: '#666',    // Gris foncé - vraie couleur secondaire originale
-    muted: '#6c757d',     // Texte atténué
-    white: '#ffffff',     // Texte blanc
+    primary: '#111111',   
+    secondary: '#666',    
+    muted: '#6c757d',     
+    white: '#ffffff',     
   },
 
   border: {
-    light: '#e9ecef',     // Bordures légères
-    medium: '#dee2e6',    // Bordures normales
-    dark: '#adb5bd',      // Bordures foncées
+    light: '#e9ecef',     
+    medium: '#dee2e6',    
+    dark: '#adb5bd',      
   },
-
-  // === COULEURS SPÉCIFIQUES ÉCRANS ===
+  
   auth: {
-    primary: '#3d5c5c',   // Vert auth (SignIn/SignUp)
-    background: '#b3b3b3', // Fond auth
-    gradient1: ['#948E99', '#2E1437'], // Dégradé principal
-    gradient2: ['#ada996', '#f2f2f2', '#dbdbdb', '#eaeaea'], // Dégradé secondaire
+    primary: '#3d5c5c',   
+    background: '#b3b3b3', 
+    gradient1: ['#948E99', '#2E1437'], 
+    gradient2: ['#ada996', '#f2f2f2', '#dbdbdb', '#eaeaea'], 
   },
-
-  // === COULEURS HÉRITÉES (compatibilité) ===
+  
   buttons: "black",
-  grey1: "#43484d",     // Alias vers grey.700
-  grey2: "#5e6977",     // Alias vers grey.600
-  grey3: "#86939e",     // Alias vers grey.500
-  grey4: "#bdc6cf",     // Alias vers grey.200
-  grey5: "#e1e8ee",     // Alias vers grey.100
+  grey1: "#43484d",     
+  grey2: "#5e6977",     
+  grey3: "#86939e",     
+  grey4: "#bdc6cf",     
+  grey5: "#e1e8ee",     
   cardComment: "#86939e",
   cardbackground: 'white',
   statusbar: '#ff8c52',
   headerText: 'white',
-
-  // === COULEURS ADDITIONNELLES ===
-  rating: '#FFA000',    // Étoiles/ratings
-  divider: '#F0F0F0',    // Séparateurs
-  highlight: '#FFF9E6',  // Surlignage
-  shadow: 'rgba(0,0,0,0.1)', // Ombres
-
-  // === COULEURS SPÉCIFIQUES LIVREURS ===
+  
+  rating: '#FFA000',    
+  divider: '#F0F0F0',    
+  highlight: '#FFF9E6',  
+  shadow: 'rgba(0,0,0,0.1)', 
+  
   driver: {
-    available: '#4CAF50',      // Vert pour disponible
-    onDelivery: '#FF9800',     // Orange pour en livraison
-    offline: '#757575',        // Gris pour hors ligne
-    busy: '#F44336',          // Rouge pour occupé
+    available: '#4CAF50',      
+    onDelivery: '#FF9800',     
+    offline: '#757575',        
+    busy: '#F44336',          
   }
 }
 
@@ -146,5 +137,4 @@ export function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 function deg2rad(deg) {
   return deg * (Math.PI / 180)
 }
-
 

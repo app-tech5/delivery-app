@@ -5,7 +5,7 @@ import i18n from '../i18n';
 import { colors } from '../global';
 
 const PaymentMethodsList = ({ paymentMethods, loading, onRefresh, onEdit, onDelete, onSetDefault }) => {
-  // Fonction pour obtenir l'icône selon le type de paiement
+  
   const getPaymentIcon = (methodType) => {
     switch (methodType) {
       case 'credit_card':
@@ -25,8 +25,7 @@ const PaymentMethodsList = ({ paymentMethods, loading, onRefresh, onEdit, onDele
         return 'payment';
     }
   };
-
-  // Fonction pour obtenir le nom du type de paiement
+  
   const getPaymentTypeName = (methodType) => {
     switch (methodType) {
       case 'credit_card':
@@ -47,8 +46,7 @@ const PaymentMethodsList = ({ paymentMethods, loading, onRefresh, onEdit, onDele
         return i18n.t('payment.other');
     }
   };
-
-  // Fonction pour formater les détails masqués
+  
   const formatMaskedDetails = (method) => {
     switch (method.methodType) {
       case 'credit_card':
@@ -63,8 +61,7 @@ const PaymentMethodsList = ({ paymentMethods, loading, onRefresh, onEdit, onDele
         return '';
     }
   };
-
-  // Fonction pour obtenir la couleur selon le statut de vérification
+  
   const getStatusColor = (verificationStatus) => {
     switch (verificationStatus) {
       case 'verified':

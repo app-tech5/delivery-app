@@ -23,7 +23,7 @@ const SystemInfo = ({ systemInfo, currency, driver, isAuthenticated }) => {
         </View>
 
         <View style={styles.systemInfoRow}>
-          <Text style={styles.systemInfoLabel}>Currency</Text>
+          <Text style={styles.systemInfoLabel}>{i18n.t('support.currencyLabel')}</Text>
           <Text style={styles.systemInfoValue}>
             {currency?.symbol || '€'} ({currency?.code || 'EUR'})
           </Text>
@@ -31,7 +31,7 @@ const SystemInfo = ({ systemInfo, currency, driver, isAuthenticated }) => {
 
         {isAuthenticated && driver && (
           <View style={styles.systemInfoRow}>
-            <Text style={styles.systemInfoLabel}>Driver ID</Text>
+            <Text style={styles.systemInfoLabel}>{i18n.t('support.driverIdLabel')}</Text>
             <Text style={styles.systemInfoValue}>{driver._id}</Text>
           </View>
         )}
@@ -74,5 +74,4 @@ const styles = StyleSheet.create({
 });
 
 export default SystemInfo;
-
 

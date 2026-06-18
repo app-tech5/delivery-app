@@ -1,6 +1,4 @@
-// Export de toutes les fonctions utilitaires depuis un seul endroit
 
-// Currency utilities
 export {
   formatCurrency,
   getCurrency,
@@ -12,7 +10,6 @@ export {
   SUPPORTED_CURRENCIES
 } from './currencyUtils';
 
-// Date utilities
 export {
   formatDate,
   formatTime,
@@ -30,19 +27,17 @@ export {
 
 export { getDeliveryFilters } from './deliveryFilters';
 
-// Status utilities
 export {
   DRIVER_STATUSES,
-  DRIVER_STATUS_LABELS,
   DRIVER_STATUS_COLORS,
   DELIVERY_STATUSES,
-  DELIVERY_STATUS_LABELS,
   DELIVERY_STATUS_COLORS,
   TRANSACTION_STATUSES,
   TRANSACTION_TYPES,
   TRANSACTION_TYPE_COLORS,
   TRANSACTION_TYPE_ICONS,
   getDriverStatusLabel,
+  getDeliveryStatusLabel,
   getDriverStatusColor,
   getTransactionTypeColor,
   getTransactionTypeIcon,
@@ -50,7 +45,6 @@ export {
   isDriverStatusActive
 } from './statusUtils';
 
-// Storage utilities
 export {
   updateDriverCache,
   clearDriverCache,
@@ -81,7 +75,6 @@ export {
 export { pickImageFromLibrary } from './pickImage';
 export { pickDriverDocument } from './pickDriverFile';
 
-// Legacy utilities (pour compatibilité)
 export {
   getStatusLabel,
   INITIAL_STATS,
@@ -114,12 +107,10 @@ export {
   getNotificationIcon
 } from './formatters';
 
-// Cache utilities
 export {
   loadNearbyRestaurantsWithSmartCache
 } from './cacheUtils';
 
-// Location utilities
 export {
   getDriverLocation,
   getActiveDeliveries,
@@ -130,7 +121,6 @@ export {
   stopDriverBackgroundLocation,
 } from './locationUtils';
 
-// Delivery adapters
 export {
   mapDeliveryToHistoryItem,
   mapDeliveryGroupToUI,

@@ -10,9 +10,6 @@ import { isDriverOnline, isDriverApproved } from '../utils/statusUtils';
 
 const LOCATION_UPDATE_INTERVAL_MS = 30000;
 
-/**
- * Envoie la position GPS au serveur tant que le driver est en ligne (available, busy, …).
- */
 export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver) => {
   const subscriptionRef = useRef(null);
   const inFlightRef = useRef(false);

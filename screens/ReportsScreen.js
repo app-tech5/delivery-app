@@ -38,11 +38,9 @@ export default function ReportsScreen() {
 
   const [activePeriod, setActivePeriod] = useState('30days');
   const [refreshing, setRefreshing] = useState(false);
-
-  // Utiliser le hook personnalisé pour les données de rapport
+  
   const { periods, performanceStats, trendStats } = useReportsData(deliveries, stats, activePeriod);
-
-  // Gestionnaire de pull-to-refresh
+  
   const onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -57,8 +55,7 @@ export default function ReportsScreen() {
       setRefreshing(false);
     }
   };
-
-  // Vérifier l'authentification
+  
   if (!isAuthenticated || !driver) {
     return <ReconnectMessage message="Please reconnect to view reports" />;
   }
@@ -95,7 +92,7 @@ export default function ReportsScreen() {
 
         <PerformanceScoreCard performanceStats={performanceStats} />
 
-        {/* Espace en bas pour le scroll */}
+        {}
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </ScreenLayout>

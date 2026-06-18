@@ -8,9 +8,6 @@ import {
   resetSettingsState,
 } from '../utils/settingsUtils';
 
-/**
- * @param {boolean} canLoadSettings - Auth resolved, onboarding complete (same as restaurant-app gate)
- */
 export const useSettingsManager = (canLoadSettings) => {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(false);

@@ -24,7 +24,7 @@ const AboutSection = ({ onOpenURL }) => {
         >
           <View style={styles.settingInfo}>
             <Text style={styles.settingTitle}>{i18n.t('settings.termsOfService')}</Text>
-            <Text style={styles.settingSubtitle}>Read our terms and conditions</Text>
+            <Text style={styles.settingSubtitle}>{i18n.t('settings.termsSubtitle')}</Text>
           </View>
           <Icon name="open-in-new" type="material" size={20} color={colors.primary} />
         </TouchableOpacity>
@@ -35,7 +35,7 @@ const AboutSection = ({ onOpenURL }) => {
         >
           <View style={styles.settingInfo}>
             <Text style={styles.settingTitle}>{i18n.t('settings.privacyPolicy')}</Text>
-            <Text style={styles.settingSubtitle}>Learn how we protect your data</Text>
+            <Text style={styles.settingSubtitle}>{i18n.t('settings.privacySubtitle')}</Text>
           </View>
           <Icon name="open-in-new" type="material" size={20} color={colors.primary} />
         </TouchableOpacity>
@@ -46,7 +46,7 @@ const AboutSection = ({ onOpenURL }) => {
         >
           <View style={styles.settingInfo}>
             <Text style={styles.settingTitle}>{i18n.t('settings.support')}</Text>
-            <Text style={styles.settingSubtitle}>Get help and contact support</Text>
+            <Text style={styles.settingSubtitle}>{i18n.t('settings.supportLinkSubtitle')}</Text>
           </View>
           <Icon name="help" type="material" size={20} color={colors.primary} />
         </TouchableOpacity>
@@ -93,5 +93,4 @@ const styles = StyleSheet.create({
 });
 
 export default AboutSection;
-
 

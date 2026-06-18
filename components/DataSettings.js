@@ -7,13 +7,13 @@ import i18n from '../i18n';
 const DataSettings = ({ onClearCache, onClearData }) => {
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>Data & Storage</Text>
+      <Text style={styles.sectionTitle}>{i18n.t('settings.dataStorage')}</Text>
 
       <Card containerStyle={styles.card}>
         <TouchableOpacity style={styles.settingRow} onPress={onClearCache}>
           <View style={styles.settingInfo}>
             <Text style={styles.settingTitle}>{i18n.t('settings.clearCache')}</Text>
-            <Text style={styles.settingSubtitle}>Free up storage space</Text>
+            <Text style={styles.settingSubtitle}>{i18n.t('settings.clearCacheSubtitle')}</Text>
           </View>
           <Icon name="chevron-right" type="material" size={24} color={colors.text.secondary} />
         </TouchableOpacity>
@@ -23,7 +23,7 @@ const DataSettings = ({ onClearCache, onClearData }) => {
             <Text style={[styles.settingTitle, { color: colors.error }]}>
               {i18n.t('settings.clearData')}
             </Text>
-            <Text style={styles.settingSubtitle}>Delete all app data and logout</Text>
+            <Text style={styles.settingSubtitle}>{i18n.t('settings.clearDataSubtitle')}</Text>
           </View>
           <Icon name="chevron-right" type="material" size={24} color={colors.error} />
         </TouchableOpacity>
@@ -70,5 +70,4 @@ const styles = StyleSheet.create({
 });
 
 export default DataSettings;
-
 

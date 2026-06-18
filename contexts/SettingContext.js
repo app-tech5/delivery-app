@@ -2,10 +2,8 @@ import React, { createContext, useContext } from 'react';
 import { useDriver } from './DriverContext';
 import { useSettingsManager } from '../hooks/useSettingsManager';
 
-// Créer le contexte
 const SettingContext = createContext();
 
-// Provider du contexte
 export function SettingProvider({ children }) {
   const { isAuthenticated, needsOnboarding, isLoading } = useDriver();
   const settingsData = useSettingsManager(
@@ -23,7 +21,6 @@ export function SettingProvider({ children }) {
   );
 }
 
-// Hook pour utiliser le contexte
 export function useSettings() {
   const context = useContext(SettingContext);
   if (!context) {
@@ -32,7 +29,6 @@ export function useSettings() {
   return context;
 }
 
-// Fonctions utilitaires exportées
 export { getSettingsCacheInfo } from '../utils/settingsUtils';
 
 export default SettingContext;

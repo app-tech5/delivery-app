@@ -32,7 +32,7 @@ export default function UserAvatar({
             styles.image,
             { width: size, height: size, borderRadius: radius },
           ]}
-          // onError={() => setLoadFailed(true)}
+          
         />
       ) : (
         <View

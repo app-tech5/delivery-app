@@ -20,7 +20,6 @@ import { useDriver } from '../contexts/DriverContext';
 
 const Drawer = createDrawerNavigator();
 
-// Composant personnalisé pour le contenu du drawer
 function CustomDrawerContent(props) {
   const { logout } = useDriver();
 
@@ -39,7 +38,7 @@ function CustomDrawerContent(props) {
           onPress: async () => {
             try {
               await logout();
-              // La navigation vers l'écran de login sera gérée par l'App.js ou le contexte d'authentification
+              
             } catch (error) {
               console.error('Erreur lors de la déconnexion:', error);
               Alert.alert('Erreur', 'Une erreur est survenue lors de la déconnexion');
@@ -107,7 +106,7 @@ export default function DrawerNavigator() {
         drawerInactiveBackgroundColor: 'transparent',
       }}
     >
-      {/* 🏠 TABLEAU DE BORD */}
+      {}
       <Drawer.Screen
         name="Home"
         component={HomeScreen}
@@ -123,7 +122,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 🚚 LIVRAISONS ACTIVES */}
+      {}
       <Drawer.Screen
         name="Deliveries"
         component={DeliveriesStackNavigator}
@@ -139,7 +138,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 💰 REVENUS & TRANSACTIONS */}
+      {}
       <Drawer.Screen
         name="Earnings"
         component={EarningsScreen}
@@ -155,7 +154,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 💳 TRANSACTIONS */}
+      {}
       <Drawer.Screen
         name="Transactions"
         component={TransactionsScreen}
@@ -171,7 +170,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 📊 HISTORIQUE DES LIVRAISONS */}
+      {}
       <Drawer.Screen
         name="History"
         component={HistoryScreen}
@@ -187,7 +186,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 📈 RAPPORTS */}
+      {}
       <Drawer.Screen
         name="Reports"
         component={ReportsScreen}
@@ -203,23 +202,10 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* ⭐ NOTES & ÉVALUATIONS */}
-      {/* <Drawer.Screen
-        name="Ratings"
-        component={RatingScreen}
-        options={{
-          title: i18n.t('reports.ratingsTitle'),
-          drawerIcon: ({ focused, size }) => (
-            <MaterialIcons
-              name="star-outline"
-              color={focused ? colors.primary : '#666'}
-              size={size}
-            />
-          ),
-        }}
-      /> */}
+      {}
+      {}
 
-      {/* 🔔 NOTIFICATIONS */}
+      {}
       <Drawer.Screen
         name="Notifications"
         component={NotificationsScreen}
@@ -235,7 +221,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 🆘 SUPPORT CLIENT */}
+      {}
       <Drawer.Screen
         name="Support"
         component={SupportScreen}
@@ -251,7 +237,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 👤 PROFIL */}
+      {}
       <Drawer.Screen
         name="Profile"
         component={ProfileStackNavigator}
@@ -267,7 +253,7 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {/* 📋 DÉTAILS COMMANDE */}
+      {}
       <Drawer.Screen
         name="OrderDetails"
         component={OrderDetailsScreen}
@@ -281,32 +267,15 @@ export default function DrawerNavigator() {
             />
           ),
           drawerItemStyle: {
-            display: 'none' // Masquer du drawer car accessible depuis d'autres écrans
+            display: 'none' 
           }
         }}
       />
 
+      {}
+      {}
 
-      {/* 💳 MÉTHODES DE PAIEMENT */}
-      {/* <Drawer.Screen
-        name="PaymentMethods"
-        component={PaymentMethodsScreen}
-        options={{
-          title: i18n.t('payment.paymentMethodsTitle'),
-          drawerIcon: ({ focused, size }) => (
-            <MaterialIcons
-              name="payment"
-              color={focused ? colors.primary : '#666'}
-              size={size}
-            />
-          ),
-          drawerItemStyle: {
-            display: 'none' // Masquer du drawer car accessible depuis les paramètres
-          }
-        }}
-      /> */}
-
-      {/* ⚙️ PARAMÈTRES */}
+      {}
       <Drawer.Screen
         name="Settings"
         component={SettingsStackNavigator}

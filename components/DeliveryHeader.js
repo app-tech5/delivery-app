@@ -13,4 +13,3 @@ const DeliveryHeader = ({ delivery }) => (
 
 export default DeliveryHeader;
 
-

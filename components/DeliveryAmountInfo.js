@@ -21,4 +21,3 @@ const DeliveryAmountInfo = ({ delivery }) => {
 
 export default DeliveryAmountInfo;
 
-

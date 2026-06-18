@@ -13,7 +13,7 @@ const PaymentSettings = () => {
   const { paymentMethods, loading } = usePaymentMethods(driver, hasCompletedOnboarding);
 
   const handlePaymentMethodsPress = () => {
-    // Naviguer vers un écran de méthodes de paiement (qu'on va créer)
+    
     navigation.navigate('PaymentMethods');
   };
 
@@ -204,5 +204,4 @@ const styles = StyleSheet.create({
 });
 
 export default PaymentSettings;
-
 

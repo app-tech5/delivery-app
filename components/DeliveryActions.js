@@ -63,7 +63,7 @@ const DeliveryActions = ({ delivery, onAccept, onStartDelivery, onMarkDelivered,
     <View style={styles.actionsContainer}>
       {onViewDetails && (
         <Button
-          title="View Details"
+          title={i18n.t('reports.viewDetails')}
           onPress={() => onViewDetails(delivery._id)}
           buttonStyle={styles.detailsButton}
           icon={
@@ -83,5 +83,4 @@ const DeliveryActions = ({ delivery, onAccept, onStartDelivery, onMarkDelivered,
 };
 
 export default DeliveryActions;
-
 

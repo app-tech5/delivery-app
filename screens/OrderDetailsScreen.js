@@ -15,7 +15,6 @@ import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 
-// Import shared components and utilities
 import {
   ScreenLayout,
   AuthGuard,
@@ -58,14 +57,13 @@ export default function OrderDetailsScreen() {
     try {
       setLoading(true);
       setError(null);
-
-      // Find order in deliveries or fetch from API
+      
       const foundOrder = deliveries.find(d => d._id === orderId);
 
       if (foundOrder) {
         setOrder(foundOrder);
       } else {
-        // If not found in local deliveries, try to load from API
+        
         await loadDriverOrders();
         const refreshedOrder = deliveries.find(d => d._id === orderId);
         if (refreshedOrder) {
@@ -106,7 +104,7 @@ export default function OrderDetailsScreen() {
           onPress: async () => {
             try {
               await markAsDelivered(order._id);
-              // Reload order details
+              
               await loadOrderDetails();
             } catch (error) {
               Alert.alert('Error', i18n.t('reports.updateError'));

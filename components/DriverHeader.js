@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { colors } from '../global';
 import { getStatusColor } from '../utils';
+import i18n from '../i18n';
 
 const DriverHeader = ({ driver }) => {
   if (!driver) return null;
@@ -30,7 +31,7 @@ const DriverHeader = ({ driver }) => {
               {driver?.userId?.name || 'Driver'}
             </Text>
             <Text style={styles.driverId}>
-              ID: {driver?.licenseNumber || 'N/A'}
+              {i18n.t('driver.idLabel', { id: driver?.licenseNumber || 'N/A' })}
             </Text>
           </View>
         </View>

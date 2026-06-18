@@ -136,6 +136,7 @@
     "passwordsDoNotMatch": "Passwords do not match",
     "signIn": "Sign In",
     "signUp": "Sign Up",
+    "getStarted": "Get Started",
     "signingUp": "Signing up...",
     "signUpSubtitle": "Create your driver account",
     "signUpFieldsRequired": "Name, email and password are required",
@@ -220,6 +221,7 @@
     "notApprovedError": "Your account must be approved before going online.",
     "driver": "Driver",
     "id": "ID",
+    "idLabel": "ID: {{id}}",
     "backgroundLocationNotificationBody": "Location active for deliveries"
   },
   "errors": {
@@ -248,7 +250,8 @@
     "edit": "Edit",
     "amount": "Amount",
     "confirmLogout": "Are you sure you want to log out?",
-    "all": "All"
+    "all": "All",
+    "error": "Error"
   },
   "reports": {
     "title": "Reports",
@@ -348,7 +351,13 @@
     "noTransactionsForPeriod": "No transactions for this period",
     "deliveryDescription": "Delivery #",
     "completedStatus": "Completed",
-    "outForDeliveryButton": "Out for delivery"
+    "outForDeliveryButton": "Out for delivery",
+    "deliveriesCount": "{{count}} deliveries",
+    "perDayAmount": "{{amount}}/day",
+    "completedOfTotal": "{{completed}}/{{total}} completed",
+    "volume": "Volume",
+    "noDeliveriesWithStatus": "No deliveries with status \"{{status}}\"",
+    "viewDetails": "View Details"
   },
   "orderDetails": {
     "title": "Order Details",
@@ -446,6 +455,9 @@
     "liveChat": "Live Chat",
     "workingHours": "Working Hours",
     "responseTime": "Average Response Time",
+    "responseTimeUnder2h": "< 2h",
+    "currencyLabel": "Currency",
+    "driverIdLabel": "Driver ID",
     "appVersion": "App Version",
     "deviceInfo": "Device Information",
     "sendReport": "Send Report",
@@ -597,7 +609,13 @@
     "settingsSaved": "Settings saved successfully",
     "cacheCleared": "Cache cleared successfully",
     "dataCleared": "All data cleared",
-    "confirmDataClear": "This will delete all app data. Continue?"
+    "confirmDataClear": "This will delete all app data. Continue?",
+    "termsSubtitle": "Read our terms and conditions",
+    "privacySubtitle": "Learn how we protect your data",
+    "supportLinkSubtitle": "Get help and contact support",
+    "dataStorage": "Data & Storage",
+    "clearCacheSubtitle": "Free up storage space",
+    "clearDataSubtitle": "Delete all app data and logout"
   },
   "driver_license": "Driver's License",
   "insurance": "Insurance",

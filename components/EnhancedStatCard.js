@@ -21,7 +21,7 @@ const EnhancedStatCard = ({
       { backgroundColor },
       style
     ]}>
-      {/* Icône principale */}
+      {}
       <View style={styles.statIcon}>
         <Icon
           name={icon.name}
@@ -31,13 +31,13 @@ const EnhancedStatCard = ({
         />
       </View>
 
-      {/* Contenu principal */}
+      {}
       <View style={styles.statContent}>
         <Text style={styles.statValue}>{value}</Text>
         <Text style={styles.statLabel}>{label}</Text>
       </View>
 
-      {/* Indicateur de tendance (optionnel) */}
+      {}
       {trend && (
         <View style={styles.trendContainer}>
           <Icon
@@ -49,7 +49,7 @@ const EnhancedStatCard = ({
         </View>
       )}
 
-      {/* Étoiles pour la note (optionnel) */}
+      {}
       {stars && (
         <View style={styles.ratingStars}>
           {[1, 2, 3, 4, 5].map((star) => (
@@ -69,7 +69,7 @@ const EnhancedStatCard = ({
 
 const styles = {
   statCard: {
-    width: (width - 48) / 2, // 2 cards per row with margins
+    width: (width - 48) / 2, 
     marginBottom: 16,
     borderRadius: 12,
     padding: 16,
@@ -106,5 +106,4 @@ const styles = {
 };
 
 export default EnhancedStatCard;
-
 

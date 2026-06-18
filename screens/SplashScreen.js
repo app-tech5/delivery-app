@@ -5,6 +5,7 @@ import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../global';
 import { ScreenHeader } from '../components';
+import i18n from '../i18n';
 
 export default function SplashScreen({ navigation }) {
   return (
@@ -40,7 +41,7 @@ export default function SplashScreen({ navigation }) {
               colors={colors.auth.gradient2}
               style={styles.signInButton}
             >
-              <Text style={styles.signInText}>Commencer</Text>
+              <Text style={styles.signInText}>{i18n.t('auth.getStarted')}</Text>
               <Icon
                 name="navigate-next"
                 type="material"

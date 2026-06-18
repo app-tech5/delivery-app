@@ -3,7 +3,6 @@ import { useSettings } from '../contexts/SettingContext';
 import CompactDeliveryCard from './CompactDeliveryCard';
 import FullDeliveryCard from './FullDeliveryCard';
 
-// Composant principal
 export default function DeliveryCard({
   delivery,
   onAccept,

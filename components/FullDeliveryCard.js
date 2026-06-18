@@ -27,4 +27,3 @@ const FullDeliveryCard = ({ delivery, onAccept, onStartDelivery, onMarkDelivered
 
 export default FullDeliveryCard;
 
-

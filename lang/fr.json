@@ -24,6 +24,7 @@
     "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
     "signIn": "Se connecter",
     "signUp": "S'inscrire",
+    "getStarted": "Commencer",
     "signingUp": "Inscription en cours...",
     "signingIn": "Connexion en cours...",
     "emailAndPasswordRequired": "Email et mot de passe requis",
@@ -99,6 +100,7 @@
     "notApprovedError": "Votre compte doit être approuvé avant de vous mettre en ligne.",
     "driver": "Livreur",
     "id": "ID",
+    "idLabel": "ID : {{id}}",
     "backgroundLocationNotificationBody": "Localisation active pour les livraisons"
   },
   "errors": {
@@ -114,7 +116,7 @@
     "loading": "Chargement...",
     "retry": "Réessayer",
     "cancel": "Annuler",
-    "viewVehicleDetails": "Voir les Détails du Véhicule"
+    "viewVehicleDetails": "Voir les Détails du Véhicule",
     "confirm": "Confirmer",
     "yes": "Oui",
     "no": "Non",
@@ -128,7 +130,8 @@
     "edit": "Modifier",
     "amount": "Montant",
     "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ?",
-    "all": "Toutes"
+    "all": "Toutes",
+    "error": "Erreur"
   },
   "reports": {
     "title": "Rapports",
@@ -165,7 +168,26 @@
     "ratingsTitle": "Notes",
     "deliveriesRated": "livraisons notées",
     "totalRatedDeliveries": "Livraisons Notées",
-    "earnings": "Gains"
+    "earnings": "Gains",
+    "deliveriesCount": "{{count}} livraisons",
+    "perDayAmount": "{{amount}}/jour",
+    "completedOfTotal": "{{completed}}/{{total}} terminées",
+    "volume": "Volume",
+    "orderPrefix": "Commande #",
+    "deliverySingular": "livraison",
+    "deliveryPlural": "livraisons",
+    "pendingLabel": "En attente",
+    "acceptedLabel": "Acceptée",
+    "outForDeliveryLabel": "En livraison",
+    "deliveredLabel": "Livrée",
+    "cancelledLabel": "Annulée",
+    "noDeliveries": "Aucune livraison",
+    "noDeliveriesFiltered": "Aucune livraison trouvée",
+    "noDeliveriesAtAll": "Vous n'avez pas encore reçu de livraisons",
+    "noDeliveriesWithStatus": "Aucune livraison avec le statut \"{{status}}\"",
+    "viewDetails": "Voir les détails",
+    "refreshError": "Impossible de rafraîchir les livraisons",
+    "completedStatus": "Terminée"
   },
   "payment": {
     "paymentMethodsTitle": "Modes de Paiement",
@@ -223,7 +245,30 @@
     "reportIssues": "Signaler immédiatement tout problème mécanique"
   },
   "settings": {
-    "payment": "Paiement"
+    "payment": "Paiement",
+    "about": "À propos",
+    "version": "Version",
+    "termsOfService": "Conditions d'utilisation",
+    "termsSubtitle": "Consultez nos conditions générales",
+    "privacyPolicy": "Politique de confidentialité",
+    "privacySubtitle": "Découvrez comment nous protégeons vos données",
+    "support": "Support",
+    "supportLinkSubtitle": "Obtenez de l'aide et contactez le support",
+    "dataStorage": "Données et stockage",
+    "clearCache": "Vider le cache",
+    "clearCacheSubtitle": "Libérer de l'espace de stockage",
+    "clearData": "Effacer toutes les données",
+    "clearDataSubtitle": "Supprimer toutes les données de l'app et se déconnecter"
+  },
+  "support": {
+    "contact": "Nous contacter",
+    "systemInfo": "Informations système",
+    "appVersion": "Version de l'app",
+    "deviceInfo": "Informations appareil",
+    "responseTime": "Délai de réponse moyen",
+    "responseTimeUnder2h": "< 2h",
+    "currencyLabel": "Devise",
+    "driverIdLabel": "ID livreur"
   },
   "orderDetails": {
     "title": "Détails de la Commande",

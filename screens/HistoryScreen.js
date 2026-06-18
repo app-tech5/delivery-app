@@ -12,7 +12,6 @@ import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 
-// Import shared components and utilities
 import {
   ScreenLayout,
   EmptyState,
@@ -49,17 +48,14 @@ export default function HistoryScreen() {
   const handleViewDetails = (delivery) => {
     navigation.navigate('OrderDetails', { orderId: delivery.rawDelivery._id });
   };
-
-  // Utiliser le hook personnalisé pour le groupement des livraisons
+  
   const { groupedDeliveries, globalStats } = useDeliveriesGrouping(deliveries, activeFilter);
-
-  // Hook pour la logique de refresh
+  
   const { refreshing, onRefresh } = useHistoryRefresh({
     invalidateDeliveriesCache,
     loadDriverOrders
   });
-
-  // Transformer les données pour l'UI
+  
   const uiStats = mapHistoryStatsToUI(globalStats, currency);
   const uiGroups = groupedDeliveries.map(group => mapDeliveryGroupToUI(group, currency));
 
@@ -121,14 +117,14 @@ export default function HistoryScreen() {
           <View style={styles.timelineContainer}>
             {uiGroups.map((group, groupIndex) => (
               <View key={group.date.toISOString()}>
-                {/* En-tête de groupe (date) */}
+                {}
                 <DateGroupHeader
                   date={group.date}
                   count={group.count}
                   totalEarnings={group.totalEarnings}
                 />
 
-                {/* Livraisons du jour */}
+                {}
                 {group.deliveries.map((delivery, deliveryIndex) => (
                   <DeliveryTimelineItem
                     key={delivery.rawDelivery._id}
@@ -143,7 +139,7 @@ export default function HistoryScreen() {
           </View>
         )}
 
-        {/* Espace en bas pour le scroll */}
+        {}
         <View style={styles.bottomSpacer} />
         </ScrollView>
       </ScreenLayout>
@@ -159,13 +155,11 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-
-  // Timeline
+  
   timelineContainer: {
     paddingHorizontal: 16,
   },
-
-  // Bottom spacer
+  
   bottomSpacer: {
     height: 20,
   },

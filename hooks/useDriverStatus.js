@@ -5,19 +5,11 @@ import { requestDriverLocationPermissions } from '../utils/locationUtils';
 import { isDriverOnline, isDriverApproved } from '../utils/statusUtils';
 import i18n from '../i18n';
 
-/**
- * Hook personnalisé pour gérer les changements de statut du driver et des livraisons
- * @returns {Object} État de chargement et fonctions de gestion des statuts
- */
 export const useDriverStatus = () => {
   const { driver, updateStatus, updateDeliveryStatus } = useDriver();
   const [localLoading, setLocalLoading] = useState(false);
   const statusUpdateRef = useRef(false);
-
-  /**
-   * Gestionnaire de changement de statut du driver
-   * @param {string} newStatus - Nouveau statut du driver
-   */
+  
   const handleStatusChange = async (newStatus) => {
     if (localLoading || statusUpdateRef.current) return;
     if (newStatus === driver?.status) return;
@@ -50,12 +42,7 @@ export const useDriverStatus = () => {
       setLocalLoading(false);
     }
   };
-
-  /**
-   * Gestionnaire de changement de statut d'une commande
-   * @param {string} orderId - ID de la commande
-   * @param {string} newStatus - Nouveau statut de la livraison
-   */
+  
   const handleOrderStatusChange = async (orderId, newStatus) => {
     if (localLoading) return;
 

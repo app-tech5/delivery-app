@@ -13,7 +13,7 @@ const BugReportForm = ({ bugReport, setBugReport, onSubmit }) => {
       <Card containerStyle={styles.bugReportCard}>
         <Text style={styles.bugReportTitle}>{i18n.t('support.describeIssue')}</Text>
 
-        {/* Sélecteur de catégorie */}
+        {}
         <View style={styles.selectorContainer}>
           <Text style={styles.selectorLabel}>{i18n.t('support.category')}</Text>
           <View style={styles.selectorButtons}>
@@ -37,7 +37,7 @@ const BugReportForm = ({ bugReport, setBugReport, onSubmit }) => {
           </View>
         </View>
 
-        {/* Sélecteur de priorité */}
+        {}
         <View style={styles.selectorContainer}>
           <Text style={styles.selectorLabel}>{i18n.t('support.priority')}</Text>
           <View style={styles.selectorButtons}>
@@ -65,7 +65,7 @@ const BugReportForm = ({ bugReport, setBugReport, onSubmit }) => {
           </View>
         </View>
 
-        {/* Zone de description */}
+        {}
         <Input
           placeholder={i18n.t('support.issuePlaceholder')}
           multiline
@@ -169,5 +169,4 @@ const styles = StyleSheet.create({
 });
 
 export default BugReportForm;
-
 

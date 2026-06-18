@@ -8,7 +8,7 @@ import i18n from '../i18n';
 const DeliveryCard = ({ order, currency, onOrderDelivered, isLoading }) => (
   <Card key={order._id} containerStyle={styles.deliveryCard}>
     <View style={styles.deliveryHeader}>
-      <Text style={styles.deliveryId}>Commande #{order._id.slice(-6)}</Text>
+      <Text style={styles.deliveryId}>{i18n.t('orderDetails.orderNumber')}{order._id.slice(-6)}</Text>
       <Text style={[
         styles.deliveryStatus,
         { color: getStatusColor(order.status) }
@@ -137,5 +137,4 @@ const styles = StyleSheet.create({
 });
 
 export default ActiveDeliveries;
-
 

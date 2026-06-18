@@ -44,7 +44,7 @@ const TransactionItem = ({ transaction, currency }) => {
         </View>
       </View>
 
-      {/* Détails supplémentaires */}
+      {}
       {(transaction.details?.address || transaction.details?.customer) && (
         <View style={styles.transactionDetails}>
           {transaction.details?.address && (

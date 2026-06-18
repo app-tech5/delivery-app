@@ -15,10 +15,6 @@ const LOCATION_WATCH_OPTIONS = {
   timeInterval: 30000,
 };
 
-/**
- * Demande les permissions foreground puis background.
- * @returns {Promise<{ foreground: boolean, background: boolean }>}
- */
 export const requestDriverLocationPermissions = async () => {
   const foreground = await Location.requestForegroundPermissionsAsync();
   if (foreground.status !== 'granted') {
@@ -32,10 +28,6 @@ export const requestDriverLocationPermissions = async () => {
   };
 };
 
-/**
- * Récupère la position GPS actuelle du driver (permission foreground requise).
- * @returns {Promise<{ latitude: number, longitude: number } | null>}
- */
 export const getCurrentDriverCoordinates = async () => {
   const { foreground } = await requestDriverLocationPermissions();
   if (!foreground) {
@@ -49,11 +41,6 @@ export const getCurrentDriverCoordinates = async () => {
   };
 };
 
-/**
- * Surveille la position GPS du driver (foreground).
- * @param {Function} onLocationUpdate - callback({ latitude, longitude })
- * @returns {Promise<Location.LocationSubscription | null>}
- */
 export const watchDriverLocation = async (onLocationUpdate) => {
   const { status } = await Location.getForegroundPermissionsAsync();
   if (status !== 'granted') {
@@ -68,10 +55,6 @@ export const watchDriverLocation = async (onLocationUpdate) => {
   });
 };
 
-/**
- * Démarre le suivi GPS en arrière-plan (driver en ligne).
- * @returns {Promise<boolean>}
- */
 export const startDriverBackgroundLocation = async () => {
   try {
     const isRunning = await Location.hasStartedLocationUpdatesAsync(DRIVER_LOCATION_TASK);
@@ -118,9 +101,6 @@ export const startDriverBackgroundLocation = async () => {
   }
 };
 
-/**
- * Arrête le suivi GPS en arrière-plan.
- */
 export const stopDriverBackgroundLocation = async () => {
   const isRunning = await Location.hasStartedLocationUpdatesAsync(DRIVER_LOCATION_TASK);
   if (isRunning) {
@@ -128,32 +108,21 @@ export const stopDriverBackgroundLocation = async () => {
   }
 };
 
-/**
- * Calcule la position du driver pour la carte
- * @param {Object} driver - Objet driver avec location
- * @returns {Object} Position pour la carte (latitude, longitude, latitudeDelta, longitudeDelta)
- */
 export const getDriverLocation = (driver) => {
   return driver?.location?.coordinates ? {
-    latitude: driver.location.coordinates[1], // latitude
-    longitude: driver.location.coordinates[0], // longitude
+    latitude: driver.location.coordinates[1], 
+    longitude: driver.location.coordinates[0], 
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   } : {
-    latitude: 48.8566, // Paris par défaut
+    latitude: 48.8566, 
     longitude: 2.3522,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   };
 };
 
-/**
- * Filtre les livraisons actives (en cours de livraison)
- * @param {Array} deliveries - Liste des livraisons
- * @returns {Array} Livraisons actives
- */
 export const getActiveDeliveries = (deliveries) => {
   return deliveries.filter(delivery => delivery.status === 'out_for_delivery');
 };
-
 

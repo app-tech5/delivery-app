@@ -24,8 +24,7 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
   const [cvv, setCvv] = useState('');
   const [paypalEmail, setPaypalEmail] = useState(editingMethod?.paypalEmail || '');
   const [loading, setLoading] = useState(false);
-
-  // Réinitialiser le formulaire
+  
   const resetForm = () => {
     setMethodType('credit_card');
     setCardNumber('');
@@ -35,8 +34,7 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
     setCvv('');
     setPaypalEmail('');
   };
-
-  // Validation des données
+  
   const validateForm = () => {
     if (methodType === 'credit_card' || methodType === 'debit_card') {
       if (!cardNumber || !expiryMonth || !expiryYear || !cardholderName || !cvv) {
@@ -55,16 +53,14 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
     }
     return true;
   };
-
-  // Formater le numéro de carte
+  
   const formatCardNumber = (text) => {
     const cleaned = text.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
     const match = cleaned.match(/\d{1,4}/g);
     const formatted = match ? match.join(' ') : '';
     setCardNumber(formatted);
   };
-
-  // Soumettre le formulaire
+  
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
@@ -72,7 +68,7 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
     try {
       let paymentData = {
         methodType,
-        isDefault: false, // Par défaut non défini comme défaut
+        isDefault: false, 
         isActive: true
       };
 
@@ -87,7 +83,7 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
       } else if (methodType === 'paypal') {
         paymentData.paypalEmail = paypalEmail.trim();
       } else if (methodType === 'apple_pay' || methodType === 'google_pay') {
-        // Pour les wallets, on génère un token fictif
+        
         paymentData.walletToken = Math.random().toString(36).substring(2, 15);
       }
 
@@ -113,8 +109,7 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
       setLoading(false);
     }
   };
-
-  // Détecter la marque de la carte
+  
   const getCardBrand = (cardNumber) => {
     const number = cardNumber.replace(/\s/g, '');
     if (number.startsWith('4')) return 'visa';
@@ -122,8 +117,7 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
     if (number.startsWith('3')) return 'amex';
     return 'other';
   };
-
-  // Rendu des options de type de paiement
+  
   const renderPaymentTypeSelector = () => {
     const types = [
       { value: 'credit_card', label: i18n.t('payment.creditCard'), icon: 'credit-card' },
@@ -163,8 +157,7 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
       </View>
     );
   };
-
-  // Rendu des champs selon le type de paiement
+  
   const renderPaymentFields = () => {
     if (methodType === 'credit_card' || methodType === 'debit_card') {
       return (
@@ -431,5 +424,4 @@ const styles = StyleSheet.create({
 });
 
 export default AddPaymentMethodModal;
-
 

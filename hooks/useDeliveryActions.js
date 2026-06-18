@@ -3,17 +3,10 @@ import { Alert } from 'react-native';
 import { useDriver } from '../contexts/DriverContext';
 import i18n from '../i18n';
 
-/**
- * Hook personnalisé pour gérer les actions sur les livraisons
- * @returns {Object} Fonctions pour les actions sur les livraisons
- */
 export const useDeliveryActions = () => {
   const { updateDeliveryStatus, acceptDelivery } = useDriver();
   const [loading, setLoading] = useState(false);
-
-  /**
-   * Gestionnaire générique pour les changements de statut
-   */
+  
   const handleStatusChange = async (orderId, newStatus, confirmMessage) => {
     Alert.alert(
       'Change Status',
@@ -38,10 +31,7 @@ export const useDeliveryActions = () => {
       ]
     );
   };
-
-  /**
-   * Gestionnaire pour accepter une livraison
-   */
+  
   const handleAcceptDelivery = async (orderId) => {
     Alert.alert(
       i18n.t('reports.acceptDeliveryTitle'),
@@ -66,10 +56,7 @@ export const useDeliveryActions = () => {
       ]
     );
   };
-
-  /**
-   * Gestionnaire pour commencer la livraison
-   */
+  
   const handleStartDelivery = (orderId) => {
     handleStatusChange(
       orderId,
@@ -77,10 +64,7 @@ export const useDeliveryActions = () => {
       i18n.t('reports.startDeliveryConfirm')
     );
   };
-
-  /**
-   * Gestionnaire pour marquer comme livré
-   */
+  
   const handleMarkDelivered = (orderId) => {
     handleStatusChange(
       orderId,

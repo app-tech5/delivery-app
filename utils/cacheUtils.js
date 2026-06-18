@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Cache keys pour delivery-app
 const CACHE_KEYS = {
   SETTINGS: 'app_settings',
   DRIVER_DELIVERIES: 'driver_deliveries',
@@ -11,22 +10,13 @@ const CACHE_KEYS = {
   CACHE_VERSION: 'cache_version'
 };
 
-// Cache configuration pour delivery-app
 const CACHE_CONFIG = {
   VERSION: '1.0'
 };
 
-
-/**
- * Compare deux objets settings pour voir s'ils sont différents
- * @param {Object} oldSettings - Anciens settings
- * @param {Object} newSettings - Nouveaux settings
- * @returns {boolean} True si les settings ont changé
- */
 export const hasSettingsChanged = (oldSettings, newSettings) => {
   if (!oldSettings || !newSettings) return true;
-
-  // Comparaison des propriétés principales
+  
   const oldCurrency = oldSettings.currency?.symbol || '';
   const newCurrency = newSettings.currency?.symbol || '';
   const oldLanguage = oldSettings.language?.code || '';
@@ -35,60 +25,35 @@ export const hasSettingsChanged = (oldSettings, newSettings) => {
   return oldCurrency !== newCurrency || oldLanguage !== newLanguage;
 };
 
-/**
- * Compare deux listes de livraisons pour voir s'elles sont différentes
- * @param {Array} oldDeliveries - Anciennes livraisons
- * @param {Array} newDeliveries - Nouvelles livraisons
- * @returns {boolean} True si les livraisons ont changé
- */
 export const hasDeliveriesChanged = (oldDeliveries, newDeliveries) => {
   if (!oldDeliveries || !newDeliveries) return true;
   if (oldDeliveries.length !== newDeliveries.length) return true;
-
-  // Comparaison basée sur les IDs et statuts
+  
   const oldIds = oldDeliveries.map(delivery => `${delivery._id}_${delivery.status}_${delivery.updatedAt || delivery.createdAt}`);
   const newIds = newDeliveries.map(delivery => `${delivery._id}_${delivery.status}_${delivery.updatedAt || delivery.createdAt}`);
 
   return JSON.stringify(oldIds.sort()) !== JSON.stringify(newIds.sort());
 };
 
-/**
- * Compare deux objets stats pour voir s'ils sont différents
- * @param {Object} oldStats - Anciennes stats
- * @param {Object} newStats - Nouvelles stats
- * @returns {boolean} True si les stats ont changé
- */
 export const hasDriverStatsChanged = (oldStats, newStats) => {
   if (!oldStats || !newStats) return true;
-
-  // Comparaison des valeurs principales des stats
+  
   const oldValues = `${oldStats.todayDeliveries || 0}_${oldStats.totalEarnings || 0}_${oldStats.rating || 0}_${oldStats.completedOrders || 0}`;
   const newValues = `${newStats.todayDeliveries || 0}_${newStats.totalEarnings || 0}_${newStats.rating || 0}_${newStats.completedOrders || 0}`;
 
   return oldValues !== newValues;
 };
 
-/**
- * Compare deux listes de restaurants proches pour voir s'ils sont différents
- * @param {Array} oldRestaurants - Anciens restaurants
- * @param {Array} newRestaurants - Nouveaux restaurants
- * @returns {boolean} True si les restaurants ont changé
- */
 export const hasNearbyRestaurantsChanged = (oldRestaurants, newRestaurants) => {
   if (!oldRestaurants || !newRestaurants) return true;
   if (oldRestaurants.length !== newRestaurants.length) return true;
-
-  // Comparaison basée sur les IDs et distances
+  
   const oldIds = oldRestaurants.map(r => `${r._id || r.id}_${r.distance?.toFixed(1) || 'N/A'}`);
   const newIds = newRestaurants.map(r => `${r._id || r.id}_${r.distance?.toFixed(1) || 'N/A'}`);
 
   return JSON.stringify(oldIds.sort()) !== JSON.stringify(newIds.sort());
 };
 
-/**
- * Sauvegarde les settings en cache
- * @param {Object} settings - Settings à sauvegarder
- */
 export const saveSettingsToCache = async (settings) => {
   try {
     if (!settings) {
@@ -114,11 +79,6 @@ export const saveSettingsToCache = async (settings) => {
   }
 };
 
-/**
- * Sauvegarde les livraisons du driver en cache
- * @param {Array} deliveries - Livraisons à sauvegarder
- * @param {string} driverId - ID du driver pour identifier le cache
- */
 export const saveDeliveriesToCache = async (deliveries, driverId) => {
   try {
     if (!deliveries || !Array.isArray(deliveries) || !driverId) {
@@ -145,11 +105,6 @@ export const saveDeliveriesToCache = async (deliveries, driverId) => {
   }
 };
 
-/**
- * Sauvegarde les stats du driver en cache
- * @param {Object} stats - Stats à sauvegarder
- * @param {string} driverId - ID du driver pour identifier le cache
- */
 export const saveDriverStatsToCache = async (stats, driverId) => {
   try {
     if (!stats || !driverId) {
@@ -176,13 +131,6 @@ export const saveDriverStatsToCache = async (stats, driverId) => {
   }
 };
 
-/**
- * Sauvegarde les restaurants proches en cache
- * @param {Array} restaurants - Restaurants proches à sauvegarder
- * @param {number} latitude - Latitude du centre de recherche
- * @param {number} longitude - Longitude du centre de recherche
- * @param {number} radius - Rayon de recherche en km
- */
 export const saveNearbyRestaurantsToCache = async (restaurants, latitude, longitude, radius = 10) => {
   try {
     if (!restaurants || !Array.isArray(restaurants)) {
@@ -208,10 +156,6 @@ export const saveNearbyRestaurantsToCache = async (restaurants, latitude, longit
   }
 };
 
-/**
- * Récupère les settings depuis le cache
- * @returns {Object|null} Données du cache ou null
- */
 export const getSettingsFromCache = async () => {
   try {
     const cacheKey = CACHE_KEYS.SETTINGS;
@@ -226,15 +170,12 @@ export const getSettingsFromCache = async () => {
     }
 
     const parsedData = JSON.parse(cachedData);
-
-    // Vérifier la version du cache
+    
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
       console.log(`🔄 Version du cache des settings obsolète, suppression`);
       await clearSettingsCache();
       return null;
     }
-
-    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
 
     console.log(`📖 Settings chargés depuis le cache: ${parsedData.settings.appName || 'App'}`);
     return {
@@ -249,11 +190,6 @@ export const getSettingsFromCache = async () => {
   }
 };
 
-/**
- * Récupère les livraisons du driver depuis le cache
- * @param {string} driverId - ID du driver
- * @returns {Object|null} Données du cache ou null
- */
 export const getDeliveriesFromCache = async (driverId) => {
   try {
     if (!driverId) {
@@ -273,15 +209,12 @@ export const getDeliveriesFromCache = async (driverId) => {
     }
 
     const parsedData = JSON.parse(cachedData);
-
-    // Vérifier la version du cache
+    
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
       console.log(`🔄 Version du cache des livraisons obsolète pour driver ${driverId}, suppression`);
       await clearDeliveriesCache(driverId);
       return null;
     }
-
-    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
 
     console.log(`📖 Livraisons chargées depuis le cache pour driver ${driverId}: ${parsedData.deliveries.length} livraisons`);
     return {
@@ -296,11 +229,6 @@ export const getDeliveriesFromCache = async (driverId) => {
   }
 };
 
-/**
- * Récupère les stats du driver depuis le cache
- * @param {string} driverId - ID du driver
- * @returns {Object|null} Données du cache ou null
- */
 export const getDriverStatsFromCache = async (driverId) => {
   try {
     if (!driverId) {
@@ -319,15 +247,12 @@ export const getDriverStatsFromCache = async (driverId) => {
     }
 
     const parsedData = JSON.parse(cachedData);
-
-    // Vérifier la version du cache
+    
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
       console.log(`🔄 Version du cache des stats obsolète pour driver ${driverId}, suppression`);
       await clearDriverStatsCache(driverId);
       return null;
     }
-
-    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
 
     console.log(`📖 Stats chargées depuis le cache pour driver ${driverId}: ${parsedData.stats.todayDeliveries || 0} livraisons aujourd'hui`);
     return {
@@ -342,13 +267,6 @@ export const getDriverStatsFromCache = async (driverId) => {
   }
 };
 
-/**
- * Récupère les restaurants proches depuis le cache
- * @param {number} latitude - Latitude du centre de recherche
- * @param {number} longitude - Longitude du centre de recherche
- * @param {number} radius - Rayon de recherche en km
- * @returns {Object|null} Données du cache ou null
- */
 export const getNearbyRestaurantsFromCache = async (latitude, longitude, radius = 10) => {
   try {
     const locationKey = `${latitude.toFixed(4)}_${longitude.toFixed(4)}_${radius}`;
@@ -362,14 +280,11 @@ export const getNearbyRestaurantsFromCache = async (latitude, longitude, radius 
     }
 
     const parsedData = JSON.parse(cachedData);
-
-    // Vérifier la version du cache
+    
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
       await clearNearbyRestaurantsCache(latitude, longitude, radius);
       return null;
     }
-
-    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
 
     return {
       restaurants: parsedData.restaurants,
@@ -383,9 +298,6 @@ export const getNearbyRestaurantsFromCache = async (latitude, longitude, radius 
   }
 };
 
-/**
- * Supprime le cache des settings
- */
 export const clearSettingsCache = async () => {
   try {
     const cacheKey = CACHE_KEYS.SETTINGS;
@@ -400,10 +312,6 @@ export const clearSettingsCache = async () => {
   }
 };
 
-/**
- * Supprime le cache des livraisons pour un driver
- * @param {string} driverId - ID du driver
- */
 export const clearDeliveriesCache = async (driverId) => {
   try {
     if (!driverId) {
@@ -423,10 +331,6 @@ export const clearDeliveriesCache = async (driverId) => {
   }
 };
 
-/**
- * Supprime le cache des stats pour un driver
- * @param {string} driverId - ID du driver
- */
 export const clearDriverStatsCache = async (driverId) => {
   try {
     if (!driverId) {
@@ -446,12 +350,6 @@ export const clearDriverStatsCache = async (driverId) => {
   }
 };
 
-/**
- * Supprime le cache des restaurants proches
- * @param {number} latitude - Latitude du centre de recherche
- * @param {number} longitude - Longitude du centre de recherche
- * @param {number} radius - Rayon de recherche en km
- */
 export const clearNearbyRestaurantsCache = async (latitude, longitude, radius = 10) => {
   try {
     const locationKey = `${latitude.toFixed(4)}_${longitude.toFixed(4)}_${radius}`;
@@ -465,19 +363,6 @@ export const clearNearbyRestaurantsCache = async (latitude, longitude, radius = 
   }
 };
 
-/**
- * Charge les settings avec un cache intelligent
- * 1. Lit d'abord le cache AsyncStorage
- * 2. Affiche immédiatement si disponible
- * 3. Fetch l'API en arrière-plan
- * 4. Met à jour si les données ont changé
- *
- * @param {Function} apiFetcher - Fonction pour fetch l'API (getSettings)
- * @param {Function} onDataLoaded - Callback quand les données sont prêtes (cache ou API)
- * @param {Function} onDataUpdated - Callback quand les données sont mises à jour depuis l'API
- * @param {Function} onLoadingStateChange - Callback pour l'état de chargement
- * @param {Function} onError - Callback en cas d'erreur
- */
 export const loadSettingsWithSmartCache = async (
   apiFetcher,
   onDataLoaded,
@@ -487,40 +372,34 @@ export const loadSettingsWithSmartCache = async (
 ) => {
   try {
     console.log(`🚀 Démarrage du chargement intelligent des settings`);
-
-    // 1. Essayer de charger depuis le cache
+    
     onLoadingStateChange?.(true);
     const cachedData = await getSettingsFromCache();
 
     if (cachedData && cachedData.settings) {
       console.log('⚡ Settings affichés depuis le cache');
-      onDataLoaded(cachedData.settings, true); // true = fromCache
+      onDataLoaded(cachedData.settings, true); 
       onLoadingStateChange?.(false);
     } else {
       console.log('📭 Pas de cache disponible, attente des données API');
       onLoadingStateChange?.(true);
     }
-
-    // 2. Fetch l'API en arrière-plan (toujours, même si cache disponible)
+    
     console.log('🌐 Fetch API en arrière-plan pour les settings...');
     const freshData = await apiFetcher();
 
     if (freshData) {
       console.log(`📡 Settings API reçus`);
-
-      // Normaliser les données (comme dans le contexte actuel)
+      
       const appSettings = Array.isArray(freshData) ? freshData[0] : freshData;
-
-      // 3. Vérifier si les données ont changé
+      
       const hasChanged = !cachedData || hasSettingsChanged(cachedData.settings, appSettings);
 
       if (hasChanged) {
         console.log('🔄 Settings mis à jour, sauvegarde en cache et affichage');
-
-        // Sauvegarder en cache
+        
         await saveSettingsToCache(appSettings);
-
-        // Mettre à jour l'affichage
+        
         onDataUpdated(appSettings);
       } else {
         console.log('✅ Settings identiques, pas de mise à jour nécessaire');
@@ -529,22 +408,20 @@ export const loadSettingsWithSmartCache = async (
       console.warn('⚠️ Données settings API invalides ou vides');
       onError?.('Données settings invalides');
     }
-
-    // Fin du chargement
+    
     onLoadingStateChange?.(false);
 
   } catch (error) {
     console.error('❌ Erreur lors du chargement intelligent des settings:', error);
     onLoadingStateChange?.(false);
     onError?.(error.message);
-
-    // En cas d'erreur, essayer quand même d'utiliser le cache si disponible
+    
     const fallbackCache = await getSettingsFromCache();
     if (fallbackCache && fallbackCache.settings) {
       console.log('🔄 Erreur API, utilisation du cache comme fallback');
       onDataLoaded(fallbackCache.settings, true);
     } else {
-      // Si pas de cache, utiliser les valeurs par défaut
+      
       console.log('🔄 Pas de cache disponible, utilisation des valeurs par défaut');
       const defaultSettings = {
         appName: 'Good Food Delivery',
@@ -565,20 +442,6 @@ export const loadSettingsWithSmartCache = async (
   }
 };
 
-/**
- * Charge les livraisons du driver avec un cache intelligent
- * 1. Lit d'abord le cache AsyncStorage
- * 2. Affiche immédiatement si disponible
- * 3. Fetch l'API en arrière-plan
- * 4. Met à jour si les données ont changé
- *
- * @param {string} driverId - ID du driver
- * @param {Function} apiFetcher - Fonction pour fetch l'API (getDriverOrders)
- * @param {Function} onDataLoaded - Callback quand les données sont prêtes (cache ou API)
- * @param {Function} onDataUpdated - Callback quand les données sont mises à jour depuis l'API
- * @param {Function} onLoadingStateChange - Callback pour l'état de chargement
- * @param {Function} onError - Callback en cas d'erreur
- */
 export const loadDeliveriesWithSmartCache = async (
   driverId,
   apiFetcher,
@@ -595,37 +458,32 @@ export const loadDeliveriesWithSmartCache = async (
 
   try {
     console.log(`🚀 Démarrage du chargement intelligent des livraisons pour driver ${driverId}`);
-
-    // 1. Essayer de charger depuis le cache
+    
     onLoadingStateChange?.(true);
     const cachedData = await getDeliveriesFromCache(driverId);
 
     if (cachedData && cachedData.deliveries) {
       console.log('⚡ Livraisons affichées depuis le cache');
-      onDataLoaded(cachedData.deliveries, true); // true = fromCache
+      onDataLoaded(cachedData.deliveries, true); 
       onLoadingStateChange?.(false);
     } else {
       console.log('📭 Pas de cache disponible, attente des données API');
       onLoadingStateChange?.(true);
     }
-
-    // 2. Fetch l'API en arrière-plan (toujours, même si cache disponible)
+    
     console.log('🌐 Fetch API en arrière-plan pour les livraisons...');
     const freshData = await apiFetcher();
 
     if (freshData && Array.isArray(freshData)) {
       console.log(`📡 Livraisons API reçues: ${freshData.length} livraisons`);
-
-      // 3. Vérifier si les données ont changé
+      
       const hasChanged = !cachedData || hasDeliveriesChanged(cachedData.deliveries, freshData);
 
       if (hasChanged) {
         console.log('🔄 Livraisons mises à jour, sauvegarde en cache et affichage');
-
-        // Sauvegarder en cache
+        
         await saveDeliveriesToCache(freshData, driverId);
-
-        // Mettre à jour l'affichage
+        
         onDataUpdated(freshData);
       } else {
         console.log('✅ Livraisons identiques, pas de mise à jour nécessaire');
@@ -634,42 +492,26 @@ export const loadDeliveriesWithSmartCache = async (
       console.warn('⚠️ Données livraisons API invalides ou vides');
       onError?.('Données livraisons invalides');
     }
-
-    // Fin du chargement
+    
     onLoadingStateChange?.(false);
 
   } catch (error) {
     console.error('❌ Erreur lors du chargement intelligent des livraisons:', error);
     onLoadingStateChange?.(false);
     onError?.(error.message);
-
-    // En cas d'erreur, essayer quand même d'utiliser le cache si disponible
+    
     const fallbackCache = await getDeliveriesFromCache(driverId);
     if (fallbackCache && fallbackCache.deliveries) {
       console.log('🔄 Erreur API, utilisation du cache comme fallback');
       onDataLoaded(fallbackCache.deliveries, true);
     } else {
-      // Si pas de cache, retourner un tableau vide
+      
       console.log('🔄 Pas de cache disponible, utilisation d\'un tableau vide');
       onDataLoaded([], false);
     }
   }
 };
 
-/**
- * Charge les stats du driver avec un cache intelligent
- * 1. Lit d'abord le cache AsyncStorage
- * 2. Affiche immédiatement si disponible
- * 3. Fetch l'API en arrière-plan
- * 4. Met à jour si les données ont changé
- *
- * @param {string} driverId - ID du driver
- * @param {Function} apiFetcher - Fonction pour fetch l'API (getDriverStats)
- * @param {Function} onDataLoaded - Callback quand les données sont prêtes (cache ou API)
- * @param {Function} onDataUpdated - Callback quand les données sont mises à jour depuis l'API
- * @param {Function} onLoadingStateChange - Callback pour l'état de chargement
- * @param {Function} onError - Callback en cas d'erreur
- */
 export const loadDriverStatsWithSmartCache = async (
   driverId,
   apiFetcher,
@@ -686,37 +528,32 @@ export const loadDriverStatsWithSmartCache = async (
 
   try {
     console.log(`🚀 Démarrage du chargement intelligent des stats pour driver ${driverId}`);
-
-    // 1. Essayer de charger depuis le cache
+    
     onLoadingStateChange?.(true);
     const cachedData = await getDriverStatsFromCache(driverId);
 
     if (cachedData && cachedData.stats) {
       console.log('⚡ Stats affichées depuis le cache');
-      onDataLoaded(cachedData.stats, true); // true = fromCache
+      onDataLoaded(cachedData.stats, true); 
       onLoadingStateChange?.(false);
     } else {
       console.log('📭 Pas de cache disponible, attente des données API');
       onLoadingStateChange?.(true);
     }
-
-    // 2. Fetch l'API en arrière-plan (toujours, même si cache disponible)
+    
     console.log('🌐 Fetch API en arrière-plan pour les stats...');
     const freshData = await apiFetcher();
 
     if (freshData) {
       console.log(`📡 Stats API reçues`);
-
-      // 3. Vérifier si les données ont changé
+      
       const hasChanged = !cachedData || hasDriverStatsChanged(cachedData.stats, freshData);
 
       if (hasChanged) {
         console.log('🔄 Stats mises à jour, sauvegarde en cache et affichage');
-
-        // Sauvegarder en cache
+        
         await saveDriverStatsToCache(freshData, driverId);
-
-        // Mettre à jour l'affichage
+        
         onDataUpdated(freshData);
       } else {
         console.log('✅ Stats identiques, pas de mise à jour nécessaire');
@@ -725,22 +562,20 @@ export const loadDriverStatsWithSmartCache = async (
       console.warn('⚠️ Données stats API invalides ou vides');
       onError?.('Données stats invalides');
     }
-
-    // Fin du chargement
+    
     onLoadingStateChange?.(false);
 
   } catch (error) {
     console.error('❌ Erreur lors du chargement intelligent des stats:', error);
     onLoadingStateChange?.(false);
     onError?.(error.message);
-
-    // En cas d'erreur, essayer quand même d'utiliser le cache si disponible
+    
     const fallbackCache = await getDriverStatsFromCache(driverId);
     if (fallbackCache && fallbackCache.stats) {
       console.log('🔄 Erreur API, utilisation du cache comme fallback');
       onDataLoaded(fallbackCache.stats, true);
     } else {
-      // Si pas de cache, retourner les stats par défaut
+      
       console.log('🔄 Pas de cache disponible, utilisation des stats par défaut');
       const defaultStats = {
         todayDeliveries: 0,
@@ -753,11 +588,6 @@ export const loadDriverStatsWithSmartCache = async (
   }
 };
 
-/**
- * Sauvegarde les méthodes de paiement dans le cache
- * @param {string} userId - ID de l'utilisateur
- * @param {Array} paymentMethods - Liste des méthodes de paiement
- */
 export const setPaymentMethodsCache = async (userId, paymentMethods) => {
   try {
     if (!userId) {
@@ -783,11 +613,6 @@ export const setPaymentMethodsCache = async (userId, paymentMethods) => {
   }
 };
 
-/**
- * Récupère les méthodes de paiement depuis le cache
- * @param {string} userId - ID de l'utilisateur
- * @returns {Object|null} Données du cache ou null
- */
 export const getPaymentMethodsFromCache = async (userId) => {
   try {
     if (!userId) {
@@ -806,15 +631,12 @@ export const getPaymentMethodsFromCache = async (userId) => {
     }
 
     const parsedData = JSON.parse(cachedData);
-
-    // Vérifier la version du cache
+    
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
       console.log(`🔄 Version du cache des méthodes de paiement obsolète pour user ${userId}, suppression`);
       await clearPaymentMethodsCache(userId);
       return null;
     }
-
-    // Le cache ne expire jamais - seulement invalidé manuellement ou si version changée
 
     console.log(`📖 Méthodes de paiement chargées depuis le cache pour user ${userId}: ${parsedData.paymentMethods.length} méthodes`);
     return {
@@ -829,10 +651,6 @@ export const getPaymentMethodsFromCache = async (userId) => {
   }
 };
 
-/**
- * Supprime le cache des méthodes de paiement
- * @param {string} userId - ID de l'utilisateur
- */
 export const clearPaymentMethodsCache = async (userId) => {
   try {
     if (!userId) {
@@ -869,20 +687,6 @@ export const clearAllDriverSessionCaches = async (driverId, userId) => {
   ]);
 };
 
-/**
- * Charge les méthodes de paiement avec un cache intelligent
- * 1. Lit d'abord le cache AsyncStorage
- * 2. Affiche immédiatement si disponible
- * 3. Fetch l'API en arrière-plan
- * 4. Met à jour si les données ont changé
- *
- * @param {string} userId - ID de l'utilisateur
- * @param {Function} apiFetcher - Fonction pour fetch l'API (getPaymentMethods)
- * @param {Function} onDataLoaded - Callback quand les données sont prêtes (cache ou API)
- * @param {Function} onDataUpdated - Callback quand les données sont mises à jour depuis l'API
- * @param {Function} onLoadingStateChange - Callback pour l'état de chargement
- * @param {Function} onError - Callback en cas d'erreur
- */
 export const loadPaymentMethodsWithCache = async (
   userId,
   apiFetcher,
@@ -899,19 +703,17 @@ export const loadPaymentMethodsWithCache = async (
 
   try {
     console.log(`🚀 Démarrage du chargement intelligent des méthodes de paiement pour user ${userId}`);
-
-    // 1. Essayer de charger depuis le cache
+    
     onLoadingStateChange?.(true);
     const cachedData = await getPaymentMethodsFromCache(userId);
 
     if (cachedData) {
-      // Si cache disponible, afficher immédiatement
+      
       console.log('📱 Affichage des méthodes de paiement depuis le cache');
       onDataLoaded(cachedData.paymentMethods, true);
-
-      // 2. Vérifier si on doit rafraîchir depuis l'API
+      
       const cacheAge = Date.now() - cachedData.timestamp;
-      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+      const CACHE_DURATION = 5 * 60 * 1000; 
 
       if (cacheAge < CACHE_DURATION) {
         console.log(`⏰ Cache des méthodes de paiement récent (${Math.round(cacheAge / 1000)}s), pas de rafraîchissement`);
@@ -919,16 +721,14 @@ export const loadPaymentMethodsWithCache = async (
         return;
       }
     }
-
-    // 3. Fetch depuis l'API
+    
     console.log('🌐 Fetch des méthodes de paiement depuis l\'API');
     const apiData = await apiFetcher();
-
-    // 4. Sauvegarder dans le cache
+    
     await setPaymentMethodsCache(userId, apiData);
 
     if (cachedData) {
-      // Si on avait du cache, vérifier si les données ont changé
+      
       const hasChanged = JSON.stringify(cachedData.paymentMethods) !== JSON.stringify(apiData);
       if (hasChanged) {
         console.log('🔄 Méthodes de paiement mises à jour, notification du changement');
@@ -937,7 +737,7 @@ export const loadPaymentMethodsWithCache = async (
         console.log('✅ Méthodes de paiement identiques, pas de mise à jour');
       }
     } else {
-      // Pas de cache, afficher les données de l'API
+      
       console.log('📱 Affichage des méthodes de paiement depuis l\'API (pas de cache)');
       onDataLoaded(apiData, false);
     }
@@ -947,14 +747,13 @@ export const loadPaymentMethodsWithCache = async (
   } catch (error) {
     console.error('❌ Erreur lors du chargement intelligent des méthodes de paiement:', error);
     onError?.(error.message || 'Erreur de chargement');
-
-    // En cas d'erreur, essayer d'utiliser le cache comme fallback
+    
     const fallbackCache = await getPaymentMethodsFromCache(userId);
     if (fallbackCache) {
       console.log('🔄 Erreur API, utilisation du cache comme fallback');
       onDataLoaded(fallbackCache.paymentMethods, true);
     } else {
-      // Si pas de cache, retourner un tableau vide
+      
       console.log('🔄 Pas de cache disponible, utilisation d\'un tableau vide');
       onDataLoaded([], false);
     }
@@ -963,22 +762,6 @@ export const loadPaymentMethodsWithCache = async (
   }
 };
 
-/**
- * Charge les restaurants proches avec un cache intelligent
- * 1. Lit d'abord le cache AsyncStorage
- * 2. Affiche immédiatement si disponible
- * 3. Fetch l'API en arrière-plan
- * 4. Met à jour si les données ont changé
- *
- * @param {number} latitude - Latitude du centre de recherche
- * @param {number} longitude - Longitude du centre de recherche
- * @param {number} radius - Rayon de recherche en km
- * @param {Function} apiFetcher - Fonction pour fetch l'API (getNearbyRestaurants)
- * @param {Function} onDataLoaded - Callback quand les données sont prêtes (cache ou API)
- * @param {Function} onDataUpdated - Callback quand les données sont mises à jour depuis l'API
- * @param {Function} onLoadingStateChange - Callback pour l'état de chargement
- * @param {Function} onError - Callback en cas d'erreur
- */
 export const loadNearbyRestaurantsWithSmartCache = async (
   latitude,
   longitude,

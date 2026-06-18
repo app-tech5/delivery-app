@@ -1,9 +1,6 @@
 import i18n from '../i18n';
 import { colors } from '../global';
 
-/**
- * Données FAQ pour le support
- */
 export const FAQ_DATA = [
   {
     id: 'q1',
@@ -32,9 +29,6 @@ export const FAQ_DATA = [
   }
 ];
 
-/**
- * Catégories pour les rapports de bug
- */
 export const BUG_CATEGORIES = [
   { key: 'general', label: i18n.t('support.general') },
   { key: 'technical', label: i18n.t('support.technical') },
@@ -42,18 +36,12 @@ export const BUG_CATEGORIES = [
   { key: 'account', label: i18n.t('support.account') }
 ];
 
-/**
- * Priorités pour les rapports de bug
- */
 export const BUG_PRIORITIES = [
   { key: 'low', label: i18n.t('support.low'), color: colors.success },
   { key: 'normal', label: i18n.t('support.normal'), color: colors.warning },
   { key: 'urgent', label: i18n.t('support.urgent'), color: colors.error }
 ];
 
-/**
- * Actions de contact disponibles
- */
 export const CONTACT_ACTIONS = [
   {
     id: 'call',
@@ -80,5 +68,4 @@ export const CONTACT_ACTIONS = [
     actionType: 'chat'
   }
 ];
-
 

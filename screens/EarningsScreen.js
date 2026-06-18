@@ -5,10 +5,8 @@ import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 
-// Import hooks
 import { useRecentDeliveries, useEarningsRefresh } from '../hooks';
 
-// Import components
 import {
   AuthGuard,
   EnhancedStatCard,
@@ -17,7 +15,6 @@ import {
   ScreenLayout
 } from '../components';
 
-// Import utilities
 import { formatCurrency, getTrendIcon } from '../utils';
 
 const { width } = Dimensions.get('window');
@@ -31,12 +28,10 @@ export default function EarningsScreen() {
   } = useDriver();
 
   const { currency } = useSettings();
-
-  // Hooks personnalisés
+  
   const recentDeliveries = useRecentDeliveries(deliveries, { days: 7, limit: 10, status: 'delivered' });
   const { refreshing, onRefresh } = useEarningsRefresh({ invalidateDriverStatsCache, loadDriverStats });
-
-  // Configuration des cartes statistiques
+  
   const statCards = [
     {
       value: formatCurrency(stats.totalEarnings, currency),
@@ -83,7 +78,7 @@ export default function EarningsScreen() {
           />
         }
       >
-        {/* Cartes statistiques principales */}
+        {}
         <View style={styles.statsGrid}>
           {statCards.map((cardConfig, index) => (
             <EnhancedStatCard
@@ -98,10 +93,10 @@ export default function EarningsScreen() {
           ))}
         </View>
 
-        {/* Section des revenus détaillés */}
+        {}
         <EarningsDetailsCard stats={stats} currency={currency} />
 
-        {/* Livraisons récentes */}
+        {}
         {recentDeliveries.length > 0 && (
           <View style={styles.recentSection}>
             <Text style={styles.sectionTitle}>{i18n.t('reports.recentDeliveries')}</Text>
@@ -116,7 +111,7 @@ export default function EarningsScreen() {
           </View>
         )}
 
-        {/* Espace en bas pour le scroll */}
+        {}
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </ScreenLayout>
@@ -127,16 +122,14 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-
-  // Stats grid
+  
   statsGrid: {
     padding: 16,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-
-  // Recent deliveries section
+  
   recentSection: {
     paddingHorizontal: 16,
     marginBottom: 24,
@@ -147,8 +140,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: 12,
   },
-
-  // Bottom spacer
+  
   bottomSpacer: {
     height: 20,
   },

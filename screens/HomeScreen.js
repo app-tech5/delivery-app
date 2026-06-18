@@ -6,10 +6,8 @@ import { colors } from '../global';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 
-// Import hooks
 import { useNearbyRestaurants, useDriverStatus } from '../hooks';
 
-// Import components
 import {
   AuthGuard,
   ScreenLayout,
@@ -19,7 +17,6 @@ import {
   RestaurantMap
 } from '../components';
 
-// Import utilities
 import { getDriverLocation, getActiveDeliveries, getStatusColor } from '../utils';
 
 function HomeScreen() {
@@ -34,25 +31,20 @@ function HomeScreen() {
     isAuthenticated,
   } = useDriver();
   const { currency } = useSettings();
-
-  // Hooks personnalisés
+  
   const { isLoading, handleStatusChange, handleOrderStatusChange } = useDriverStatus();
-
-  // Position du driver
+  
   const driverLocation = getDriverLocation(driver);
-
-  // Hook pour les restaurants proches
+  
   const { nearbyRestaurants, restaurantsLoading } = useNearbyRestaurants(driverLocation);
-
-  // Charger les données du driver
+  
   useEffect(() => {
     if (hasCompletedOnboarding) {
       loadDriverStats();
       loadDriverOrders();
     }
   }, [hasCompletedOnboarding]);
-
-  // Commandes actives (en livraison)
+  
   const activeDeliveries = getActiveDeliveries(deliveries);
 
   return (

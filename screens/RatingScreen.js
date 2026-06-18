@@ -6,7 +6,6 @@ import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { useRecentDeliveries, useEarningsRefresh } from '../hooks';
 
-// Import components
 import {
   AuthGuard,
   ScreenLayout,
@@ -22,8 +21,7 @@ export default function RatingScreen() {
   } = useDriver();
 
   const { currency } = useSettings();
-
-  // Hooks personnalisés
+  
   const recentDeliveries = useRecentDeliveries(deliveries, { days: 30, limit: 10, status: 'delivered' });
   const { refreshing, onRefresh } = useEarningsRefresh({ invalidateDriverStatsCache, loadDriverStats });
 
@@ -42,10 +40,10 @@ export default function RatingScreen() {
           />
         }
       >
-        {/* Cartes statistiques principales */}
-        {/* <RatingStats stats={stats} currency={currency} /> */}
+        {}
+        {}
 
-        {/* Section des livraisons récentes */}
+        {}
         {recentDeliveries.length > 0 && (
           <View style={styles.recentSection}>
             <Text style={styles.sectionTitle}>{i18n.t('reports.recentDeliveries')}</Text>
@@ -71,7 +69,7 @@ export default function RatingScreen() {
           </View>
         )}
 
-        {/* Espace en bas pour le scroll */}
+        {}
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </ScreenLayout>

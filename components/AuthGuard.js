@@ -17,7 +17,7 @@ const AuthGuard = ({
   buttonStyle
 }) => {
   if (isAuthenticated && driver) {
-    return null; // Ne rien afficher si authentifié
+    return null; 
   }
 
   return (
@@ -68,5 +68,4 @@ const styles = StyleSheet.create({
 });
 
 export default AuthGuard;
-
 

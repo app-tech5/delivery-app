@@ -15,9 +15,6 @@ const getRestaurantPoint = (restaurant) => {
   return { latitude: lat, longitude: lng };
 };
 
-/**
- * Carte MapLibre (même stack que customer-app OrderTracking) : driver + restaurants proches.
- */
 export default function DriverNearbyMap({
   driverLocation,
   nearbyRestaurants = [],

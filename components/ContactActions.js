@@ -9,7 +9,9 @@ const ContactActions = ({ onContactAction }) => {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{i18n.t('support.contact')}</Text>
-      <Text style={styles.sectionSubtitle}>{i18n.t('support.responseTime')}: &lt; 2h</Text>
+      <Text style={styles.sectionSubtitle}>
+        {i18n.t('support.responseTime')}: {i18n.t('support.responseTimeUnder2h')}
+      </Text>
 
       {CONTACT_ACTIONS.map((action) => (
         <TouchableOpacity
@@ -83,5 +85,4 @@ const styles = StyleSheet.create({
 });
 
 export default ContactActions;
-
 

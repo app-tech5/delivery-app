@@ -3,10 +3,8 @@ import { View, StyleSheet } from 'react-native';
 import i18n from '../i18n';
 import { colors } from '../global';
 
-// Import components
 import { EnhancedStatCard } from './EnhancedStatCard';
 
-// Import utilities
 import { formatCurrency } from '../utils';
 
 const RatingStats = ({ stats, currency }) => {
@@ -67,5 +65,4 @@ const styles = StyleSheet.create({
 });
 
 export default RatingStats;
-
 

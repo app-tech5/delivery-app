@@ -64,13 +64,13 @@ const VehicleInfoCard = ({ vehicle }) => {
 
   const formatLicensePlate = (plate) => {
     if (!plate) return '';
-    // Format français standard: AA-123-AA
+    
     return plate.toUpperCase();
   };
 
   return (
     <View style={styles.container}>
-      {/* Header avec icône et titre */}
+      {}
       <View style={styles.header}>
         <View style={styles.iconContainer}>
           <MaterialIcons
@@ -87,7 +87,7 @@ const VehicleInfoCard = ({ vehicle }) => {
         </View>
       </View>
 
-      {/* Informations détaillées */}
+      {}
       <View style={styles.detailsContainer}>
         {vehicle.model && (
           <View style={styles.detailRow}>
@@ -113,7 +113,7 @@ const VehicleInfoCard = ({ vehicle }) => {
           </View>
         )}
 
-        {/* Status du véhicule */}
+        {}
         <View style={styles.statusContainer}>
           <View style={styles.statusRow}>
             <View style={styles.statusDot} />
@@ -124,7 +124,7 @@ const VehicleInfoCard = ({ vehicle }) => {
         </View>
       </View>
 
-      {/* Section sécurité */}
+      {}
       <View style={styles.securitySection}>
         <View style={styles.securityHeader}>
           <FontAwesome name="shield" size={16} color={colors.success} />
@@ -271,5 +271,4 @@ const styles = StyleSheet.create({
 });
 
 export default VehicleInfoCard;
-
 

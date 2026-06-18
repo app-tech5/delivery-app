@@ -14,7 +14,6 @@ import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { DeliveryCard } from '../components';
 
-// Import shared components and utilities
 import {
   ScreenLayout,
   EmptyState,
@@ -47,8 +46,7 @@ export default function DeliveriesScreen() {
   };
 
   const filters = getDeliveryFilters();
-
-  // Filtrer les livraisons selon le filtre actif
+  
   const filteredDeliveries = orders.filter(delivery => {
     if (activeFilter === 'all') return true;
     return delivery.status === activeFilter;
@@ -59,11 +57,9 @@ export default function DeliveriesScreen() {
       setOrders(deliveries);
     }
   }, [deliveries, setOrders]);
-
-  // Utiliser le hook pour les actions sur les livraisons
+  
   const { handleAcceptDelivery, handleStartDelivery, handleMarkDelivered, handleStatusChange } = useDeliveryActions();
-
-  // Gestionnaire de pull-to-refresh
+  
   const onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -71,7 +67,7 @@ export default function DeliveriesScreen() {
       await loadDriverOrders();
     } catch (error) {
       console.error('Erreur lors du rafraîchissement:', error);
-      Alert.alert('Error', i18n.t('reports.refreshError'));
+      Alert.alert(i18n.t('common.error'), i18n.t('reports.refreshError'));
     } finally {
       setRefreshing(false);
     }
@@ -114,7 +110,9 @@ export default function DeliveriesScreen() {
                 title={activeFilter === 'all' ? i18n.t('reports.noDeliveries') : i18n.t('reports.noDeliveriesFiltered')}
                 subtitle={activeFilter === 'all'
                   ? i18n.t('reports.noDeliveriesAtAll')
-                  : `Aucune livraison avec le statut "${filters.find(f => f.key === activeFilter)?.label}"`
+                  : i18n.t('reports.noDeliveriesWithStatus', {
+                    status: filters.find((filter) => filter.key === activeFilter)?.label,
+                  })
                 }
               />
             ) : (

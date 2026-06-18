@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import { colors } from '../global';
 
 export const deliveryCardStyles = StyleSheet.create({
-  // Version complète
+  
   card: {
     borderRadius: 12,
     padding: 16,
@@ -87,8 +87,7 @@ export const deliveryCardStyles = StyleSheet.create({
     borderColor: colors.primary,
     borderRadius: 8,
   },
-
-  // Version compacte
+  
   compactCard: {
     borderRadius: 12,
     padding: 12,
@@ -131,5 +130,4 @@ export const deliveryCardStyles = StyleSheet.create({
     fontStyle: 'italic',
   },
 });
-
 

@@ -30,7 +30,6 @@ export default function SettingsScreen() {
     handleFeatureComingSoon
   } = useSettingsManager(invalidateCache, logout);
 
-
   return (
     <ScreenLayout title={i18n.t('navigation.settings')}>
       <ScrollView style={styles.scrollView}>

@@ -24,13 +24,11 @@ export default function NotificationsScreen() {
     markAllAsRead,
     deleteNotification
   } = useNotifications(deliveries, driver);
-
-  // Vérifier l'authentification
+  
   if (!isAuthenticated || !driver) {
     return <AuthGuard isAuthenticated={isAuthenticated} driver={driver} subtitle="Please reconnect to view notifications" />;
   }
-
-  // Fonction pour obtenir le titre et sous-titre de l'état vide
+  
   const getEmptyStateContent = () => {
     if (activeFilter === 'all') {
       return {
@@ -147,8 +145,7 @@ const styles = StyleSheet.create({
   bottomSpacer: {
     height: 20,
   },
-
-  // Filters
+  
   filtersContainer: {
     backgroundColor: colors.white,
     borderBottomWidth: 1,
@@ -189,7 +186,7 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontSize: 10,
   },
-  // Header actions
+  
   headerBadgeContainer: {
     marginTop: -8,
   },

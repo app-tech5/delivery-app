@@ -22,28 +22,28 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
     }
 
     try {
-      // Utiliser le cache intelligent pour les livraisons
+      
       await loadDeliveriesWithSmartCache(
-        driver._id, // driverId
-        () => apiClient.getDriverOrders(status), // apiFetcher
+        driver._id, 
+        () => apiClient.getDriverOrders(status), 
         (data, fromCache) => {
-          // onDataLoaded - appelé quand les données sont prêtes (cache ou API)
+          
           setDeliveries(data);
           if (fromCache) {
             console.log('🔄 Livraisons chargées depuis le cache dans DriverContext');
           }
         },
         (data) => {
-          // onDataUpdated - appelé quand les données sont mises à jour depuis l'API
+          
           setDeliveries(data);
           console.log('🔄 Livraisons mises à jour depuis l\'API dans DriverContext');
         },
         (loading) => {
-          // onLoadingStateChange - on pourrait utiliser un état de chargement spécifique
+          
           console.log(`🔄 État de chargement des livraisons: ${loading}`);
         },
         (errorMsg) => {
-          // onError
+          
           console.error('Erreur chargement livraisons:', errorMsg);
         }
       );
@@ -51,12 +51,10 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
       console.error('Error loading driver orders with smart cache:', error);
     }
   };
-
-  // Mettre à jour le statut du driver
+  
   const updateStatus = async (status, location = null) => {
     if (config.DEMO_MODE) {
-      // Mode démo : simulation locale uniquement
-      // Alert.alert('Mode Démo', `Statut changé à "${getDriverStatusLabel(status)}" (simulation)`);
+      
       return { driver: { ...(driver || {}), status } };
     }
 
@@ -68,11 +66,10 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
       throw error;
     }
   };
-
-  // Accepter une commande
+  
   const acceptDelivery = async (orderId) => {
     if (config.DEMO_MODE) {
-      // Mode démo : simulation locale
+      
       setDeliveries(prevDeliveries =>
         prevDeliveries.map(delivery =>
           delivery._id === orderId
@@ -90,18 +87,17 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
         status: 'out_for_delivery'
       });
       await apiClient.updateDriver({ currentOrder: orderId });
-      await loadDriverOrders(); // Recharger les commandes
+      await loadDriverOrders(); 
       return response;
     } catch (error) {
       console.error('Accept order error:', error);
       throw error;
     }
   };
-
-  // Mettre à jour le statut d'une commande
+  
   const updateDeliveryStatus = async (orderId, status, location = null) => {
     if (config.DEMO_MODE) {
-      // Mode démo : simulation locale
+      
       setDeliveries(prevDeliveries =>
         prevDeliveries.map(delivery =>
           delivery._id === orderId
@@ -118,25 +114,24 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
       if (status === 'delivered' || status === 'cancelled') {
         await apiClient.updateDriver({ currentOrder: null });
       }
-      // Invalider le cache après mise à jour pour forcer un rechargement frais
+      
       if (driver?._id) {
         await clearDeliveriesCache(driver._id);
       }
-      await loadDriverOrders(); // Recharger les commandes
+      await loadDriverOrders(); 
       return response;
     } catch (error) {
       console.error('Update order status error:', error);
       throw error;
     }
   };
-
-  // Invalider le cache des livraisons (pour forcer un rechargement)
+  
   const invalidateDeliveriesCache = async () => {
     if (driver?._id) {
       try {
         await clearDeliveriesCache(driver._id);
         console.log('🗑️ Cache des livraisons invalidé');
-        await loadDriverOrders(); // Recharger immédiatement
+        await loadDriverOrders(); 
       } catch (error) {
         console.error('Erreur lors de l\'invalidation du cache des livraisons:', error);
       }

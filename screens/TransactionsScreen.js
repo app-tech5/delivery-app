@@ -28,8 +28,7 @@ export default function TransactionsScreen() {
     onRefresh,
     periodFilters
   } = useTransactions(deliveries, loadDriverOrders, invalidateDeliveriesCache);
-
-  // Vérifier l'authentification
+  
   if (!isAuthenticated || !driver) {
     return <ReconnectMessage message={i18n.t('reports.pleaseReconnectTransactions')} />;
   }

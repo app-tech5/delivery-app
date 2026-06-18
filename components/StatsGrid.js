@@ -71,4 +71,3 @@ const styles = StyleSheet.create({
 export default StatsGrid;
 export { StatItem };
 
-

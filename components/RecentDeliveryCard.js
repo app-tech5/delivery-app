@@ -21,7 +21,7 @@ const RecentDeliveryCard = ({
   const date = showDate ? new Date(delivery.createdAt || delivery.updatedAt).toLocaleDateString(i18n.locale) : null;
 
   if (compact) {
-    // Version compacte pour les listes denses
+    
     return (
       <View style={[styles.compactContainer, style]}>
         <View style={styles.compactHeader}>
@@ -36,8 +36,7 @@ const RecentDeliveryCard = ({
       </View>
     );
   }
-
-  // Version complète par défaut
+  
   return (
     <Card containerStyle={[styles.card, style]}>
       <View style={styles.header}>
@@ -80,7 +79,7 @@ const RecentDeliveryCard = ({
 };
 
 const styles = {
-  // Version complète
+  
   card: {
     borderRadius: 12,
     padding: 16,
@@ -135,8 +134,7 @@ const styles = {
     marginLeft: 4,
     fontWeight: '500',
   },
-
-  // Version compacte
+  
   compactContainer: {
     padding: 12,
     backgroundColor: colors.white,
@@ -171,5 +169,4 @@ const styles = {
 };
 
 export default RecentDeliveryCard;
-
 

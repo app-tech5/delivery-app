@@ -15,10 +15,10 @@ const AnalyticsCard = ({ performanceStats }) => {
           <Text style={styles.analysisLabel}>{i18n.t('reports.averageDaily')}</Text>
           <View style={styles.analysisValues}>
             <Text style={styles.analysisValue}>
-              {performanceStats.avgDeliveriesPerDay.toFixed(1)} deliveries
+              {i18n.t('reports.deliveriesCount', { count: performanceStats.avgDeliveriesPerDay.toFixed(1) })}
             </Text>
             <Text style={styles.analysisSubvalue}>
-              {formatCurrency(performanceStats.avgRevenuePerDay)}/day
+              {i18n.t('reports.perDayAmount', { amount: formatCurrency(performanceStats.avgRevenuePerDay) })}
             </Text>
           </View>
         </View>
@@ -30,7 +30,7 @@ const AnalyticsCard = ({ performanceStats }) => {
               {formatCurrency(performanceStats.bestDay.revenue)}
             </Text>
             <Text style={styles.analysisSubvalue}>
-              {performanceStats.bestDay.deliveries} deliveries
+              {i18n.t('reports.deliveriesCount', { count: performanceStats.bestDay.deliveries })}
             </Text>
           </View>
         </View>
@@ -42,7 +42,7 @@ const AnalyticsCard = ({ performanceStats }) => {
               {formatCurrency(performanceStats.worstDay.revenue)}
             </Text>
             <Text style={styles.analysisSubvalue}>
-              {performanceStats.worstDay.deliveries || 0} deliveries
+              {i18n.t('reports.deliveriesCount', { count: performanceStats.worstDay.deliveries || 0 })}
             </Text>
           </View>
         </View>
@@ -95,5 +95,4 @@ const styles = StyleSheet.create({
 });
 
 export default AnalyticsCard;
-
 

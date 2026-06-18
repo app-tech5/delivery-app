@@ -14,7 +14,6 @@ import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 
-// Import shared components and utilities
 import {
   ScreenLayout,
   EmptyState,
@@ -22,7 +21,6 @@ import {
   Loading
 } from '../components';
 
-// Import order detail components
 import {
   OrderHeaderCard,
   OrderItemsCard,
@@ -32,10 +30,8 @@ import {
   DriverInfoCard
 } from '../components';
 
-// Import hooks
 import { useDeliveryActions } from '../hooks';
 
-// Import API client
 import apiClient from '../api';
 
 export default function DeliveryDetailsScreen() {
@@ -51,8 +47,7 @@ export default function DeliveryDetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-
-  // Fetch order details
+  
   const fetchOrderDetails = async (showRefreshIndicator = false) => {
     if (!orderId) {
       setError(i18n.t('common.error'));
@@ -68,8 +63,7 @@ export default function DeliveryDetailsScreen() {
       }
 
       setError(null);
-
-      // Fetch order details from API
+      
       const orderData = await apiClient.apiCall(`/resource/orders/${orderId}`);
 
       if (orderData) {
@@ -91,11 +85,10 @@ export default function DeliveryDetailsScreen() {
       fetchOrderDetails();
     }
   }, [isAuthenticated, driver, orderId]);
-
-  // Handle navigation to customer/restaurant
+  
   const handleNavigate = (address) => {
     if (address) {
-      // You can implement navigation to maps here
+      
       Alert.alert(
         i18n.t('orderDetails.navigation'),
         `${i18n.t('orderDetails.navigateTo')}: ${address}`,
@@ -104,7 +97,7 @@ export default function DeliveryDetailsScreen() {
           {
             text: i18n.t('common.ok'),
             onPress: () => {
-              // Implement actual navigation logic here
+              
               console.log('Navigate to:', address);
             }
           }
@@ -112,15 +105,13 @@ export default function DeliveryDetailsScreen() {
       );
     }
   };
-
-  // Handle refresh
+  
   const onRefresh = () => {
     fetchOrderDetails(true);
   };
 
   const deliveryTitle = i18n.t('navigation.deliveryDetails');
-
-  // Loading state
+  
   if (loading) {
     return (
       <>
@@ -131,8 +122,7 @@ export default function DeliveryDetailsScreen() {
       </>
     );
   }
-
-  // Error state
+  
   if (error) {
     return (
       <>
@@ -148,8 +138,7 @@ export default function DeliveryDetailsScreen() {
       </>
     );
   }
-
-  // No order found
+  
   if (!order) {
     return (
       <>
@@ -182,10 +171,10 @@ export default function DeliveryDetailsScreen() {
         }
       >
         <View style={styles.content}>
-          {/* Order Header */}
+          {}
           <OrderHeaderCard order={order} />
 
-          {/* Restaurant Info */}
+          {}
           <RestaurantInfoCard
             order={order}
             onNavigate={handleNavigate}
@@ -193,19 +182,19 @@ export default function DeliveryDetailsScreen() {
 
           <DriverInfoCard order={order} />
 
-          {/* Customer Info */}
+          {}
           <CustomerInfoCard
             order={order}
             onNavigate={handleNavigate}
           />
 
-          {/* Order Items */}
+          {}
           <OrderItemsCard order={order} currency={currency} />
 
-          {/* Order Summary */}
+          {}
           <OrderSummaryCard order={order} currency={currency} />
 
-          {/* Delivery Actions - Only show if order is assigned to current driver */}
+          {}
           {order.driver === driver?._id && order.status !== 'delivered' && order.status !== 'cancelled' && (
             <View style={styles.actionsContainer}>
               <Text style={styles.actionsTitle}>{i18n.t('orderDetails.deliveryActions')}</Text>

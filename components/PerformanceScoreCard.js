@@ -35,9 +35,9 @@ const PerformanceScoreCard = ({ performanceStats }) => {
           </View>
 
           <View style={styles.scoreItem}>
-            <Text style={styles.scoreLabel}>Volume</Text>
+            <Text style={styles.scoreLabel}>{i18n.t('reports.volume')}</Text>
             <Text style={styles.scoreItemValue}>
-              {performanceStats.avgDeliveriesPerDay.toFixed(1)}/day
+              {i18n.t('reports.perDayAmount', { amount: performanceStats.avgDeliveriesPerDay.toFixed(1) })}
             </Text>
           </View>
         </View>
@@ -98,5 +98,4 @@ const styles = StyleSheet.create({
 });
 
 export default PerformanceScoreCard;
-
 
