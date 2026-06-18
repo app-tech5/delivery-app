@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { useSettingsManager } from '../hooks/useSettingsManager';
-import { ScreenHeader } from '../components';
+import { ScreenLayout } from '../components';
 import GeneralSettings from '../components/GeneralSettings';
 import PaymentSettings from '../components/PaymentSettings';
 import NotificationSettings from '../components/NotificationSettings';
@@ -32,12 +32,7 @@ export default function SettingsScreen() {
 
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader
-        title={i18n.t('navigation.settings')}
-        containerStyle={{ paddingTop: 10 }}
-      />
-
+    <ScreenLayout title={i18n.t('navigation.settings')}>
       <ScrollView style={styles.scrollView}>
         <GeneralSettings
           localSettings={localSettings}
@@ -75,15 +70,11 @@ export default function SettingsScreen() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
   },

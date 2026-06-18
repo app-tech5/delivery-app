@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   RefreshControl,
   Alert
@@ -14,12 +13,13 @@ import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { useReportsData } from '../hooks/useReportsData';
 import {
-  ScreenHeader,
+  ScreenLayout,
   PeriodSelector,
   ReportsMetricsGrid,
   AnalyticsCard,
   PerformanceScoreCard,
-  AuthGuard
+  AuthGuard,
+  ReconnectMessage,
 } from '../components';
 
 export default function ReportsScreen() {
@@ -64,12 +64,10 @@ export default function ReportsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader
-        title={i18n.t('reports.title')}
-        subtitle={`${performanceStats.totalDeliveries} deliveries • ${performanceStats.totalRevenue?.toFixed(2) || '0.00'}${currency?.symbol || '€'}`}
-      />
-
+    <ScreenLayout
+      title={i18n.t('reports.title')}
+      subtitle={`${performanceStats.totalDeliveries} deliveries • ${performanceStats.totalRevenue?.toFixed(2) || '0.00'}${currency?.symbol || '€'}`}
+    >
       <PeriodSelector
         periods={periods}
         activePeriod={activePeriod}
@@ -100,15 +98,11 @@ export default function ReportsScreen() {
         {/* Espace en bas pour le scroll */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
   },

@@ -1,11 +1,9 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView } from 'react-native';
-import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { useTransactions } from '../hooks/useTransactions';
-import { ScreenHeader, ReconnectMessage } from '../components';
+import { ScreenLayout, ReconnectMessage } from '../components';
 import TransactionFilters from '../components/TransactionFilters';
 import TransactionSummary from '../components/TransactionSummary';
 import TransactionList from '../components/TransactionList';
@@ -37,13 +35,10 @@ export default function TransactionsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader
-        title={i18n.t('reports.transactionsTitle')}
-        subtitle={`${transactionStats.count} ${transactionStats.count === 1 ? i18n.t('reports.transactionSingular') : i18n.t('reports.transactionPlural')}`}
-        containerStyle={{ paddingTop: 10 }}
-      />
-
+    <ScreenLayout
+      title={i18n.t('reports.transactionsTitle')}
+      subtitle={`${transactionStats.count} ${transactionStats.count === 1 ? i18n.t('reports.transactionSingular') : i18n.t('reports.transactionPlural')}`}
+    >
       <TransactionFilters
         periodFilters={periodFilters}
         activeFilter={activeFilter}
@@ -62,13 +57,6 @@ export default function TransactionsScreen() {
         onRefresh={onRefresh}
         currency={currency}
       />
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
-});

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   Alert,
   RefreshControl
@@ -17,7 +16,7 @@ import { useSettings } from '../contexts/SettingContext';
 
 // Import shared components and utilities
 import {
-  ScreenHeader,
+  ScreenLayout,
   EmptyState,
   AuthGuard,
   Loading
@@ -119,56 +118,60 @@ export default function DeliveryDetailsScreen() {
     fetchOrderDetails(true);
   };
 
+  const deliveryTitle = i18n.t('navigation.deliveryDetails');
+
   // Loading state
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <>
         <AuthGuard isAuthenticated={isAuthenticated} driver={driver} />
-        <ScreenHeader title={i18n.t('navigation.deliveryDetails')} />
-        <Loading />
-      </SafeAreaView>
+        <ScreenLayout title={deliveryTitle}>
+          <Loading />
+        </ScreenLayout>
+      </>
     );
   }
 
   // Error state
   if (error) {
     return (
-      <SafeAreaView style={styles.container}>
+      <>
         <AuthGuard isAuthenticated={isAuthenticated} driver={driver} />
-        <ScreenHeader title={i18n.t('navigation.deliveryDetails')} />
-        <EmptyState
-          icon="error-outline"
-          iconType="material"
-          title={i18n.t('common.error')}
-          subtitle={error}
-        />
-      </SafeAreaView>
+        <ScreenLayout title={deliveryTitle}>
+          <EmptyState
+            icon="error-outline"
+            iconType="material"
+            title={i18n.t('common.error')}
+            subtitle={error}
+          />
+        </ScreenLayout>
+      </>
     );
   }
 
   // No order found
   if (!order) {
     return (
-      <SafeAreaView style={styles.container}>
+      <>
         <AuthGuard isAuthenticated={isAuthenticated} driver={driver} />
-        <ScreenHeader title={i18n.t('navigation.deliveryDetails')} />
-        <EmptyState
-          icon="package-variant-closed"
-          iconType="material-community"
-          title={i18n.t('reports.noOrderFound')}
-          subtitle={i18n.t('reports.noOrderFoundDesc')}
-        />
-      </SafeAreaView>
+        <ScreenLayout title={deliveryTitle}>
+          <EmptyState
+            icon="package-variant-closed"
+            iconType="material-community"
+            title={i18n.t('reports.noOrderFound')}
+            subtitle={i18n.t('reports.noOrderFoundDesc')}
+          />
+        </ScreenLayout>
+      </>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
       <AuthGuard isAuthenticated={isAuthenticated} driver={driver} />
 
-      <ScreenHeader title={i18n.t('navigation.deliveryDetails')} />
-
-      <ScrollView
+      <ScreenLayout title={deliveryTitle}>
+        <ScrollView
         style={styles.scrollView}
         refreshControl={
           <RefreshControl
@@ -266,15 +269,12 @@ export default function DeliveryDetailsScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+      </ScreenLayout>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
   },

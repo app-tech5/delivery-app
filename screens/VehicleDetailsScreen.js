@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 
 // Import components
 import {
-  ScreenHeader,
+  ScreenLayout,
   VehicleInfoCard
 } from '../components';
 
@@ -17,12 +17,10 @@ export default function VehicleDetailsScreen() {
   const vehicle = driver?.vehicle || {};
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader
-        title={i18n.t('vehicle.vehicleDetailsTitle')}
-        subtitle={i18n.t('vehicle.vehicleManagement')}
-      />
-
+    <ScreenLayout
+      title={i18n.t('vehicle.vehicleDetailsTitle')}
+      subtitle={i18n.t('vehicle.vehicleManagement')}
+    >
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -86,15 +84,11 @@ export default function VehicleDetailsScreen() {
         {/* Espace en bas pour le scroll */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
   },

@@ -20,6 +20,7 @@ export {
 
 // Shared components
 export { default as ScreenHeader } from './ScreenHeader';
+export { default as ScreenLayout } from './ScreenLayout';
 export { default as EmptyState } from './EmptyState';
 export { default as FilterButtons } from './FilterButtons';
 export { default as StatsGrid } from './StatsGrid';

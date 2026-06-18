@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   Dimensions,
   RefreshControl
@@ -15,7 +14,7 @@ import { useSettings } from '../contexts/SettingContext';
 
 // Import shared components and utilities
 import {
-  ScreenHeader,
+  ScreenLayout,
   EmptyState,
   FilterButtons,
   StatsGrid,
@@ -65,53 +64,49 @@ export default function HistoryScreen() {
   const uiGroups = groupedDeliveries.map(group => mapDeliveryGroupToUI(group, currency));
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.root}>
       <AuthGuard
         isAuthenticated={isAuthenticated}
         driver={driver}
       />
 
-      <ScreenHeader
+      <ScreenLayout
         title={i18n.t('reports.historyTitle')}
         subtitle={`${globalStats.periodDeliveries} ${globalStats.periodDeliveries === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')} • ${formatCurrency(globalStats.periodEarnings, currency)}`}
-      />
-
-      {/* Filtres temporels */}
-      <FilterButtons
-        filters={TIME_FILTERS}
-        activeFilter={activeFilter}
-        onFilterPress={setActiveFilter}
-      />
-
-      {/* Statistiques de la période */}
-      <StatsGrid
-        stats={[
-          {
-            value: uiStats.periodDeliveries,
-            label: i18n.t('reports.deliveriesLabel')
-          },
-          {
-            value: uiStats.periodEarnings,
-            label: i18n.t('reports.earningsLabel')
-          },
-          {
-            value: uiStats.averageEarnings,
-            label: i18n.t('reports.averageLabel')
-          }
-        ]}
-      />
-
-      {/* Chronologie des livraisons */}
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[colors.primary]}
-          />
-        }
       >
+        <FilterButtons
+          filters={TIME_FILTERS}
+          activeFilter={activeFilter}
+          onFilterPress={setActiveFilter}
+        />
+
+        <StatsGrid
+          stats={[
+            {
+              value: uiStats.periodDeliveries,
+              label: i18n.t('reports.deliveriesLabel')
+            },
+            {
+              value: uiStats.periodEarnings,
+              label: i18n.t('reports.earningsLabel')
+            },
+            {
+              value: uiStats.averageEarnings,
+              label: i18n.t('reports.averageLabel')
+            }
+          ]}
+        />
+
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+            />
+          }
+        >
         {groupedDeliveries.length === 0 ? (
           <EmptyState
             icon="history"
@@ -150,18 +145,17 @@ export default function HistoryScreen() {
 
         {/* Espace en bas pour le scroll */}
         <View style={styles.bottomSpacer} />
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </ScreenLayout>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
     backgroundColor: colors.background.secondary,
   },
-
-  // ScrollView and content
   scrollView: {
     flex: 1,
   },

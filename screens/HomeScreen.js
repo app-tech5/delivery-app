@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { SafeAreaView, StatusBar, ScrollView, StyleSheet, Platform, View, Text, Image } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
 import { colors } from '../global';
@@ -12,7 +12,7 @@ import { useNearbyRestaurants, useDriverStatus } from '../hooks';
 // Import components
 import {
   AuthGuard,
-  ScreenHeader,
+  ScreenLayout,
   StatusButtons,
   DriverStats,
   ActiveDeliveries,
@@ -24,7 +24,15 @@ import { getDriverLocation, getActiveDeliveries, getStatusColor } from '../utils
 
 function HomeScreen() {
   const navigation = useNavigation();
-  const { driver, stats, deliveries, loadDriverStats, loadDriverOrders, hasCompletedOnboarding } = useDriver();
+  const {
+    driver,
+    stats,
+    deliveries,
+    loadDriverStats,
+    loadDriverOrders,
+    hasCompletedOnboarding,
+    isAuthenticated,
+  } = useDriver();
   const { currency } = useSettings();
 
   // Hooks personnalisés
@@ -46,55 +54,53 @@ function HomeScreen() {
 
   // Commandes actives (en livraison)
   const activeDeliveries = getActiveDeliveries(deliveries);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.root}>
       <AuthGuard
+        isAuthenticated={isAuthenticated}
+        driver={driver}
         showLoginButton={true}
         onLoginPress={() => navigation.navigate('Login')}
       />
 
       {hasCompletedOnboarding && driver && (
-        <>
-          <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
-
+        <ScreenLayout
+          testID="home-screen"
+          title={driver?.userId?.name || 'Driver'}
+          subtitle={`ID: ${driver?.licenseNumber || 'N/A'}`}
+          headerContainerStyle={styles.headerContainer}
+          leftComponent={
+            driver?.userId?.image ? (
+              <Image
+                source={{ uri: driver.userId.image }}
+                style={styles.driverImage}
+              />
+            ) : (
+              <Icon
+                name="person"
+                type="material"
+                size={40}
+                color={colors.white}
+                containerStyle={styles.avatar}
+              />
+            )
+          }
+          rightComponent={
+            <View style={styles.statusContainer}>
+              <View
+                style={[
+                  styles.statusIndicator,
+                  { backgroundColor: getStatusColor(driver?.status, 'driver') }
+                ]}
+              />
+              <Text style={styles.statusText} testID="driver-status-badge">
+                {driver?.status || 'unknown'}
+              </Text>
+            </View>
+          }
+        >
           <ScrollView showsVerticalScrollIndicator={false}>
-            <ScreenHeader
-              title={driver?.userId?.name || 'Driver'}
-              subtitle={`ID: ${driver?.licenseNumber || 'N/A'}`}
-              containerStyle={{
-                borderBottomLeftRadius: 20,
-                borderBottomRightRadius: 20,
-              }}
-              leftComponent={
-                driver?.userId?.image ? (
-                  <Image
-                    source={{ uri: driver.userId.image }}
-                    style={styles.driverImage}
-                  />
-                ) : (
-                  <Icon
-                    name="person"
-                    type="material"
-                    size={40}
-                    color={colors.white}
-                    containerStyle={styles.avatar}
-                  />
-                )
-              }
-              rightComponent={
-                <View style={styles.statusContainer}>
-                  <View
-                    style={[
-                      styles.statusIndicator,
-                      { backgroundColor: getStatusColor(driver?.status, 'driver') }
-                    ]}
-                  />
-                  <Text style={styles.statusText}>
-                    {driver?.status || 'unknown'}
-                  </Text>
-                </View>
-              }
-            />
             <StatusButtons
               currentStatus={driver.status}
               onStatusChange={handleStatusChange}
@@ -114,17 +120,20 @@ function HomeScreen() {
               restaurantsLoading={restaurantsLoading}
             />
           </ScrollView>
-        </>
+        </ScreenLayout>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
     backgroundColor: colors.background.secondary,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+  headerContainer: {
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   avatar: {
     marginRight: 0,

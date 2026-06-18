@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   Alert,
   Linking,
@@ -18,7 +17,7 @@ import { useSettings } from '../contexts/SettingContext';
 
 // Import shared components and utilities
 import {
-  ScreenHeader,
+  ScreenLayout,
   AuthGuard,
   LoadingOverlay,
   OrderHeaderCard,
@@ -119,16 +118,14 @@ export default function OrderDetailsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.root}>
       <AuthGuard
         isAuthenticated={isAuthenticated}
         driver={driver}
       />
 
       {isAuthenticated && driver && (
-        <>
-          <ScreenHeader title={i18n.t('orderDetails.title')} />
-
+        <ScreenLayout title={i18n.t('orderDetails.title')}>
           {loading ? (
             <LoadingOverlay message={i18n.t('orderDetails.loadingOrder')} />
           ) : error || !order ? (
@@ -152,16 +149,15 @@ export default function OrderDetailsScreen() {
               <View style={styles.bottomSpacer} />
             </ScrollView>
           )}
-        </>
+        </ScreenLayout>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    backgroundColor: colors.background.secondary,
   },
   scrollView: {
     flex: 1,
