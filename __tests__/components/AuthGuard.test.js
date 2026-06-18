@@ -34,18 +34,19 @@ describe('AuthGuard', () => {
   const driver = { _id: 'driver-1' };
 
   it('renders nothing when the driver is authenticated', () => {
-    const { toJSON } = render(
+    const { queryByTestId } = render(
       <AuthGuard isAuthenticated driver={driver} />
     );
 
-    expect(toJSON()).toBeNull();
+    expect(queryByTestId('auth-guard')).toBeNull();
   });
 
   it('shows reconnect message when user is not signed in', () => {
-    const { getByText } = render(
+    const { getByTestId, getByText } = render(
       <AuthGuard isAuthenticated={false} driver={null} />
     );
 
+    expect(getByTestId('auth-guard')).toBeTruthy();
     expect(getByText('Please reconnect')).toBeTruthy();
     expect(getByText('Sign in to view your history')).toBeTruthy();
   });

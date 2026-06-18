@@ -24,7 +24,15 @@ import { getDriverLocation, getActiveDeliveries, getStatusColor } from '../utils
 
 function HomeScreen() {
   const navigation = useNavigation();
-  const { driver, stats, deliveries, loadDriverStats, loadDriverOrders, hasCompletedOnboarding } = useDriver();
+  const {
+    driver,
+    stats,
+    deliveries,
+    loadDriverStats,
+    loadDriverOrders,
+    hasCompletedOnboarding,
+    isAuthenticated,
+  } = useDriver();
   const { currency } = useSettings();
 
   // Hooks personnalisés
@@ -50,6 +58,8 @@ function HomeScreen() {
   return (
     <View style={styles.root}>
       <AuthGuard
+        isAuthenticated={isAuthenticated}
+        driver={driver}
         showLoginButton={true}
         onLoginPress={() => navigation.navigate('Login')}
       />

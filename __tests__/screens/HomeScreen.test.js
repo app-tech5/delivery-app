@@ -132,6 +132,7 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import HomeScreen from '../../screens/HomeScreen';
 import { useDriverStatus } from '../../hooks';
+import { expectActiveScreenShell, expectInactiveScreenShell } from '../helpers/screenShellAssertions';
 
 const baseDriver = {
   _id: 'driver-1',
@@ -152,6 +153,7 @@ const activeDelivery = {
 
 const setupDriverContext = ({
   hasCompletedOnboarding = true,
+  isAuthenticated = true,
   driver = baseDriver,
   deliveries = [activeDelivery],
   stats = { totalDeliveries: 10, totalEarnings: 500 },
@@ -163,6 +165,7 @@ const setupDriverContext = ({
     loadDriverStats: mockLoadDriverStats,
     loadDriverOrders: mockLoadDriverOrders,
     hasCompletedOnboarding,
+    isAuthenticated: hasCompletedOnboarding ? isAuthenticated : false,
   });
 };
 
@@ -177,15 +180,24 @@ describe('HomeScreen buttons', () => {
     setupDriverContext();
   });
 
+  it('hides reconnect message when the driver session is active', () => {
+    const utils = render(<HomeScreen />);
+
+    expectActiveScreenShell(utils, {
+      layoutTestID: 'home-screen-safe-area',
+      contentTestID: 'status-button-available',
+    });
+  });
+
   it('shows login button and navigates to Login when pressed', () => {
-    setupDriverContext({ hasCompletedOnboarding: false, driver: null, deliveries: [] });
+    setupDriverContext({ hasCompletedOnboarding: false, isAuthenticated: false, driver: null, deliveries: [] });
 
-    const { getByTestId, queryByTestId } = render(<HomeScreen />);
+    const utils = render(<HomeScreen />);
 
-    expect(getByTestId('auth-guard-login-button')).toBeTruthy();
-    expect(queryByTestId('status-button-available')).toBeNull();
+    expectInactiveScreenShell(utils, { contentTestID: 'status-button-available' });
+    expect(utils.getByTestId('auth-guard-login-button')).toBeTruthy();
 
-    fireEvent.press(getByTestId('auth-guard-login-button'));
+    fireEvent.press(utils.getByTestId('auth-guard-login-button'));
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith('Login');
   });
@@ -200,7 +212,7 @@ describe('HomeScreen buttons', () => {
   });
 
   it('does not load driver data when onboarding is not completed', async () => {
-    setupDriverContext({ hasCompletedOnboarding: false, driver: null, deliveries: [] });
+    setupDriverContext({ hasCompletedOnboarding: false, isAuthenticated: false, driver: null, deliveries: [] });
 
     render(<HomeScreen />);
 

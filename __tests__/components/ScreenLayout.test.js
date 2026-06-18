@@ -22,6 +22,11 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
+const getHeaderContainerStyle = (header) => {
+  const style = header.props.style;
+  return Array.isArray(style) ? style[1] : style;
+};
+
 describe('ScreenLayout', () => {
   it('extends the header under the status bar with safe-area top padding', () => {
     const { getByTestId } = render(
@@ -34,7 +39,7 @@ describe('ScreenLayout', () => {
     const header = getByTestId('screen-header');
 
     expect(safeArea.props.accessibilityLabel).toBe('left,right,bottom');
-    expect(header.props.style).toEqual(
+    expect(getHeaderContainerStyle(header)).toEqual(
       expect.arrayContaining([expect.objectContaining({ paddingTop: 55 })])
     );
   });
@@ -66,8 +71,9 @@ describe('ScreenLayout', () => {
       </ScreenLayout>
     );
 
-    expect(getByTestId('screen-header').props.style).toEqual(
+    expect(getHeaderContainerStyle(getByTestId('screen-header'))).toEqual(
       expect.arrayContaining([
+        expect.objectContaining({ paddingTop: 55 }),
         expect.objectContaining({ borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }),
       ])
     );

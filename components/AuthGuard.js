@@ -21,7 +21,7 @@ const AuthGuard = ({
   }
 
   return (
-    <SafeAreaView style={[styles.container, containerStyle]}>
+    <SafeAreaView style={[styles.container, containerStyle]} testID="auth-guard">
       <View style={styles.centerContent}>
         <Text style={[styles.title, titleStyle]}>{title}</Text>
         <Text style={[styles.subtitle, subtitleStyle]}>{subtitle}</Text>

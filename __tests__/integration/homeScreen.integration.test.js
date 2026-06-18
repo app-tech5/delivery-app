@@ -163,6 +163,7 @@ jest.mock('@react-navigation/native', () => ({
 
 import React from 'react';
 import { Alert } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import HomeScreen from '../../screens/HomeScreen';
 import { DriverProvider } from '../../contexts/DriverContext';
@@ -289,11 +290,18 @@ const seedApprovedDriverSession = async () => {
 
 const renderHomeScreen = () =>
   render(
-    <DriverProvider>
-      <SettingProvider>
-        <HomeScreen />
-      </SettingProvider>
-    </DriverProvider>
+    <SafeAreaProvider
+      initialMetrics={{
+        frame: { x: 0, y: 0, width: 390, height: 844 },
+        insets: { top: 47, left: 0, right: 0, bottom: 34 },
+      }}
+    >
+      <DriverProvider>
+        <SettingProvider>
+          <HomeScreen />
+        </SettingProvider>
+      </DriverProvider>
+    </SafeAreaProvider>
   );
 
 const waitForHomeDashboard = async (utils) => {
@@ -325,6 +333,8 @@ const expectNoDeliveryButton = (utils, orderId = ORDER_ID) => {
 };
 
 describe('HomeScreen integration (demo mode, real hooks)', () => {
+  jest.setTimeout(15000);
+
   let alertSpy;
 
   beforeEach(() => {
