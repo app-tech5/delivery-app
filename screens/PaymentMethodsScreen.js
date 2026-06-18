@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../global';
 import i18n from '../i18n';
@@ -10,7 +10,7 @@ import { usePaymentMethods } from '../hooks';
 
 // Import components
 import {
-  ScreenHeader,
+  ScreenLayout,
   PaymentMethodsList,
   AddPaymentMethodModal
 } from '../components';
@@ -86,20 +86,18 @@ export default function PaymentMethodsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader
-        title={i18n.t('payment.paymentMethodsTitle')}
-        subtitle={`${paymentMethods.length} ${i18n.t('payment.methodsAvailable')}`}
-        rightComponent={
-          <TouchableOpacity
-            onPress={handleAddPaymentMethod}
-            style={styles.addButton}
-          >
-            <MaterialIcons name="add" size={24} color={colors.primary} />
-          </TouchableOpacity>
-        }
-      />
-
+    <ScreenLayout
+      title={i18n.t('payment.paymentMethodsTitle')}
+      subtitle={`${paymentMethods.length} ${i18n.t('payment.methodsAvailable')}`}
+      rightComponent={
+        <TouchableOpacity
+          onPress={handleAddPaymentMethod}
+          style={styles.addButton}
+        >
+          <MaterialIcons name="add" size={24} color={colors.white} />
+        </TouchableOpacity>
+      }
+    >
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -129,15 +127,11 @@ export default function PaymentMethodsScreen() {
         onSuccess={handleModalSuccess}
         editingMethod={editingMethod}
       />
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
   },

@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 import { useSupport } from '../hooks/useSupport';
-import { ScreenHeader } from '../components';
+import { ScreenLayout } from '../components';
 import ContactActions from '../components/ContactActions';
 import FAQSection from '../components/FAQSection';
 import BugReportForm from '../components/BugReportForm';
@@ -26,13 +26,10 @@ export default function SupportScreen() {
   } = useSupport(currency, driver);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader
-        title={i18n.t('support.title')}
-        subtitle={i18n.t('support.subtitle')}
-        containerStyle={{ paddingTop: 10 }}
-      />
-
+    <ScreenLayout
+      title={i18n.t('support.title')}
+      subtitle={i18n.t('support.subtitle')}
+    >
       <ScrollView style={styles.scrollView}>
         <ContactActions onContactAction={handleContactAction} />
 
@@ -56,15 +53,11 @@ export default function SupportScreen() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
   },

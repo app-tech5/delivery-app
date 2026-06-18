@@ -15,7 +15,7 @@ const ScreenHeader = ({
   contentStyle
 }) => {
   return (
-    <View style={[styles.header, containerStyle]}>
+    <View style={[styles.header, containerStyle]} testID="screen-header">
       <View style={styles.topRow}>
         {leftComponent ? (
           <View style={styles.left}>

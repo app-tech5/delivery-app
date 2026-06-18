@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
@@ -9,7 +9,7 @@ import { useRecentDeliveries, useEarningsRefresh } from '../hooks';
 // Import components
 import {
   AuthGuard,
-  ScreenHeader,
+  ScreenLayout,
   RatingStats
 } from '../components';
 
@@ -28,12 +28,10 @@ export default function RatingScreen() {
   const { refreshing, onRefresh } = useEarningsRefresh({ invalidateDriverStatsCache, loadDriverStats });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader
-        title={i18n.t('reports.ratingsTitle')}
-        subtitle={`${stats.completedOrders || 0} ${i18n.t('reports.deliveriesRated')}`}
-      />
-
+    <ScreenLayout
+      title={i18n.t('reports.ratingsTitle')}
+      subtitle={`${stats.completedOrders || 0} ${i18n.t('reports.deliveriesRated')}`}
+    >
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -76,15 +74,11 @@ export default function RatingScreen() {
         {/* Espace en bas pour le scroll */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
   },

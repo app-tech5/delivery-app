@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Dimensions, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, RefreshControl } from 'react-native';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
@@ -14,7 +14,7 @@ import {
   EnhancedStatCard,
   EarningsDetailsCard,
   RecentDeliveryCard,
-  ScreenHeader
+  ScreenLayout
 } from '../components';
 
 // Import utilities
@@ -69,12 +69,10 @@ export default function EarningsScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader
-        title={i18n.t('reports.earningsTitle')}
-        subtitle={new Date().toLocaleDateString(i18n.locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-      />
-
+    <ScreenLayout
+      title={i18n.t('reports.earningsTitle')}
+      subtitle={new Date().toLocaleDateString(i18n.locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+    >
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -121,17 +119,11 @@ export default function EarningsScreen() {
         {/* Espace en bas pour le scroll */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
-
-  // ScrollView
   scrollView: {
     flex: 1,
   },

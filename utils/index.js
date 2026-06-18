@@ -28,6 +28,8 @@ export {
   TIME_FILTERS
 } from './dateUtils';
 
+export { getDeliveryFilters } from './deliveryFilters';
+
 // Status utilities
 export {
   DRIVER_STATUSES,

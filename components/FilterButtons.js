@@ -34,9 +34,10 @@ const FilterButtons = ({
           >
             <Icon
               name={filter.icon}
-              type={iconType}
+              type={filter.iconType || iconType}
               size={18}
               color={activeFilter === filter.key ? colors.white : colors.primary}
+              testID={`filter-icon-${filter.key}`}
             />
             <Text style={[
               styles.filterText,

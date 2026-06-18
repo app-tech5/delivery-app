@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../global';
 import i18n from '../i18n';
@@ -11,7 +10,7 @@ import { useProfileDocuments } from '../hooks/useProfileDocuments';
 import { buildProfileStats } from '../utils/profileUtils';
 import { buildDriverDocuments } from '../utils/documentUtils';
 import {
-  ScreenHeader,
+  ScreenLayout,
   ReconnectMessage,
   ProfileHeaderCard,
   ProfileStatsGrid,
@@ -27,7 +26,6 @@ import {
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
   const { driver, isAuthenticated, stats, logout, setDriver } = useDriver();
   const { currency } = useSettings();
 
@@ -73,20 +71,17 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
-      <ScreenHeader
-        title={i18n.t('navigation.profile')}
-        containerStyle={{ paddingTop: Math.max(insets.top, 12) + 8 }}
-        leftComponent={isEditing ? <ProfileCancelButton onPress={cancelEdit} /> : null}
-        rightComponent={
-          isEditing ? (
-            <ProfileSaveButton onPress={save} saving={saving} />
-          ) : (
-            <ProfileEditButton onPress={startEdit} />
-          )
-        }
-      />
-
+    <ScreenLayout
+      title={i18n.t('navigation.profile')}
+      leftComponent={isEditing ? <ProfileCancelButton onPress={cancelEdit} /> : null}
+      rightComponent={
+        isEditing ? (
+          <ProfileSaveButton onPress={save} saving={saving} />
+        ) : (
+          <ProfileEditButton onPress={startEdit} />
+        )
+      }
+    >
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <ProfileHeaderCard
           imageUri={displayImage}
@@ -141,15 +136,11 @@ export default function ProfileScreen() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
   },

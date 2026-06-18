@@ -3,13 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   RefreshControl,
   Alert,
-  Dimensions
 } from 'react-native';
-import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../global';
 import i18n from '../i18n';
@@ -19,19 +16,14 @@ import { DeliveryCard } from '../components';
 
 // Import shared components and utilities
 import {
-  ScreenHeader,
+  ScreenLayout,
   EmptyState,
   FilterButtons,
   AuthGuard
 } from '../components';
 import { useDeliveryActions } from '../hooks';
-import {
-  DELIVERY_STATUSES,
-  DELIVERY_STATUS_LABELS
-} from '../utils';
+import { getDeliveryFilters } from '../utils/deliveryFilters';
 import { OrdersContext } from '../contexts/OrdersContext';
-
-const { width } = Dimensions.get('window');
 
 export default function DeliveriesScreen() {
   const navigation = useNavigation();
@@ -39,8 +31,6 @@ export default function DeliveriesScreen() {
     deliveries,
     isAuthenticated,
     driver,
-    updateDeliveryStatus,
-    acceptDelivery,
     loadDriverOrders,
     invalidateDeliveriesCache
   } = useDriver();
@@ -51,21 +41,12 @@ export default function DeliveriesScreen() {
 
   const [activeFilter, setActiveFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const handleViewDetails = (orderId) => {
     navigation.navigate('DeliveryDetails', { orderId });
   };
 
-  // Filtres disponibles
-  const filters = [
-    { key: 'all', label: i18n.t('common.all'), icon: 'list' },
-    { key: DELIVERY_STATUSES.PENDING, label: DELIVERY_STATUS_LABELS[DELIVERY_STATUSES.PENDING], icon: 'clock-outline' },
-    { key: DELIVERY_STATUSES.ACCEPTED, label: DELIVERY_STATUS_LABELS[DELIVERY_STATUSES.ACCEPTED], icon: 'check-circle-outline' },
-    { key: DELIVERY_STATUSES.OUT_FOR_DELIVERY, label: DELIVERY_STATUS_LABELS[DELIVERY_STATUSES.OUT_FOR_DELIVERY], icon: 'truck-delivery' },
-    { key: DELIVERY_STATUSES.DELIVERED, label: DELIVERY_STATUS_LABELS[DELIVERY_STATUSES.DELIVERED], icon: 'check-circle' },
-    { key: DELIVERY_STATUSES.CANCELLED, label: DELIVERY_STATUS_LABELS[DELIVERY_STATUSES.CANCELLED], icon: 'close-circle' }
-  ];
+  const filters = getDeliveryFilters();
 
   // Filtrer les livraisons selon le filtre actif
   const filteredDeliveries = orders.filter(delivery => {
@@ -82,7 +63,6 @@ export default function DeliveriesScreen() {
   // Utiliser le hook pour les actions sur les livraisons
   const { handleAcceptDelivery, handleStartDelivery, handleMarkDelivered, handleStatusChange } = useDeliveryActions();
 
-
   // Gestionnaire de pull-to-refresh
   const onRefresh = async () => {
     setRefreshing(true);
@@ -97,23 +77,19 @@ export default function DeliveriesScreen() {
     }
   };
 
-  // Les gestionnaires d'actions sont maintenant fournis par le hook useDeliveryActions
-
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.root}>
       <AuthGuard
         isAuthenticated={isAuthenticated}
         driver={driver}
       />
 
       {isAuthenticated && driver && (
-        <>
-          <ScreenHeader
-            title={i18n.t('navigation.deliveries')}
-            subtitle={`${orders.length} ${orders.length === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')}`}
-          />
-
-          {/* Filtres */}
+        <ScreenLayout
+          testID="deliveries-screen"
+          title={i18n.t('navigation.deliveries')}
+          subtitle={`${orders.length} ${orders.length === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')}`}
+        >
           <FilterButtons
             filters={filters}
             activeFilter={activeFilter}
@@ -121,7 +97,6 @@ export default function DeliveriesScreen() {
             iconType="material-community"
           />
 
-          {/* Liste des livraisons */}
           <ScrollView
             style={styles.scrollView}
             refreshControl={
@@ -165,23 +140,20 @@ export default function DeliveriesScreen() {
               </View>
             )}
           </ScrollView>
-        </>
+        </ScreenLayout>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
     backgroundColor: colors.background.secondary,
   },
-  // ScrollView and content
   scrollView: {
     flex: 1,
   },
-
-  // Deliveries list
   deliveriesList: {
     padding: 16,
   },

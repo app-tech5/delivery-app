@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, SafeAreaView, ScrollView, RefreshControl, TouchableOpacity, Text} from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Text} from 'react-native';
 import { Icon, Badge } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useNotifications } from '../hooks/useNotifications';
-import { ScreenHeader, AuthGuard } from '../components';
+import { ScreenLayout, AuthGuard } from '../components';
 import NotificationItem from '../components/NotificationItem';
 import EmptyState from '../components/EmptyState';
 
@@ -47,25 +47,21 @@ export default function NotificationsScreen() {
   const emptyStateContent = getEmptyStateContent();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScreenHeader
-        title={i18n.t('notifications.title')}
-        containerStyle={{ paddingTop: 10 }}
-        titleAccessory={unreadCount > 0 ? (
-          <Badge
-            value={unreadCount}
-            status="error"
-            containerStyle={styles.headerBadgeContainer}
-          />
-        ) : null}
-        rightComponent={unreadCount > 0 ? (
-          <TouchableOpacity onPress={markAllAsRead} style={styles.markAllButton}>
-            <Text style={styles.markAllText}>{i18n.t('notifications.markAllAsRead')}</Text>
-          </TouchableOpacity>
-        ) : null}
-      />
-
-      {/* Filtres */}
+    <ScreenLayout
+      title={i18n.t('notifications.title')}
+      titleAccessory={unreadCount > 0 ? (
+        <Badge
+          value={unreadCount}
+          status="error"
+          containerStyle={styles.headerBadgeContainer}
+        />
+      ) : null}
+      rightComponent={unreadCount > 0 ? (
+        <TouchableOpacity onPress={markAllAsRead} style={styles.markAllButton}>
+          <Text style={styles.markAllText}>{i18n.t('notifications.markAllAsRead')}</Text>
+        </TouchableOpacity>
+      ) : null}
+    >
       <View style={styles.filtersContainer}>
         <ScrollView
           horizontal
@@ -137,15 +133,11 @@ export default function NotificationsScreen() {
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
   },

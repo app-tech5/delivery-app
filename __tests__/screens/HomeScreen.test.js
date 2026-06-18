@@ -98,12 +98,28 @@ jest.mock('react-native-elements', () => {
   return { Button, Icon, Card: ({ children }) => mockReact.createElement(require('react-native').View, null, children) };
 });
 
+jest.mock('react-native-safe-area-context', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+
+  return {
+    SafeAreaView: ({ children, style, edges, testID }) =>
+      React.createElement(
+        View,
+        { style, testID: testID || 'safe-area-view', accessibilityLabel: edges?.join(',') },
+        children
+      ),
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  };
+});
+
 jest.mock('../../components', () => {
   const mockReact = require('react');
   const { View } = require('react-native');
 
   return {
     AuthGuard: jest.requireActual('../../components/AuthGuard').default,
+    ScreenLayout: jest.requireActual('../../components/ScreenLayout').default,
     ScreenHeader: jest.requireActual('../../components/ScreenHeader').default,
     StatusButtons: jest.requireActual('../../components/StatusButtons').default,
     DriverStats: () => mockReact.createElement(View, { testID: 'driver-stats' }),
@@ -271,6 +287,8 @@ describe('HomeScreen buttons', () => {
   it('renders driver dashboard sections when onboarding is completed', () => {
     const { getByTestId, getByText } = render(<HomeScreen />);
 
+    expect(getByTestId('home-screen-safe-area')).toBeTruthy();
+    expect(getByTestId('screen-header')).toBeTruthy();
     expect(getByText('John Driver')).toBeTruthy();
     expect(getByText('ID: DL-12345')).toBeTruthy();
     expect(getByTestId('status-button-available')).toBeTruthy();
