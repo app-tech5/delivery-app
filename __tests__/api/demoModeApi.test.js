@@ -106,7 +106,12 @@ describe('api demo mode (reads backend, writes local)', () => {
 
     const loginResponse = await apiClient.driverLogin('john.demo@test.com', 'secret123');
     expect(loginResponse.user.email).toBe('john.demo@test.com');
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(apiClient.driver).toBeNull();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:5000/api/resource/drivers/byUserId',
+      expect.any(Object)
+    );
   });
 
   it('rejects local login when password is wrong for a locally tracked driver', async () => {
@@ -228,6 +233,10 @@ describe('api demo mode (reads backend, writes local)', () => {
 
     expect(login.user.email).toBe('persist.demo@test.com');
     expect(profile.licenseNumber).toBe('DL-PERSIST');
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:5000/api/resource/drivers/byUserId',
+      expect.any(Object)
+    );
   });
 });
