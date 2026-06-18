@@ -50,16 +50,13 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   }),
 }));
 
-jest.mock('../../config', () => ({
-  config: {
-    API_BASE_URL: 'http://localhost:5000/api',
-    API_TIMEOUT: 5000,
-    APP_NAME: 'Good Food Driver',
-    DEMO_MODE: true,
-    DEMO_EMAIL: 'driver@demo.com',
-    DEMO_PASSWORD: 'driver123',
-  },
-}));
+jest.mock('../../config', () => {
+  const actual = jest.requireActual('../../config');
+  return {
+    ...actual,
+    config: { ...actual.config, DEMO_MODE: true },
+  };
+});
 
 jest.mock('socket.io-client', () => ({
   io: jest.fn(() => ({
@@ -174,6 +171,7 @@ import { getDriverSessionFromCache } from '../../utils/storageUtils';
 import { updateDriverCache } from '../../utils/storageUtils';
 import { getDemoState } from '../../api/demo/localStore';
 import { updateDemoState } from '../../api/demo/localStore';
+import { config } from '../../config';
 
 const ORDER_ID = 'order-int-001';
 
@@ -204,7 +202,7 @@ const mockNetworkReads = () => {
           user: {
             _id: 'user-int-01',
             id: 'user-int-01',
-            email: 'driver@demo.com',
+            email: config.DEMO_EMAIL,
             name: 'Integration Driver',
             role: 'delivery',
           },
@@ -263,7 +261,7 @@ const mockNetworkReads = () => {
 const seedApprovedDriverSession = async () => {
   const apiClient = require('../../api').default;
 
-  await apiClient.driverLogin('driver@demo.com', 'driver123');
+  await apiClient.driverLogin(config.DEMO_EMAIL, config.DEMO_PASSWORD);
   const profile = await apiClient.fetchDriverByUserId();
 
   const approvedDriver = {

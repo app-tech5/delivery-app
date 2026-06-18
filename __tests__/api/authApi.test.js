@@ -5,13 +5,13 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   multiRemove: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('../../config', () => ({
-  config: {
-    API_BASE_URL: 'http://localhost:5000/api',
-    API_TIMEOUT: 5000,
-    DEMO_MODE: false,
-  },
-}));
+jest.mock('../../config', () => {
+  const actual = jest.requireActual('../../config');
+  return {
+    ...actual,
+    config: { ...actual.config, DEMO_MODE: false },
+  };
+});
 
 jest.mock('../../utils/storageUtils', () => ({
   clearDriverCache: jest.fn(() => Promise.resolve()),
@@ -19,6 +19,9 @@ jest.mock('../../utils/storageUtils', () => ({
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiClient from '../../api';
+import { config } from '../../config';
+
+const apiUrl = (path) => `${config.API_BASE_URL}${path}`;
 
 const jsonResponse = (data, ok = true, status = 200) => ({
   ok,
@@ -48,7 +51,7 @@ describe('auth API', () => {
 
       expect(global.fetch).toHaveBeenNthCalledWith(
         1,
-        'http://localhost:5000/api/auth/delivery-login',
+        apiUrl('/auth/delivery-login'),
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ email: 'driver@test.com', password: 'secret123' }),
@@ -56,7 +59,7 @@ describe('auth API', () => {
       );
       expect(global.fetch).toHaveBeenNthCalledWith(
         2,
-        'http://localhost:5000/api/resource/drivers/byUserId',
+        apiUrl('/resource/drivers/byUserId'),
         expect.any(Object)
       );
       expect(response).toEqual({ token: 'token-1', user });
@@ -104,7 +107,7 @@ describe('auth API', () => {
       const response = await apiClient.driverRegister(signupData);
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:5000/api/auth/signup',
+        apiUrl('/auth/signup'),
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({

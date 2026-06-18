@@ -20,18 +20,19 @@ jest.mock('../../utils/storageUtils', () => ({
   clearDriverCache: jest.fn(() => Promise.resolve()),
 }));
 
+const { config } = jest.requireActual('../../config');
+
+const apiUrl = (path) => `${config.API_BASE_URL}${path}`;
+
 const loadDemoApiClient = () => {
   jest.resetModules();
-  jest.doMock('../../config', () => ({
-    config: {
-      API_BASE_URL: 'http://localhost:5000/api',
-      API_TIMEOUT: 5000,
-      APP_NAME: 'Good Food Driver',
-      DEMO_MODE: true,
-      DEMO_EMAIL: 'driver@demo.com',
-      DEMO_PASSWORD: 'driver123',
-    },
-  }));
+  jest.doMock('../../config', () => {
+    const actual = jest.requireActual('../../config');
+    return {
+      ...actual,
+      config: { ...actual.config, DEMO_MODE: true },
+    };
+  });
   return require('../../api').default;
 };
 
@@ -44,7 +45,7 @@ const jsonResponse = (data, ok = true, status = 200) => ({
 const DB_DEMO_USER = {
   _id: 'user-db-demo',
   id: 'user-db-demo',
-  email: 'driver@demo.com',
+  email: config.DEMO_EMAIL,
   name: 'Demo Driver',
   role: 'delivery',
 };
@@ -75,19 +76,19 @@ describe('api demo mode (reads backend, writes local)', () => {
     const apiClient = loadDemoApiClient();
     mockBuiltinDemoLogin();
 
-    const response = await apiClient.driverLogin('driver@demo.com', 'driver123');
+    const response = await apiClient.driverLogin(config.DEMO_EMAIL, config.DEMO_PASSWORD);
 
     expect(response.token).toBe('jwt-from-db');
-    expect(response.user.email).toBe('driver@demo.com');
+    expect(response.user.email).toBe(config.DEMO_EMAIL);
     expect(global.fetch).toHaveBeenCalledTimes(2);
     expect(global.fetch).toHaveBeenNthCalledWith(
       1,
-      'http://localhost:5000/api/auth/delivery-login',
+      apiUrl('/auth/delivery-login'),
       expect.objectContaining({ method: 'POST' })
     );
     expect(global.fetch).toHaveBeenNthCalledWith(
       2,
-      'http://localhost:5000/api/resource/drivers/byUserId',
+      apiUrl('/resource/drivers/byUserId'),
       expect.any(Object)
     );
     expect(apiClient.driver?.licenseNumber).toBe('DL-DB-01');
@@ -109,7 +110,7 @@ describe('api demo mode (reads backend, writes local)', () => {
     expect(apiClient.driver).toBeNull();
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/resource/drivers/byUserId',
+      apiUrl('/resource/drivers/byUserId'),
       expect.any(Object)
     );
   });
@@ -133,7 +134,7 @@ describe('api demo mode (reads backend, writes local)', () => {
   it('creates a driver profile locally and overlays it on backend reads', async () => {
     const apiClient = loadDemoApiClient();
     mockBuiltinDemoLogin();
-    await apiClient.driverLogin('driver@demo.com', 'driver123');
+    await apiClient.driverLogin(config.DEMO_EMAIL, config.DEMO_PASSWORD);
 
     const profile = await apiClient.createDriverProfile({
       licenseNumber: 'DL-12345',
@@ -154,7 +155,7 @@ describe('api demo mode (reads backend, writes local)', () => {
   it('keeps write actions local and allows read from backend', async () => {
     const apiClient = loadDemoApiClient();
     mockBuiltinDemoLogin();
-    await apiClient.driverLogin('driver@demo.com', 'driver123');
+    await apiClient.driverLogin(config.DEMO_EMAIL, config.DEMO_PASSWORD);
     const profile = apiClient.driver;
 
     global.fetch.mockResolvedValue({
@@ -188,7 +189,7 @@ describe('api demo mode (reads backend, writes local)', () => {
   it('keeps updateDriverLocation local without backend call', async () => {
     const apiClient = loadDemoApiClient();
     mockBuiltinDemoLogin();
-    await apiClient.driverLogin('driver@demo.com', 'driver123');
+    await apiClient.driverLogin(config.DEMO_EMAIL, config.DEMO_PASSWORD);
 
     const fetchCountBefore = global.fetch.mock.calls.length;
     const coords = { latitude: 4.0982637, longitude: 9.6576275 };
@@ -235,7 +236,7 @@ describe('api demo mode (reads backend, writes local)', () => {
     expect(profile.licenseNumber).toBe('DL-PERSIST');
     expect(global.fetch).toHaveBeenCalledTimes(2);
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/resource/drivers/byUserId',
+      apiUrl('/resource/drivers/byUserId'),
       expect.any(Object)
     );
   });

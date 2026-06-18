@@ -35,14 +35,13 @@ jest.mock('../../i18n', () => ({
   },
 }));
 
-jest.mock('../../config', () => ({
-  config: {
-    APP_NAME: 'Good Food Driver',
-    DEMO_MODE: false,
-    DEMO_EMAIL: 'driver@demo.com',
-    DEMO_PASSWORD: 'driver123',
-  },
-}));
+jest.mock('../../config', () => {
+  const actual = jest.requireActual('../../config');
+  return {
+    ...actual,
+    config: { ...actual.config, DEMO_MODE: false },
+  };
+});
 
 const mockLogin = jest.fn();
 
@@ -280,8 +279,8 @@ describe('LoginScreen', () => {
       <LoginScreen navigation={mockNavigation} />
     );
 
-    expect(getByDisplayValue('driver@demo.com')).toBeTruthy();
-    expect(getByDisplayValue('driver123')).toBeTruthy();
+    expect(getByDisplayValue(config.DEMO_EMAIL)).toBeTruthy();
+    expect(getByDisplayValue(config.DEMO_PASSWORD)).toBeTruthy();
     expect(getByText('Demo Mode Active')).toBeTruthy();
   });
 });

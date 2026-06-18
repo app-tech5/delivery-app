@@ -5,22 +5,22 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   multiRemove: jest.fn(() => Promise.resolve()),
 }));
 
-jest.mock('../../config', () => ({
-  config: {
-    API_BASE_URL: 'http://localhost:5000/api',
-    API_TIMEOUT: 5000,
-    APP_NAME: 'Good Food Driver',
-    DEMO_MODE: false,
-    DEMO_EMAIL: 'driver@demo.com',
-    DEMO_PASSWORD: 'driver123',
-  },
-}));
+jest.mock('../../config', () => {
+  const actual = jest.requireActual('../../config');
+  return {
+    ...actual,
+    config: { ...actual.config, DEMO_MODE: false },
+  };
+});
 
 jest.mock('../../utils/storageUtils', () => ({
   clearDriverCache: jest.fn(() => Promise.resolve()),
 }));
 
 import apiClient from '../../api';
+import { config } from '../../config';
+
+const apiUrl = (path) => `${config.API_BASE_URL}${path}`;
 
 const jsonResponse = (data, ok = true, status = 200) => ({
   ok,
@@ -45,7 +45,7 @@ describe('driver api non-demo regression', () => {
     const data = await apiClient.getDriverOrders();
 
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/resource/orders?driver=driver-1',
+      apiUrl('/resource/orders?driver=driver-1'),
       expect.objectContaining({ headers: expect.any(Object) })
     );
     expect(data).toEqual([{ _id: 'order-1', id: 'order-1', status: 'preparing' }]);
@@ -59,7 +59,7 @@ describe('driver api non-demo regression', () => {
     const data = await apiClient.updateOrder('order-1', { status: 'delivered' });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/resource/orders/order-1',
+      apiUrl('/resource/orders/order-1'),
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ status: 'delivered' }),
@@ -79,7 +79,7 @@ describe('driver api non-demo regression', () => {
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:5000/api/resource/drivers/driver-1',
+      apiUrl('/resource/drivers/driver-1'),
       expect.objectContaining({
         method: 'PUT',
       })

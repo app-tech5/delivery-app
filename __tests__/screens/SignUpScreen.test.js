@@ -36,11 +36,7 @@ jest.mock('../../i18n', () => ({
   },
 }));
 
-jest.mock('../../config', () => ({
-  config: {
-    APP_NAME: 'Good Food Driver',
-  },
-}));
+jest.mock('../../config', () => jest.requireActual('../../config'));
 
 const mockRegister = jest.fn();
 
