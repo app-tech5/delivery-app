@@ -407,6 +407,8 @@
     "deliveryActions": "Delivery Actions",
     "navigateTo": "Navigate to",
     "navigation": "Navigation",
+    "mapsNotAvailable": "Maps navigation is not available",
+    "driverLocationNotAvailable": "Driver location is not available",
     "driverPhone": "Driver Phone",
     "callDriver": "Call Driver",
     "noDriverAssigned": "No driver assigned yet",

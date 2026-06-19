@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearDriverCache } from './storageUtils';
+import { DEMO_STORAGE_KEY } from '../api/demo/localStore';
 
 const CACHE_KEYS = {
   SETTINGS: 'app_settings',
@@ -678,14 +680,33 @@ const clearCachesByPrefix = async (prefix) => {
   }
 };
 
-export const clearAllDriverSessionCaches = async (driverId, userId) => {
-  await Promise.all([
-    driverId ? clearDeliveriesCache(driverId) : Promise.resolve(),
-    driverId ? clearDriverStatsCache(driverId) : Promise.resolve(),
-    userId ? clearPaymentMethodsCache(userId) : Promise.resolve(),
-    clearCachesByPrefix(CACHE_KEYS.NEARBY_RESTAURANTS),
-  ]);
+export const clearAllLocalAppDataOnLogout = async () => {
+  try {
+    const cachePrefixes = [
+      CACHE_KEYS.DRIVER_DELIVERIES,
+      CACHE_KEYS.DRIVER_STATS,
+      CACHE_KEYS.PAYMENT_METHODS,
+      CACHE_KEYS.NEARBY_RESTAURANTS,
+      CACHE_KEYS.SETTINGS,
+    ];
+
+    await Promise.all(cachePrefixes.map((prefix) => clearCachesByPrefix(prefix)));
+
+    await AsyncStorage.multiRemove([
+      CACHE_KEYS.CACHE_VERSION,
+      DEMO_STORAGE_KEY,
+    ]);
+
+    await clearDriverCache();
+
+    console.log('🗑️ Stockage local vidé après déconnexion');
+  } catch (error) {
+    console.error('❌ Erreur lors du vidage du stockage local:', error);
+    throw error;
+  }
 };
+
+export const clearAllDriverSessionCaches = clearAllLocalAppDataOnLogout;
 
 export const loadPaymentMethodsWithCache = async (
   userId,

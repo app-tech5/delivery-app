@@ -8,7 +8,7 @@ export const config = {
   APP_NAME: 'Good Food Driver',
   VERSION: '1.1.0',
   
-  DEMO_MODE: false,
+  DEMO_MODE: true,
   
   DEMO_EMAIL: 'driver@demo.com',
   DEMO_PASSWORD: 'driver123',

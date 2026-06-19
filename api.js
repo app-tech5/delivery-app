@@ -1,7 +1,6 @@
 
 import { config } from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { clearDriverCache } from './utils/storageUtils';
 
 const isDemoMode = () => config.DEMO_MODE === true;
 
@@ -436,7 +435,6 @@ class ApiClient {
     this.token = null;
     this.user = null;
     this.driver = null;
-    await clearDriverCache();
   }
 
   async fetchDriverByUserId() {

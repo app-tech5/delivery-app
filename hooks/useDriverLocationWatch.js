@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import apiClient from '../api';
+import { isDemoDriverAccount } from '../utils/demoDriverUtils';
 import {
   watchDriverLocation,
   requestDriverLocationPermissions,
@@ -16,6 +17,10 @@ export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver
   const lastSentAtRef = useRef(0);
 
   useEffect(() => {
+    if (isDemoDriverAccount(apiClient.user, driver)) {
+      return undefined;
+    }
+
     let cancelled = false;
 
     const stopWatch = () => {
@@ -64,17 +69,17 @@ export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver
     const startWatch = async () => {
       if (subscriptionRef.current) return;
 
-      await requestDriverLocationPermissions();
+      await requestDriverLocationPermissions(apiClient.user, driver);
 
       const subscription = await watchDriverLocation((coords) => {
         sendLocation(coords);
-      });
+      }, apiClient.user, driver);
 
       if (!cancelled && subscription) {
         subscriptionRef.current = subscription;
       }
 
-      await startDriverBackgroundLocation();
+      await startDriverBackgroundLocation(apiClient.user, driver);
     };
 
     startWatch();
@@ -83,5 +88,5 @@ export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver
       cancelled = true;
       stopAll();
     };
-  }, [driver?._id, driver?.status, hasCompletedOnboarding, setDriver]);
+  }, [driver?._id, driver?.status, driver?.userId?.email, hasCompletedOnboarding, setDriver]);
 };

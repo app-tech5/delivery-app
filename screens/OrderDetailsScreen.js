@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  Linking,
   Dimensions
 } from 'react-native';
 import { Button } from 'react-native-elements';
@@ -80,19 +79,6 @@ export default function OrderDetailsScreen() {
     }
   };
 
-  const handleNavigate = (address) => {
-    if (address) {
-      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-      Linking.canOpenURL(url).then(supported => {
-        if (supported) {
-          Linking.openURL(url);
-        } else {
-          Alert.alert('Error', 'Maps navigation is not available');
-        }
-      });
-    }
-  };
-
   const handleMarkAsDelivered = async () => {
     Alert.alert(
       i18n.t('reports.completeDeliveryConfirm'),
@@ -138,8 +124,8 @@ export default function OrderDetailsScreen() {
           ) : (
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
               <OrderHeaderCard order={order} />
-              <CustomerInfoCard order={order} onNavigate={handleNavigate} />
-              <RestaurantInfoCard order={order} onNavigate={handleNavigate} />
+              <CustomerInfoCard order={order} />
+              <RestaurantInfoCard order={order} />
               <OrderItemsCard order={order} currency={currency} />
               <OrderSummaryCard order={order} currency={currency} />
               <OrderActionButtons order={order} onMarkAsDelivered={handleMarkAsDelivered} />

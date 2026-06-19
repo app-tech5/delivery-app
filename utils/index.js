@@ -27,6 +27,10 @@ export {
 
 export { getDeliveryFilters } from './deliveryFilters';
 
+export { buildMapsDirectionsUrl, openMapsNavigation } from './navigationUtils';
+
+export { getAccountEmail, isDemoDriverAccount } from './demoDriverUtils';
+
 export {
   DRIVER_STATUSES,
   DRIVER_STATUS_COLORS,
@@ -108,11 +112,15 @@ export {
 } from './formatters';
 
 export {
-  loadNearbyRestaurantsWithSmartCache
+  loadNearbyRestaurantsWithSmartCache,
+  clearAllLocalAppDataOnLogout,
+  clearAllDriverSessionCaches,
 } from './cacheUtils';
 
 export {
   getDriverLocation,
+  getDriverCoordinatesPoint,
+  shouldUseDeviceLocation,
   getActiveDeliveries,
   getCurrentDriverCoordinates,
   watchDriverLocation,

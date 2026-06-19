@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api';
-import { clearAllDriverSessionCaches } from '../utils/cacheUtils';
+import { clearAllLocalAppDataOnLogout } from '../utils/cacheUtils';
 import { updateDriverCache, getDriverSessionFromCache } from '../utils/driverUtils';
 
 export const useDriverAuth = () => {
@@ -129,15 +129,7 @@ export const useDriverAuth = () => {
 
   const logout = async () => {
     try {
-      const driverId = driver?._id || driver?.id;
-      const userId =
-        apiClient.user?._id ||
-        apiClient.user?.id ||
-        driver?.userId?._id ||
-        driver?.userId ||
-        driver?.users?.value;
-
-      await clearAllDriverSessionCaches(driverId, userId);
+      await clearAllLocalAppDataOnLogout();
       await apiClient.logout();
       setDriver(null);
       setIsAuthenticated(false);

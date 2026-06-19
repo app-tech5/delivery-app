@@ -314,6 +314,15 @@
     "preparationTime": "Temps de préparation",
     "readyForPickup": "Prêt pour retrait",
     "outForDelivery": "En cours de livraison",
-    "delivered": "Livrée"
+    "delivered": "Livrée",
+    "deliveryActions": "Actions de livraison",
+    "navigateTo": "Naviguer vers",
+    "navigation": "Navigation",
+    "mapsNotAvailable": "La navigation cartographique n'est pas disponible",
+    "driverLocationNotAvailable": "La position du livreur n'est pas disponible",
+    "driverPhone": "Téléphone livreur",
+    "callDriver": "Appeler le livreur",
+    "noDriverAssigned": "Aucun livreur assigné",
+    "vehicle": "Véhicule"
   }
 }

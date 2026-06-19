@@ -20,7 +20,7 @@ jest.mock('../../utils/driverUtils', () => ({
 }));
 
 jest.mock('../../utils/cacheUtils', () => ({
-  clearAllDriverSessionCaches: jest.fn(() => Promise.resolve()),
+  clearAllLocalAppDataOnLogout: jest.fn(() => Promise.resolve()),
 }));
 
 import { renderHook, act, waitFor } from '@testing-library/react-native';
@@ -143,6 +143,26 @@ describe('useDriverAuth', () => {
       ).rejects.toThrow('Email already exists');
 
       expect(result.current.isAuthenticated).toBe(false);
+    });
+  });
+
+  describe('logout', () => {
+    it('clears all local app data and resets auth state', async () => {
+      const { clearAllLocalAppDataOnLogout } = require('../../utils/cacheUtils');
+      apiClient.logout = jest.fn(() => Promise.resolve());
+
+      const { result } = renderHook(() => useDriverAuth());
+      await waitForHookReady(result);
+
+      await act(async () => {
+        await result.current.logout();
+      });
+
+      expect(clearAllLocalAppDataOnLogout).toHaveBeenCalled();
+      expect(apiClient.logout).toHaveBeenCalled();
+      expect(result.current.driver).toBeNull();
+      expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.needsOnboarding).toBe(false);
     });
   });
 });

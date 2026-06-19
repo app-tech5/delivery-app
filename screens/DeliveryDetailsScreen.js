@@ -86,26 +86,6 @@ export default function DeliveryDetailsScreen() {
     }
   }, [isAuthenticated, driver, orderId]);
   
-  const handleNavigate = (address) => {
-    if (address) {
-      
-      Alert.alert(
-        i18n.t('orderDetails.navigation'),
-        `${i18n.t('orderDetails.navigateTo')}: ${address}`,
-        [
-          { text: i18n.t('common.cancel'), style: 'cancel' },
-          {
-            text: i18n.t('common.ok'),
-            onPress: () => {
-              
-              console.log('Navigate to:', address);
-            }
-          }
-        ]
-      );
-    }
-  };
-  
   const onRefresh = () => {
     fetchOrderDetails(true);
   };
@@ -177,7 +157,6 @@ export default function DeliveryDetailsScreen() {
           {}
           <RestaurantInfoCard
             order={order}
-            onNavigate={handleNavigate}
           />
 
           <DriverInfoCard order={order} />
@@ -185,7 +164,6 @@ export default function DeliveryDetailsScreen() {
           {}
           <CustomerInfoCard
             order={order}
-            onNavigate={handleNavigate}
           />
 
           {}

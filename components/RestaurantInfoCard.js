@@ -5,7 +5,14 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { Linking } from 'react-native';
 
-const RestaurantInfoCard = ({ order, onNavigate }) => {
+import { openMapsNavigation } from '../utils/navigationUtils';
+import { useDriver } from '../contexts/DriverContext';
+import { isDemoDriverAccount } from '../utils/demoDriverUtils';
+import { getDriverCoordinatesPoint } from '../utils/locationUtils';
+import apiClient from '../api';
+
+const RestaurantInfoCard = ({ order }) => {
+  const { driver } = useDriver();
   const handleCall = (phoneNumber) => {
     if (phoneNumber) {
       const url = `tel:${phoneNumber}`;
@@ -16,12 +23,6 @@ const RestaurantInfoCard = ({ order, onNavigate }) => {
           Alert.alert('Error', 'Phone calls are not supported on this device');
         }
       });
-    }
-  };
-
-  const handleNavigate = (address) => {
-    if (address && onNavigate) {
-      onNavigate(address);
     }
   };
 
@@ -53,6 +54,7 @@ const RestaurantInfoCard = ({ order, onNavigate }) => {
         <Button
           title={i18n.t('orderDetails.callRestaurant')}
           onPress={() => handleCall(order.restaurant?.phone)}
+          containerStyle={styles.actionButtonContainer}
           buttonStyle={styles.callButton}
           icon={
             <Icon name="phone" type="material" size={16} color={colors.white} style={{ marginRight: 8 }} />
@@ -60,7 +62,16 @@ const RestaurantInfoCard = ({ order, onNavigate }) => {
         />
         <Button
           title={i18n.t('orderDetails.navigateToRestaurant')}
-          onPress={() => handleNavigate(order.restaurant?.address)}
+          onPress={() => openMapsNavigation({
+            destination: {
+              address: order.restaurant?.address,
+              latitude: order.restaurant?.latitude,
+              longitude: order.restaurant?.longitude,
+            },
+            origin: getDriverCoordinatesPoint(driver),
+            requireOrigin: isDemoDriverAccount(apiClient.user, driver),
+          })}
+          containerStyle={styles.actionButtonContainer}
           buttonStyle={styles.navigateButton}
           icon={
             <Icon name="navigation" type="material" size={16} color={colors.white} style={{ marginRight: 8 }} />
@@ -76,6 +87,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
+    marginHorizontal: 0,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -107,20 +119,21 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginTop: 16,
     gap: 12,
+  },
+  actionButtonContainer: {
+    width: '100%',
   },
   callButton: {
     backgroundColor: colors.primary,
     borderRadius: 8,
-    flex: 1,
+    paddingVertical: 12,
   },
   navigateButton: {
     backgroundColor: colors.success,
     borderRadius: 8,
-    flex: 1,
+    paddingVertical: 12,
   },
 });
 
