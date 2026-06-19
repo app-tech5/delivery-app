@@ -4,6 +4,12 @@ import { Card, Icon } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { formatCurrency } from '../utils';
+import {
+  getOrderItemLineTotal,
+  getOrderItemUnitPrice,
+  getOrderItemExtraAmount,
+  getOrderItemVariantAmount,
+} from '../utils/orderItemUtils';
 
 const OrderItemsCard = ({ order, currency }) => {
   return (
@@ -15,12 +21,16 @@ const OrderItemsCard = ({ order, currency }) => {
 
       <View style={styles.divider} />
 
-      {order.items?.map((item, index) => (
+      {order.items?.map((item, index) => {
+        const lineTotal = getOrderItemLineTotal(item);
+        const unitPrice = getOrderItemUnitPrice(item);
+
+        return (
         <View key={index} style={styles.itemContainer}>
           <View style={styles.itemHeader}>
             <Text style={styles.itemName}>{item.name}</Text>
             <Text style={styles.itemTotal}>
-              {formatCurrency(item.total, currency)}
+              {formatCurrency(lineTotal, currency)}
             </Text>
           </View>
 
@@ -29,7 +39,7 @@ const OrderItemsCard = ({ order, currency }) => {
               {i18n.t('orderDetails.quantity')}: {item.quantity}
             </Text>
             <Text style={styles.itemPrice}>
-              {formatCurrency(item.price, currency)} {i18n.t('orderDetails.item').toLowerCase()}
+              {formatCurrency(unitPrice, currency)} {i18n.t('orderDetails.item').toLowerCase()}
             </Text>
           </View>
 
@@ -38,7 +48,7 @@ const OrderItemsCard = ({ order, currency }) => {
               <Text style={styles.extrasTitle}>{i18n.t('orderDetails.extras')}:</Text>
               {item.extras.map((extra, extraIndex) => (
                 <Text key={extraIndex} style={styles.extraItem}>
-                  • {extra.name} (+{formatCurrency(extra.price * extra.quantity, currency)})
+                  • {extra.name} (+{formatCurrency(getOrderItemExtraAmount(extra), currency)})
                 </Text>
               ))}
             </View>
@@ -49,13 +59,14 @@ const OrderItemsCard = ({ order, currency }) => {
               <Text style={styles.variantsTitle}>{i18n.t('orderDetails.variants')}:</Text>
               {item.variants.map((variant, variantIndex) => (
                 <Text key={variantIndex} style={styles.variantItem}>
-                  • {variant.name} {variant.size} (+{formatCurrency(variant.extra, currency)})
+                  • {variant.name} {variant.size} (+{formatCurrency(getOrderItemVariantAmount(variant), currency)})
                 </Text>
               ))}
             </View>
           )}
         </View>
-      ))}
+      );
+      })}
     </Card>
   );
 };

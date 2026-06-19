@@ -32,14 +32,17 @@ import {
 
 import { useDeliveryActions } from '../hooks';
 
-import apiClient from '../api';
-
 export default function DeliveryDetailsScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { orderId } = route.params || {};
 
-  const { isAuthenticated, driver } = useDriver();
+  const {
+    isAuthenticated,
+    driver,
+    deliveries,
+    loadDriverOrders,
+  } = useDriver();
   const { currency } = useSettings();
   const { handleAcceptDelivery, handleStartDelivery, handleMarkDelivered, handleStatusChange } = useDeliveryActions();
 
@@ -47,8 +50,23 @@ export default function DeliveryDetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  
-  const fetchOrderDetails = async (showRefreshIndicator = false) => {
+
+  useEffect(() => {
+    if (!orderId) {
+      setError(i18n.t('common.error'));
+      setLoading(false);
+      return;
+    }
+
+    const foundOrder = deliveries.find((delivery) => delivery._id === orderId);
+    if (foundOrder) {
+      setOrder(foundOrder);
+      setError(null);
+      setLoading(false);
+    }
+  }, [deliveries, orderId]);
+
+  const loadOrderDetails = async (showRefreshIndicator = false) => {
     if (!orderId) {
       setError(i18n.t('common.error'));
       setLoading(false);
@@ -61,18 +79,17 @@ export default function DeliveryDetailsScreen() {
       } else {
         setLoading(true);
       }
-
       setError(null);
-      
-      const orderData = await apiClient.apiCall(`/resource/orders/${orderId}`);
 
-      if (orderData) {
-        setOrder(orderData);
-      } else {
-        setError(i18n.t('reports.noOrderFound'));
+      const cachedOrder = deliveries.find((delivery) => delivery._id === orderId);
+      if (cachedOrder) {
+        setOrder(cachedOrder);
+        return;
       }
+
+      await loadDriverOrders();
     } catch (err) {
-      console.error('Error fetching order details:', err);
+      console.error('Error loading order details:', err);
       setError(i18n.t('common.errorLoadingData'));
     } finally {
       setLoading(false);
@@ -81,13 +98,38 @@ export default function DeliveryDetailsScreen() {
   };
 
   useEffect(() => {
-    if (isAuthenticated && driver && orderId) {
-      fetchOrderDetails();
+    if (!isAuthenticated || !driver || !orderId) {
+      return;
     }
+
+    const foundOrder = deliveries.find((delivery) => delivery._id === orderId);
+    if (foundOrder) {
+      return;
+    }
+
+    loadOrderDetails();
   }, [isAuthenticated, driver, orderId]);
-  
-  const onRefresh = () => {
-    fetchOrderDetails(true);
+
+  useEffect(() => {
+    if (!orderId || loading || order) {
+      return;
+    }
+
+    const foundOrder = deliveries.find((delivery) => delivery._id === orderId);
+    if (!foundOrder) {
+      setError(i18n.t('reports.noOrderFound'));
+    }
+  }, [deliveries, orderId, loading, order]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await loadDriverOrders();
+    } catch (err) {
+      console.error('Error refreshing order details:', err);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const deliveryTitle = i18n.t('navigation.deliveryDetails');
