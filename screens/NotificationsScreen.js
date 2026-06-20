@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Text} from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { View, StyleSheet, FlatList, RefreshControl, TouchableOpacity, Text, ScrollView } from 'react-native';
 import { Icon, Badge } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
@@ -10,7 +10,12 @@ import NotificationItem from '../components/NotificationItem';
 import EmptyState from '../components/EmptyState';
 
 export default function NotificationsScreen() {
-  const { deliveries, isAuthenticated, driver } = useDriver();
+  const {
+    deliveries,
+    isAuthenticated,
+    driver,
+    hasCompletedOnboarding,
+  } = useDriver();
 
   const {
     filteredNotifications,
@@ -24,12 +29,8 @@ export default function NotificationsScreen() {
     markAllAsRead,
     deleteNotification
   } = useNotifications(deliveries, driver);
-  
-  if (!isAuthenticated || !driver) {
-    return <AuthGuard isAuthenticated={isAuthenticated} driver={driver} subtitle="Please reconnect to view notifications" />;
-  }
-  
-  const getEmptyStateContent = () => {
+
+  const emptyStateContent = useMemo(() => {
     if (activeFilter === 'all') {
       return {
         title: i18n.t('notifications.noNotifications'),
@@ -40,9 +41,33 @@ export default function NotificationsScreen() {
       title: `No ${activeFilter} notifications`,
       subtitle: 'No notifications in this category yet.'
     };
-  };
+  }, [activeFilter]);
 
-  const emptyStateContent = getEmptyStateContent();
+  const renderNotification = useCallback(({ item: notification }) => (
+    <NotificationItem
+      notification={notification}
+      onMarkAsRead={markAsRead}
+      onDelete={deleteNotification}
+    />
+  ), [markAsRead, deleteNotification]);
+
+  const emptyComponent = useMemo(() => (
+    <EmptyState
+      icon="notifications-none"
+      title={emptyStateContent.title}
+      subtitle={emptyStateContent.subtitle}
+    />
+  ), [emptyStateContent]);
+
+  if (!isAuthenticated || !driver) {
+    return (
+      <AuthGuard
+        isAuthenticated={isAuthenticated}
+        driver={driver}
+        subtitle="Please reconnect to view notifications"
+      />
+    );
+  }
 
   return (
     <ScreenLayout
@@ -100,44 +125,40 @@ export default function NotificationsScreen() {
         </ScrollView>
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[colors.primary]}
-          />
-        }
-      >
-        {filteredNotifications.length === 0 ? (
-          <EmptyState
-            icon="notifications-none"
-            title={emptyStateContent.title}
-            subtitle={emptyStateContent.subtitle}
-          />
-        ) : (
-          <View style={styles.notificationsList}>
-            {filteredNotifications.map((notification) => (
-              <NotificationItem
-                key={notification.id}
-                notification={notification}
-                onMarkAsRead={markAsRead}
-                onDelete={deleteNotification}
-              />
-            ))}
-          </View>
-        )}
-
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
+      {hasCompletedOnboarding && (
+        <FlatList
+          style={styles.list}
+          data={filteredNotifications}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={renderNotification}
+          ListEmptyComponent={emptyComponent}
+          contentContainerStyle={
+            filteredNotifications.length === 0 ? styles.emptyList : styles.notificationsList
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.primary]}
+            />
+          }
+          initialNumToRender={10}
+          maxToRenderPerBatch={8}
+          windowSize={5}
+          removeClippedSubviews
+          ListFooterComponent={<View style={styles.bottomSpacer} />}
+        />
+      )}
     </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
+  list: {
     flex: 1,
+  },
+  emptyList: {
+    flexGrow: 1,
   },
   notificationsList: {
     padding: 16,
@@ -145,7 +166,6 @@ const styles = StyleSheet.create({
   bottomSpacer: {
     height: 20,
   },
-  
   filtersContainer: {
     backgroundColor: colors.white,
     borderBottomWidth: 1,
@@ -186,7 +206,6 @@ const styles = StyleSheet.create({
   filterBadgeText: {
     fontSize: 10,
   },
-  
   headerBadgeContainer: {
     marginTop: -8,
   },

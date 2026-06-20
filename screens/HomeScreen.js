@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ScrollView, StyleSheet, View, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from 'react-native-elements';
@@ -6,7 +6,7 @@ import { colors } from '../global';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
 
-import { useNearbyRestaurants, useDriverStatus } from '../hooks';
+import { useNearbyRestaurants, useDriverStatus, useDeliveryActions } from '../hooks';
 
 import {
   AuthGuard,
@@ -25,25 +25,17 @@ function HomeScreen() {
     driver,
     stats,
     deliveries,
-    loadDriverStats,
-    loadDriverOrders,
     hasCompletedOnboarding,
     isAuthenticated,
   } = useDriver();
   const { currency } = useSettings();
   
-  const { isLoading, handleStatusChange, handleOrderStatusChange } = useDriverStatus();
+  const { isLoading, handleStatusChange } = useDriverStatus();
+  const { loading: deliveryActionLoading, handleMarkDelivered } = useDeliveryActions();
   
   const driverLocation = getDriverLocation(driver);
   
   const { nearbyRestaurants, restaurantsLoading } = useNearbyRestaurants(driverLocation);
-  
-  useEffect(() => {
-    if (hasCompletedOnboarding) {
-      loadDriverStats();
-      loadDriverOrders();
-    }
-  }, [hasCompletedOnboarding]);
   
   const activeDeliveries = getActiveDeliveries(deliveries);
 
@@ -103,8 +95,8 @@ function HomeScreen() {
             <ActiveDeliveries
               deliveries={activeDeliveries}
               currency={currency}
-              onOrderDelivered={handleOrderStatusChange}
-              isLoading={isLoading}
+              onOrderDelivered={handleMarkDelivered}
+              isLoading={isLoading || deliveryActionLoading}
             />
             <RestaurantMap
               driverLocation={driverLocation}

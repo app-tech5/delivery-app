@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
 import apiClient from '../api';
 import { config } from '../config';
-import { loadDeliveriesWithSmartCache, clearDeliveriesCache } from '../utils/cacheUtils';
+import { loadDeliveriesWithSmartCache, clearDeliveriesCache, getDeliveriesFromCache, saveDeliveriesToCache } from '../utils/cacheUtils';
 import { isDriverAuthenticated } from '../utils/driverUtils';
 import { getDriverStatusLabel } from '../utils/statusUtils';
 import { preloadDeliverySettingsForOrders } from '../utils/driverDeliveryFee';
@@ -16,6 +15,36 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
     }
   }, [hasCompletedOnboarding]);
 
+  const applyDeliveries = (data) => {
+    setDeliveries(data);
+    void preloadDeliverySettingsForOrders(data).then(() => {
+      setDeliveries((prev) => (prev.length > 0 ? [...prev] : prev));
+    });
+  };
+
+  const updateDemoDeliveryStatus = async (orderId, status) => {
+    let nextDeliveries = [];
+
+    setDeliveries((prevDeliveries) => {
+      nextDeliveries = prevDeliveries.map((delivery) =>
+        String(delivery._id) === String(orderId)
+          ? {
+              ...delivery,
+              status,
+              updatedAt: new Date().toISOString(),
+            }
+          : delivery
+      );
+      return nextDeliveries;
+    });
+
+    if (driver?._id && nextDeliveries.length > 0) {
+      await saveDeliveriesToCache(nextDeliveries, driver._id);
+    }
+
+    return { success: true };
+  };
+
   const loadDriverOrders = async (status = null) => {
     if (!hasCompletedOnboarding || !driver?._id) {
       console.log('❌ Driver non authentifié, impossible de charger les livraisons');
@@ -23,22 +52,34 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
     }
 
     try {
-      const applyDeliveries = async (data) => {
-        await preloadDeliverySettingsForOrders(data);
-        setDeliveries(data);
-      };
+      if (config.DEMO_MODE) {
+        const cachedData = await getDeliveriesFromCache(driver._id);
+
+        if (cachedData?.deliveries?.length) {
+          applyDeliveries(cachedData.deliveries);
+          return;
+        }
+
+        const freshData = await apiClient.getDriverOrders(status);
+        if (Array.isArray(freshData)) {
+          await saveDeliveriesToCache(freshData, driver._id);
+          applyDeliveries(freshData);
+        }
+
+        return;
+      }
 
       await loadDeliveriesWithSmartCache(
         driver._id, 
         () => apiClient.getDriverOrders(status), 
-        async (data, fromCache) => {
-          await applyDeliveries(data);
+        (data, fromCache) => {
+          applyDeliveries(data);
           if (fromCache) {
             console.log('🔄 Livraisons chargées depuis le cache dans DriverContext');
           }
         },
-        async (data) => {
-          await applyDeliveries(data);
+        (data) => {
+          applyDeliveries(data);
           console.log('🔄 Livraisons mises à jour depuis l\'API dans DriverContext');
         },
         (loading) => {
@@ -72,15 +113,7 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
   
   const acceptDelivery = async (orderId) => {
     if (config.DEMO_MODE) {
-      
-      setDeliveries(prevDeliveries =>
-        prevDeliveries.map(delivery =>
-          delivery._id === orderId
-            ? { ...delivery, status: 'out_for_delivery' }
-            : delivery
-        )
-      );
-      Alert.alert('Mode Démo', 'Commande acceptée (simulation)');
+      await updateDemoDeliveryStatus(orderId, 'out_for_delivery');
       return { success: true };
     }
 
@@ -100,16 +133,7 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
   
   const updateDeliveryStatus = async (orderId, status, location = null) => {
     if (config.DEMO_MODE) {
-      
-      setDeliveries(prevDeliveries =>
-        prevDeliveries.map(delivery =>
-          delivery._id === orderId
-            ? { ...delivery, status: status }
-            : delivery
-        )
-      );
-      Alert.alert('Mode Démo', `Commande marquée comme "${status === 'delivered' ? 'livrée' : status}" (simulation)`);
-      return { success: true };
+      return updateDemoDeliveryStatus(orderId, status);
     }
 
     try {

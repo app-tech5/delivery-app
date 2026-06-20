@@ -8,7 +8,7 @@ import { isDriverOnline, isDriverApproved } from '../utils/statusUtils';
 import i18n from '../i18n';
 
 export const useDriverStatus = () => {
-  const { driver, updateStatus, updateDeliveryStatus } = useDriver();
+  const { driver, updateStatus } = useDriver();
   const [localLoading, setLocalLoading] = useState(false);
   const statusUpdateRef = useRef(false);
   
@@ -45,24 +45,8 @@ export const useDriverStatus = () => {
     }
   };
   
-  const handleOrderStatusChange = async (orderId, newStatus) => {
-    if (localLoading) return;
-
-    setLocalLoading(true);
-
-    try {
-      await updateDeliveryStatus(orderId, newStatus);
-      Alert.alert(i18n.t('common.ok'), `${i18n.t('driver.orderDelivered')} (${i18n.t('driver.simulation')})`);
-    } catch (error) {
-      Alert.alert(i18n.t('errors.networkError'), i18n.t('driver.statusUpdateError'));
-    } finally {
-      setLocalLoading(false);
-    }
-  };
-
   return {
     isLoading: localLoading,
     handleStatusChange,
-    handleOrderStatusChange
   };
 };

@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Alert } from 'react-native';
 import i18n from '../i18n';
 
-export const useEarningsRefresh = ({ invalidateDriverStatsCache, loadDriverStats }) => {
+export const useEarningsRefresh = ({ invalidateDeliveriesCache, loadDriverOrders }) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      await invalidateDriverStatsCache();
-      await loadDriverStats();
+      await invalidateDeliveriesCache();
+      await loadDriverOrders();
     } catch (error) {
       console.error('Erreur lors du rafraîchissement des stats:', error);
       Alert.alert('Error', i18n.t('reports.refreshStatsError'));
@@ -23,4 +23,3 @@ export const useEarningsRefresh = ({ invalidateDriverStatsCache, loadDriverStats
     onRefresh
   };
 };
-

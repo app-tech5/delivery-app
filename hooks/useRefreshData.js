@@ -40,21 +40,19 @@ export const useRefreshData = ({
 
 export const useReportsRefresh = ({
   invalidateDeliveriesCache,
-  invalidateDriverStatsCache,
-  loadDriverStats,
   loadDriverOrders
 }) => {
   return useRefreshData({
-    invalidateCaches: [invalidateDeliveriesCache, invalidateDriverStatsCache],
-    loadData: [loadDriverStats, loadDriverOrders],
+    invalidateCaches: [invalidateDeliveriesCache],
+    loadData: [loadDriverOrders],
     errorMessage: 'Unable to refresh reports'
   });
 };
 
-export const useEarningsRefresh = ({ invalidateDriverStatsCache, loadDriverStats }) => {
+export const useEarningsRefresh = ({ invalidateDeliveriesCache, loadDriverOrders }) => {
   return useRefreshData({
-    invalidateCaches: [invalidateDriverStatsCache],
-    loadData: [loadDriverStats],
+    invalidateCaches: [invalidateDeliveriesCache],
+    loadData: [loadDriverOrders],
     errorMessage: i18n.t('reports.refreshStatsError')
   });
 };

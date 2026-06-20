@@ -1,7 +1,7 @@
 
 import { config } from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getDriverDeliveryEarnings } from './utils/driverDeliveryFee';
+import { calculateDriverStatsFromDeliveries } from './utils/driverDeliveryStats';
 
 const isDemoMode = () => config.DEMO_MODE === true;
 
@@ -287,36 +287,12 @@ class ApiClient {
   
   async getDriverStats() {
     try {
-      
-      if (isDemoMode()) {
-        
-        console.log('🔄 Mode démo détecté - Retour des statistiques mockées');
-        return {
-          todayDeliveries: 3, 
-          totalEarnings: 12.50, 
-          rating: 4.8, 
-          completedOrders: 42 
-        };
-      }
-      
       const orders = await this.getDriverOrders();
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
 
-      const todayOrders = orders.filter(order => {
-        const orderDate = new Date(order.createdAt);
-        orderDate.setHours(0, 0, 0, 0);
-        return orderDate.getTime() === today.getTime();
-      });
-
-      return {
-        todayDeliveries: todayOrders.filter(order => order.status === 'delivered').length,
-        totalEarnings: todayOrders
-          .filter(order => order.status === 'delivered')
-          .reduce((total, order) => total + getDriverDeliveryEarnings(order), 0),
-        rating: this.driver?.rating || 0,
-        completedOrders: orders.filter(order => order.status === 'delivered').length
-      };
+      return calculateDriverStatsFromDeliveries(
+        orders,
+        this.driver?.rating || 0
+      );
     } catch (error) {
       console.error('Error calculating driver stats:', error);
       return {

@@ -33,6 +33,14 @@ export {
   clearDeliverySettingsCache,
 } from './driverDeliveryFee';
 
+export {
+  getOrderDate,
+  getDeliveredDeliveries,
+  isDeliveredOnDate,
+  calculateDriverStatsFromDeliveries,
+  buildDeliveryTransaction,
+} from './driverDeliveryStats';
+
 export { buildMapsDirectionsUrl, openMapsNavigation } from './navigationUtils';
 
 export { getAccountEmail, isDemoDriverAccount } from './demoDriverUtils';

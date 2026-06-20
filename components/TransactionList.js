@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
@@ -28,9 +28,40 @@ const TransactionList = ({
 
   const emptyStateContent = getEmptyStateContent();
 
+  const renderTransaction = useCallback(({ item: transaction }) => (
+    <TransactionItem
+      transaction={transaction}
+      currency={currency}
+    />
+  ), [currency]);
+
+  const emptyComponent = (
+    <View style={styles.emptyState}>
+      <Icon
+        name="receipt"
+        type="material"
+        size={64}
+        color={colors.text.secondary}
+      />
+      <Text style={styles.emptyTitle}>
+        {emptyStateContent.title}
+      </Text>
+      <Text style={styles.emptySubtitle}>
+        {emptyStateContent.subtitle}
+      </Text>
+    </View>
+  );
+
   return (
-    <ScrollView
-      style={styles.scrollView}
+    <FlatList
+      style={styles.list}
+      data={filteredTransactions}
+      keyExtractor={(item) => String(item.id)}
+      renderItem={renderTransaction}
+      ListEmptyComponent={emptyComponent}
+      contentContainerStyle={
+        filteredTransactions.length === 0 ? styles.emptyList : styles.transactionsList
+      }
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
@@ -38,42 +69,21 @@ const TransactionList = ({
           colors={[colors.primary]}
         />
       }
-    >
-      {filteredTransactions.length === 0 ? (
-        <View style={styles.emptyState}>
-          <Icon
-            name="receipt"
-            type="material"
-            size={64}
-            color={colors.text.secondary}
-          />
-          <Text style={styles.emptyTitle}>
-            {emptyStateContent.title}
-          </Text>
-          <Text style={styles.emptySubtitle}>
-            {emptyStateContent.subtitle}
-          </Text>
-        </View>
-      ) : (
-        <View style={styles.transactionsList}>
-          {filteredTransactions.map((transaction) => (
-            <TransactionItem
-              key={transaction.id}
-              transaction={transaction}
-              currency={currency}
-            />
-          ))}
-        </View>
-      )}
-
-      <View style={styles.bottomSpacer} />
-    </ScrollView>
+      initialNumToRender={8}
+      maxToRenderPerBatch={6}
+      windowSize={5}
+      removeClippedSubviews
+      ListFooterComponent={<View style={styles.bottomSpacer} />}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
+  list: {
     flex: 1,
+  },
+  emptyList: {
+    flexGrow: 1,
   },
   emptyState: {
     flex: 1,
@@ -103,4 +113,3 @@ const styles = StyleSheet.create({
 });
 
 export default TransactionList;
-

@@ -32,12 +32,6 @@ export const DriverProvider = ({ children }) => {
   const hasCompletedOnboarding = !isLoading && isAuthenticated && !needsOnboarding;
 
   const {
-    stats,
-    loadDriverStats,
-    invalidateDriverStatsCache,
-  } = useDriverStats(driver, hasCompletedOnboarding);
-
-  const {
     deliveries,
     loadDriverOrders,
     updateStatus: ordersUpdateStatus,
@@ -46,7 +40,19 @@ export const DriverProvider = ({ children }) => {
     invalidateDeliveriesCache,
   } = useDriverOrders(driver, hasCompletedOnboarding);
 
+  const {
+    stats,
+    loadDriverStats,
+    invalidateDriverStatsCache,
+  } = useDriverStats(driver, hasCompletedOnboarding, deliveries);
+
   useDriverLocationWatch(driver, hasCompletedOnboarding, setDriver);
+
+  useEffect(() => {
+    if (hasCompletedOnboarding && driver?._id) {
+      loadDriverOrders();
+    }
+  }, [hasCompletedOnboarding, driver?._id]);
 
   const updateStatus = async (status, location = null) => {
     const result = await ordersUpdateStatus(status, location);

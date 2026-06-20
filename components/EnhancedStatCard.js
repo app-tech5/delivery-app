@@ -50,7 +50,7 @@ const EnhancedStatCard = ({
       )}
 
       {}
-      {stars && (
+      {stars != null && (
         <View style={styles.ratingStars}>
           {[1, 2, 3, 4, 5].map((star) => (
             <Icon

@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import React, { useMemo, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
@@ -13,76 +14,110 @@ import {
 } from '../components';
 
 export default function RatingScreen() {
+  const navigation = useNavigation();
   const {
     stats,
-    loadDriverStats,
-    invalidateDriverStatsCache,
-    deliveries
+    loadDriverOrders,
+    invalidateDeliveriesCache,
+    deliveries,
+    isAuthenticated,
+    driver,
+    hasCompletedOnboarding,
   } = useDriver();
 
   const { currency } = useSettings();
-  
+
   const recentDeliveries = useRecentDeliveries(deliveries, { days: 30, limit: 10, status: 'delivered' });
-  const { refreshing, onRefresh } = useEarningsRefresh({ invalidateDriverStatsCache, loadDriverStats });
+  const { refreshing, onRefresh } = useEarningsRefresh({
+    invalidateDeliveriesCache,
+    loadDriverOrders,
+  });
+
+  const displayedDeliveries = useMemo(
+    () => recentDeliveries.slice(0, 5),
+    [recentDeliveries]
+  );
+
+  const renderDelivery = useCallback(({ item: delivery }) => (
+    <View style={styles.deliveryItem}>
+      <View style={styles.deliveryInfo}>
+        <Text style={styles.deliveryId}>#{delivery._id.slice(-6)}</Text>
+        <Text style={styles.deliveryDate}>
+          {new Date(delivery.createdAt).toLocaleDateString(i18n.locale)}
+        </Text>
+      </View>
+      <View style={styles.deliveryRating}>
+        <Text style={styles.ratingText}>
+          ⭐ {stats.rating?.toFixed(1) || '0.0'}
+        </Text>
+      </View>
+    </View>
+  ), [stats.rating]);
+
+  const listHeader = useMemo(() => (
+    <>
+      <RatingStats stats={stats} currency={currency} />
+      {displayedDeliveries.length > 0 && (
+        <View style={styles.recentSectionHeader}>
+          <Text style={styles.sectionTitle}>{i18n.t('reports.recentDeliveries')}</Text>
+          <Text style={styles.sectionSubtitle}>
+            {i18n.t('reports.last30Days')}
+          </Text>
+        </View>
+      )}
+    </>
+  ), [stats, currency, displayedDeliveries.length]);
 
   return (
-    <ScreenLayout
-      title={i18n.t('reports.ratingsTitle')}
-      subtitle={`${stats.completedOrders || 0} ${i18n.t('reports.deliveriesRated')}`}
-    >
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[colors.primary]}
+    <View style={styles.root}>
+      <AuthGuard
+        isAuthenticated={isAuthenticated}
+        driver={driver}
+        subtitle={i18n.t('reports.pleaseReconnectHistory')}
+        showLoginButton={true}
+        onLoginPress={() => navigation.navigate('Login')}
+      />
+
+      {hasCompletedOnboarding && driver && (
+        <ScreenLayout
+          title={i18n.t('reports.ratingsTitle')}
+          subtitle={`${stats.completedOrders || 0} ${i18n.t('reports.deliveriesRated')}`}
+        >
+          <FlatList
+            style={styles.list}
+            data={displayedDeliveries}
+            keyExtractor={(item) => String(item._id)}
+            renderItem={renderDelivery}
+            ListHeaderComponent={listHeader}
+            contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[colors.primary]}
+              />
+            }
+            ListFooterComponent={<View style={styles.bottomSpacer} />}
           />
-        }
-      >
-        {}
-        {}
-
-        {}
-        {recentDeliveries.length > 0 && (
-          <View style={styles.recentSection}>
-            <Text style={styles.sectionTitle}>{i18n.t('reports.recentDeliveries')}</Text>
-            <Text style={styles.sectionSubtitle}>
-              {i18n.t('reports.last30Days')}
-            </Text>
-
-            {recentDeliveries.slice(0, 5).map((delivery) => (
-              <View key={delivery._id} style={styles.deliveryItem}>
-                <View style={styles.deliveryInfo}>
-                  <Text style={styles.deliveryId}>#{delivery._id.slice(-6)}</Text>
-                  <Text style={styles.deliveryDate}>
-                    {new Date(delivery.createdAt).toLocaleDateString(i18n.locale)}
-                  </Text>
-                </View>
-                <View style={styles.deliveryRating}>
-                  <Text style={styles.ratingText}>
-                    ⭐ {stats.rating?.toFixed(1) || '0.0'}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {}
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
-    </ScreenLayout>
+        </ScreenLayout>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
+  root: {
     flex: 1,
   },
-  recentSection: {
+  list: {
+    flex: 1,
+  },
+  listContent: {
+    paddingBottom: 20,
+  },
+  recentSectionHeader: {
     paddingHorizontal: 16,
-    marginBottom: 24,
+    marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 18,
@@ -93,7 +128,6 @@ const styles = StyleSheet.create({
   sectionSubtitle: {
     fontSize: 14,
     color: colors.text.secondary,
-    marginBottom: 12,
   },
   deliveryItem: {
     flexDirection: 'row',
@@ -103,6 +137,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: colors.background.primary,
     borderRadius: 8,
+    marginHorizontal: 16,
     marginBottom: 8,
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },

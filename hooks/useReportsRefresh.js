@@ -4,8 +4,6 @@ import i18n from '../i18n';
 
 export const useReportsRefresh = ({
   invalidateDeliveriesCache,
-  invalidateDriverStatsCache,
-  loadDriverStats,
   loadDriverOrders
 }) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -14,8 +12,6 @@ export const useReportsRefresh = ({
     setRefreshing(true);
     try {
       await invalidateDeliveriesCache();
-      await invalidateDriverStatsCache();
-      await loadDriverStats();
       await loadDriverOrders();
     } catch (error) {
       console.error('Erreur lors du rafraîchissement:', error);
@@ -30,4 +26,3 @@ export const useReportsRefresh = ({
     onRefresh
   };
 };
-

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Alert } from 'react-native';
 import i18n from '../i18n';
-import { getDriverDeliveryEarnings } from '../utils/driverDeliveryFee';
+import { buildDeliveryTransaction } from '../utils/driverDeliveryStats';
 import { PERIOD_FILTERS } from '../utils/transactionsData';
 import { calculateTransactionStats, filterTransactionsByPeriod } from '../utils/transactionUtils';
 
@@ -10,23 +10,14 @@ export const useTransactions = (deliveries, loadDriverOrders, invalidateDeliveri
   const [refreshing, setRefreshing] = useState(false);
   
   const transactions = useMemo(() => {
-    const completedDeliveries = deliveries.filter(delivery => delivery.status === 'delivered');
-
-    return completedDeliveries
-      .map(delivery => ({
-        id: delivery._id,
-        type: 'delivery_fee',
-        amount: getDriverDeliveryEarnings(delivery),
-        description: `${i18n.t('reports.deliveryDescription')}${delivery._id.slice(-6)}`,
-        date: new Date(delivery.createdAt || delivery.updatedAt),
-        status: 'completed',
-        details: {
-          address: delivery.delivery?.address,
-          customer: delivery.user?.name,
-          restaurant: delivery.restaurant?.name
-        }
-      }))
-      .sort((a, b) => b.date - a.date); 
+    return deliveries
+      .filter((delivery) => delivery.status === 'delivered')
+      .map((delivery) =>
+        buildDeliveryTransaction(delivery, {
+          deliveryDescription: i18n.t('reports.deliveryDescription'),
+        })
+      )
+      .sort((a, b) => b.date - a.date);
   }, [deliveries]);
   
   const filteredTransactions = useMemo(() => {

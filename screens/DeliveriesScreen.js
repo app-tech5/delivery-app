@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  ScrollView,
+  FlatList,
   RefreshControl,
   Alert,
 } from 'react-native';
@@ -22,7 +21,6 @@ import {
 } from '../components';
 import { useDeliveryActions } from '../hooks';
 import { getDeliveryFilters } from '../utils/deliveryFilters';
-import { OrdersContext } from '../contexts/OrdersContext';
 
 export default function DeliveriesScreen() {
   const navigation = useNavigation();
@@ -34,36 +32,29 @@ export default function DeliveriesScreen() {
     invalidateDeliveriesCache
   } = useDriver();
 
-  const { orders, setOrders } = useContext(OrdersContext);
-
   const { currency } = useSettings();
 
   const [activeFilter, setActiveFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
 
-  const handleViewDetails = (orderId) => {
+  const handleViewDetails = useCallback((orderId) => {
     navigation.navigate('DeliveryDetails', { orderId });
-  };
+  }, [navigation]);
 
   const filters = getDeliveryFilters();
 
-  const deliveryOrders = orders.filter(
-    (order) => order?.delivery?.type !== 'pickup'
+  const deliveryOrders = useMemo(
+    () => deliveries.filter((order) => order?.delivery?.type !== 'pickup'),
+    [deliveries]
   );
 
-  const filteredDeliveries = deliveryOrders.filter((delivery) => {
-    if (activeFilter === 'all') return true;
-    return delivery.status === activeFilter;
-  });
+  const filteredDeliveries = useMemo(() => {
+    if (activeFilter === 'all') return deliveryOrders;
+    return deliveryOrders.filter((delivery) => delivery.status === activeFilter);
+  }, [deliveryOrders, activeFilter]);
 
-  useEffect(() => {
-    if (deliveries.length > 0) {
-      setOrders(deliveries);
-    }
-  }, [deliveries, setOrders]);
-  
   const { handleAcceptDelivery, handleStartDelivery, handleMarkDelivered, handleStatusChange } = useDeliveryActions();
-  
+
   const onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -76,6 +67,42 @@ export default function DeliveriesScreen() {
       setRefreshing(false);
     }
   };
+
+  const renderDelivery = useCallback(({ item: delivery }) => (
+    <DeliveryCard
+      delivery={delivery}
+      onAccept={handleAcceptDelivery}
+      onStartDelivery={(id) => handleStatusChange(
+        id,
+        'out_for_delivery',
+        i18n.t('reports.startDeliveryConfirm')
+      )}
+      onMarkDelivered={(id) => handleStatusChange(
+        id,
+        'delivered',
+        i18n.t('reports.completeDeliveryConfirm')
+      )}
+      onViewDetails={handleViewDetails}
+    />
+  ), [
+    handleAcceptDelivery,
+    handleStatusChange,
+    handleViewDetails,
+  ]);
+
+  const emptyComponent = useMemo(() => (
+    <EmptyState
+      icon="package-variant-closed"
+      iconType="material-community"
+      title={activeFilter === 'all' ? i18n.t('reports.noDeliveries') : i18n.t('reports.noDeliveriesFiltered')}
+      subtitle={activeFilter === 'all'
+        ? i18n.t('reports.noDeliveriesAtAll')
+        : i18n.t('reports.noDeliveriesWithStatus', {
+          status: filters.find((filter) => filter.key === activeFilter)?.label,
+        })
+      }
+    />
+  ), [activeFilter, filters]);
 
   return (
     <View style={styles.root}>
@@ -97,8 +124,15 @@ export default function DeliveriesScreen() {
             iconType="material-community"
           />
 
-          <ScrollView
-            style={styles.scrollView}
+          <FlatList
+            style={styles.list}
+            data={filteredDeliveries}
+            keyExtractor={(item) => String(item._id)}
+            renderItem={renderDelivery}
+            ListEmptyComponent={emptyComponent}
+            contentContainerStyle={
+              filteredDeliveries.length === 0 ? styles.emptyList : styles.deliveriesList
+            }
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -106,42 +140,11 @@ export default function DeliveriesScreen() {
                 colors={[colors.primary]}
               />
             }
-          >
-            {filteredDeliveries.length === 0 ? (
-              <EmptyState
-                icon="package-variant-closed"
-                iconType="material-community"
-                title={activeFilter === 'all' ? i18n.t('reports.noDeliveries') : i18n.t('reports.noDeliveriesFiltered')}
-                subtitle={activeFilter === 'all'
-                  ? i18n.t('reports.noDeliveriesAtAll')
-                  : i18n.t('reports.noDeliveriesWithStatus', {
-                    status: filters.find((filter) => filter.key === activeFilter)?.label,
-                  })
-                }
-              />
-            ) : (
-              <View style={styles.deliveriesList}>
-                {filteredDeliveries.map((delivery) => (
-                  <DeliveryCard
-                    key={delivery._id}
-                    delivery={delivery}
-                    onAccept={handleAcceptDelivery}
-                    onStartDelivery={(id) => handleStatusChange(
-                      id,
-                      'out_for_delivery',
-                      i18n.t('reports.startDeliveryConfirm')
-                    )}
-                    onMarkDelivered={(id) => handleStatusChange(
-                      id,
-                      'delivered',
-                      i18n.t('reports.completeDeliveryConfirm')
-                    )}
-                    onViewDetails={handleViewDetails}
-                  />
-                ))}
-              </View>
-            )}
-          </ScrollView>
+            initialNumToRender={6}
+            maxToRenderPerBatch={4}
+            windowSize={5}
+            removeClippedSubviews
+          />
         </ScreenLayout>
       )}
     </View>
@@ -153,10 +156,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background.secondary,
   },
-  scrollView: {
+  list: {
     flex: 1,
   },
   deliveriesList: {
     padding: 16,
+  },
+  emptyList: {
+    flexGrow: 1,
   },
 });

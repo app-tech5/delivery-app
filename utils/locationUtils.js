@@ -161,5 +161,9 @@ export const getDriverLocation = (driver, user = apiClient.user) => {
 };
 
 export const getActiveDeliveries = (deliveries) => {
-  return deliveries.filter(delivery => delivery.status === 'out_for_delivery');
+  return deliveries.filter(
+    (delivery) =>
+      delivery?.status === 'out_for_delivery' &&
+      delivery?.delivery?.type !== 'pickup'
+  );
 };

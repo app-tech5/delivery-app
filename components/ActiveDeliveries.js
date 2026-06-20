@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card, Button } from 'react-native-elements';
 import { colors } from '../global';
-import { formatCurrency, getStatusColor } from '../utils';
+import { formatCurrency, getStatusColor, getDriverDeliveryEarnings } from '../utils';
 import i18n from '../i18n';
 
 const DeliveryCard = ({ order, currency, onOrderDelivered, isLoading }) => (
@@ -30,14 +30,17 @@ const DeliveryCard = ({ order, currency, onOrderDelivered, isLoading }) => (
       </Text>
     )}
     <View style={styles.amountSection}>
-      <Text style={styles.amountLabel}>{i18n.t('common.amount')}:</Text>
-      <Text style={styles.amountValue}>{formatCurrency(order.totalPrice, currency)}</Text>
+      <Text style={styles.amountLabel}>{i18n.t('reports.deliveryEarnings')}:</Text>
+      <Text style={styles.amountValue}>
+        {formatCurrency(getDriverDeliveryEarnings(order), currency)}
+      </Text>
     </View>
     <View style={styles.deliveryActions}>
       <Button
         title={i18n.t('driver.orderDelivered')}
-        onPress={() => onOrderDelivered(order._id, 'delivered')}
+        onPress={() => onOrderDelivered(order._id)}
         loading={isLoading}
+        testID={`delivery-delivered-${order._id}`}
         buttonStyle={styles.deliverButton}
       />
     </View>

@@ -35,10 +35,9 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: () => mockNavigation,
 }));
 
-const mockLoadDriverStats = jest.fn();
 const mockLoadDriverOrders = jest.fn();
 const mockHandleStatusChange = jest.fn();
-const mockHandleOrderStatusChange = jest.fn();
+const mockHandleMarkDelivered = jest.fn();
 
 const mockUseDriver = jest.fn();
 
@@ -60,7 +59,10 @@ jest.mock('../../hooks', () => ({
   useDriverStatus: jest.fn(() => ({
     isLoading: false,
     handleStatusChange: mockHandleStatusChange,
-    handleOrderStatusChange: mockHandleOrderStatusChange,
+  })),
+  useDeliveryActions: jest.fn(() => ({
+    loading: false,
+    handleMarkDelivered: mockHandleMarkDelivered,
   })),
 }));
 
@@ -131,7 +133,7 @@ jest.mock('../../components', () => {
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import HomeScreen from '../../screens/HomeScreen';
-import { useDriverStatus } from '../../hooks';
+import { useDriverStatus, useDeliveryActions } from '../../hooks';
 import { expectActiveScreenShell, expectInactiveScreenShell } from '../helpers/screenShellAssertions';
 
 const baseDriver = {
@@ -162,7 +164,6 @@ const setupDriverContext = ({
     driver: hasCompletedOnboarding ? driver : null,
     stats,
     deliveries,
-    loadDriverStats: mockLoadDriverStats,
     loadDriverOrders: mockLoadDriverOrders,
     hasCompletedOnboarding,
     isAuthenticated: hasCompletedOnboarding ? isAuthenticated : false,
@@ -175,7 +176,10 @@ describe('HomeScreen buttons', () => {
     useDriverStatus.mockReturnValue({
       isLoading: false,
       handleStatusChange: mockHandleStatusChange,
-      handleOrderStatusChange: mockHandleOrderStatusChange,
+    });
+    useDeliveryActions.mockReturnValue({
+      loading: false,
+      handleMarkDelivered: mockHandleMarkDelivered,
     });
     setupDriverContext();
   });
@@ -206,7 +210,6 @@ describe('HomeScreen buttons', () => {
     render(<HomeScreen />);
 
     await waitFor(() => {
-      expect(mockLoadDriverStats).toHaveBeenCalled();
       expect(mockLoadDriverOrders).toHaveBeenCalled();
     });
   });
@@ -217,7 +220,6 @@ describe('HomeScreen buttons', () => {
     render(<HomeScreen />);
 
     await waitFor(() => {
-      expect(mockLoadDriverStats).not.toHaveBeenCalled();
       expect(mockLoadDriverOrders).not.toHaveBeenCalled();
     });
   });
@@ -250,7 +252,6 @@ describe('HomeScreen buttons', () => {
     useDriverStatus.mockReturnValue({
       isLoading: true,
       handleStatusChange: mockHandleStatusChange,
-      handleOrderStatusChange: mockHandleOrderStatusChange,
     });
 
     const { getByTestId } = render(<HomeScreen />);
@@ -277,15 +278,12 @@ describe('HomeScreen buttons', () => {
     expect(mockHandleStatusChange).not.toHaveBeenCalled();
   });
 
-  it('calls handleOrderStatusChange when Mark as delivered is pressed', () => {
+  it('calls handleMarkDelivered when Mark as delivered is pressed', () => {
     const { getByTestId } = render(<HomeScreen />);
 
     fireEvent.press(getByTestId('delivery-delivered-order-active-123456'));
 
-    expect(mockHandleOrderStatusChange).toHaveBeenCalledWith(
-      'order-active-123456',
-      'delivered'
-    );
+    expect(mockHandleMarkDelivered).toHaveBeenCalledWith('order-active-123456');
   });
 
   it('does not show delivery action button when there are no active deliveries', () => {

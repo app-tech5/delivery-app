@@ -1,4 +1,5 @@
 import { formatCurrency } from './currencyUtils';
+import { getOrderDate } from './driverDeliveryStats';
 import { formatDate } from './dateUtils';
 import { getTransactionTypeColor, getTransactionTypeIcon } from './statusUtils';
 
@@ -69,8 +70,8 @@ export const filterDeliveriesByPeriod = (deliveries, filterKey) => {
     cutoffDate.setDate(cutoffDate.getDate() - days);
   }
 
-  return deliveries.filter(delivery => {
-    const deliveryDate = new Date(delivery.createdAt || delivery.updatedAt);
+  return deliveries.filter((delivery) => {
+    const deliveryDate = getOrderDate(delivery);
     return deliveryDate >= cutoffDate;
   });
 };
