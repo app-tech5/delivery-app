@@ -38,6 +38,12 @@ export const deliveryCardStyles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.primary,
   },
+  amountLabel: {
+    fontSize: 11,
+    color: colors.text.secondary,
+    marginBottom: 2,
+    textAlign: 'right',
+  },
   details: {
     marginBottom: 12,
   },
@@ -60,32 +66,49 @@ export const deliveryCardStyles = StyleSheet.create({
   actions: {
     marginTop: 8,
   },
+  actionsContainer: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: 12,
+  },
+  actionButtonContainer: {
+    flex: 1,
+  },
+  actionButton: {
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    minHeight: 44,
+  },
+  actionButtonTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginLeft: 6,
+    includeFontPadding: false,
+    lineHeight: 18,
+  },
+  actionIconContainer: {
+    marginRight: 0,
+  },
   acceptButton: {
     backgroundColor: colors.success,
-    borderRadius: 8,
   },
   startButton: {
     backgroundColor: colors.info,
-    borderRadius: 8,
   },
   deliveredButton: {
     backgroundColor: colors.primary,
-    borderRadius: 8,
   },
-  outForDeliveryButton:{
+  outForDeliveryButton: {
     backgroundColor: colors.rating,
-    borderRadius: 8,
-  },
-  actionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
   },
   detailsButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.primary,
-    borderRadius: 8,
+  },
+  detailsButtonTitle: {
+    color: colors.primary,
   },
   
   compactCard: {

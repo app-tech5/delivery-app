@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Alert } from 'react-native';
 import i18n from '../i18n';
+import { getDriverDeliveryEarnings } from '../utils/driverDeliveryFee';
 import { PERIOD_FILTERS } from '../utils/transactionsData';
 import { calculateTransactionStats, filterTransactionsByPeriod } from '../utils/transactionUtils';
 
@@ -15,7 +16,7 @@ export const useTransactions = (deliveries, loadDriverOrders, invalidateDeliveri
       .map(delivery => ({
         id: delivery._id,
         type: 'delivery_fee',
-        amount: delivery.delivery?.deliveryFee || 0,
+        amount: getDriverDeliveryEarnings(delivery),
         description: `${i18n.t('reports.deliveryDescription')}${delivery._id.slice(-6)}`,
         date: new Date(delivery.createdAt || delivery.updatedAt),
         status: 'completed',

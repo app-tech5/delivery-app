@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { getDriverDeliveryEarnings } from '../utils/driverDeliveryFee';
 
 export const useReportsData = (deliveries, stats, activePeriod) => {
   
@@ -22,7 +23,10 @@ export const useReportsData = (deliveries, stats, activePeriod) => {
   
   const performanceStats = useMemo(() => {
     const completedDeliveries = periodDeliveries.filter(d => d.status === 'delivered');
-    const totalRevenue = completedDeliveries.reduce((sum, d) => sum + (d.delivery?.deliveryFee || 0), 0);
+    const totalRevenue = completedDeliveries.reduce(
+      (sum, d) => sum + getDriverDeliveryEarnings(d),
+      0
+    );
     const totalDeliveries = completedDeliveries.length;
     
     const daysInPeriod = periods.find(p => p.key === activePeriod)?.days || 30;
@@ -36,7 +40,7 @@ export const useReportsData = (deliveries, stats, activePeriod) => {
         dailyStats[date] = { deliveries: 0, revenue: 0 };
       }
       dailyStats[date].deliveries += 1;
-      dailyStats[date].revenue += delivery.delivery?.deliveryFee || 0;
+      dailyStats[date].revenue += getDriverDeliveryEarnings(delivery);
     });
 
     const dailyArray = Object.values(dailyStats);
@@ -76,7 +80,10 @@ export const useReportsData = (deliveries, stats, activePeriod) => {
     });
 
     const prevCompletedDeliveries = prevDeliveries.filter(d => d.status === 'delivered');
-    const prevRevenue = prevCompletedDeliveries.reduce((sum, d) => sum + (d.delivery?.deliveryFee || 0), 0);
+    const prevRevenue = prevCompletedDeliveries.reduce(
+      (sum, d) => sum + getDriverDeliveryEarnings(d),
+      0
+    );
     const prevCount = prevCompletedDeliveries.length;
 
     const revenueChange = prevRevenue > 0 ? ((currentStats.totalRevenue - prevRevenue) / prevRevenue) * 100 : 0;

@@ -1,9 +1,10 @@
 import { formatCurrency, formatTime, formatOrderNumber } from './formatters';
+import { getDriverDeliveryEarnings } from './driverDeliveryFee';
 
 export const mapDeliveryToHistoryItem = (delivery, currency) => ({
   id: formatOrderNumber(delivery._id),
   time: formatTime(delivery.createdAt || delivery.updatedAt),
-  amount: formatCurrency(delivery.delivery?.deliveryFee || 0, currency),
+  amount: formatCurrency(getDriverDeliveryEarnings(delivery), currency),
   address: delivery.delivery?.address || 'Adresse non disponible',
   customer: delivery.user?.name,
   restaurant: delivery.restaurant?.name,

@@ -59,7 +59,9 @@
     "methodsAvailable": "methods available",
     "noPaymentMethods": "No payment methods",
     "addFirstPaymentMethod": "Add your first payment method to start receiving payments",
+    "cash": "Cash",
     "creditCard": "Credit Card",
+    "mobileMoney": "Mobile Money",
     "debitCard": "Debit Card",
     "paypal": "PayPal",
     "applePay": "Apple Pay",
@@ -251,7 +253,8 @@
     "amount": "Amount",
     "confirmLogout": "Are you sure you want to log out?",
     "all": "All",
-    "error": "Error"
+    "error": "Error",
+    "notAvailable": "N/A"
   },
   "reports": {
     "title": "Reports",
@@ -322,6 +325,7 @@
     "orderPrefix": "Order #",
     "pleaseReconnectEarnings": "Please reconnect to view your earnings",
     "earningsTitle": "Earnings",
+    "deliveryEarnings": "Trip earnings",
     "todayEarningsLabel": "Today's Earnings",
     "deliveriesCompletedToday": "Deliveries completed today",
     "averageEarningsPerDelivery": "Average earnings per delivery",
@@ -373,6 +377,7 @@
     "subtotal": "Subtotal",
     "tax": "Tax",
     "deliveryFee": "Delivery Fee",
+    "driverEarnings": "Your earnings",
     "grandTotal": "Grand Total",
     "status": "Status",
     "paymentMethod": "Payment Method",

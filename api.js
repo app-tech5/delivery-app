@@ -1,6 +1,7 @@
 
 import { config } from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDriverDeliveryEarnings } from './utils/driverDeliveryFee';
 
 const isDemoMode = () => config.DEMO_MODE === true;
 
@@ -260,6 +261,22 @@ class ApiClient {
     }
     return await this.apiCall(`/resource/orders?${query}`);
   }
+
+  async getRestaurantDeliverySettings(restaurantId) {
+    if (!restaurantId) {
+      return null;
+    }
+
+    try {
+      const params = new URLSearchParams({ type: String(restaurantId) });
+      const raw = await this.apiCall(`/resource/deliverysettings?${params}`);
+      const list = Array.isArray(raw) ? raw : [];
+      return list[0] || null;
+    } catch (error) {
+      console.error('Error fetching restaurant delivery settings:', error);
+      return null;
+    }
+  }
   
   async updateOrder(orderId, data) {
     return await this.apiCall(`/resource/orders/${orderId}`, {
@@ -296,7 +313,7 @@ class ApiClient {
         todayDeliveries: todayOrders.filter(order => order.status === 'delivered').length,
         totalEarnings: todayOrders
           .filter(order => order.status === 'delivered')
-          .reduce((total, order) => total + (order.delivery?.deliveryFee || 0), 0),
+          .reduce((total, order) => total + getDriverDeliveryEarnings(order), 0),
         rating: this.driver?.rating || 0,
         completedOrders: orders.filter(order => order.status === 'delivered').length
       };

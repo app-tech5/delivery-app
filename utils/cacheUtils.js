@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearDriverCache } from './storageUtils';
 import { DEMO_STORAGE_KEY } from '../api/demo/localStore';
+import { clearDeliverySettingsCache } from './driverDeliveryFee';
 
 const CACHE_KEYS = {
   SETTINGS: 'app_settings',
@@ -698,6 +699,7 @@ export const clearAllLocalAppDataOnLogout = async () => {
     ]);
 
     await clearDriverCache();
+    clearDeliverySettingsCache();
 
     console.log('🗑️ Stockage local vidé après déconnexion');
   } catch (error) {

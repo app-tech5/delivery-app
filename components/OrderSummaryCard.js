@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
-import { formatCurrency } from '../utils';
+import { formatCurrency, getDriverDeliveryEarnings, formatPaymentMethod } from '../utils';
 
 const OrderSummaryCard = ({ order, currency }) => {
   return (
@@ -40,6 +40,13 @@ const OrderSummaryCard = ({ order, currency }) => {
         </Text>
       </View>
 
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryLabel}>{i18n.t('orderDetails.driverEarnings')}</Text>
+        <Text style={[styles.summaryValue, styles.driverEarningsValue]}>
+          {formatCurrency(getDriverDeliveryEarnings(order), currency)}
+        </Text>
+      </View>
+
       <View style={styles.totalDivider} />
 
       <View style={styles.totalRow}>
@@ -52,10 +59,7 @@ const OrderSummaryCard = ({ order, currency }) => {
       <View style={styles.paymentRow}>
         <Text style={styles.paymentLabel}>{i18n.t('orderDetails.paymentMethod')}:</Text>
         <Text style={styles.paymentValue}>
-          {order.payment?.method === 'cash' ? 'Cash' :
-           order.payment?.method === 'credit_card' ? 'Credit Card' :
-           order.payment?.method === 'mobile_money' ? 'Mobile Money' :
-           order.payment?.method || 'N/A'}
+          {formatPaymentMethod(order.payment?.method)}
         </Text>
       </View>
     </Card>
@@ -97,6 +101,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text.primary,
     fontWeight: '500',
+  },
+  driverEarningsValue: {
+    color: colors.success,
+    fontWeight: '600',
   },
   totalDivider: {
     marginVertical: 12,

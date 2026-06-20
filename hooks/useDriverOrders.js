@@ -5,6 +5,7 @@ import { config } from '../config';
 import { loadDeliveriesWithSmartCache, clearDeliveriesCache } from '../utils/cacheUtils';
 import { isDriverAuthenticated } from '../utils/driverUtils';
 import { getDriverStatusLabel } from '../utils/statusUtils';
+import { preloadDeliverySettingsForOrders } from '../utils/driverDeliveryFee';
 
 export const useDriverOrders = (driver, hasCompletedOnboarding) => {
   const [deliveries, setDeliveries] = useState([]);
@@ -22,20 +23,22 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
     }
 
     try {
-      
+      const applyDeliveries = async (data) => {
+        await preloadDeliverySettingsForOrders(data);
+        setDeliveries(data);
+      };
+
       await loadDeliveriesWithSmartCache(
         driver._id, 
         () => apiClient.getDriverOrders(status), 
-        (data, fromCache) => {
-          
-          setDeliveries(data);
+        async (data, fromCache) => {
+          await applyDeliveries(data);
           if (fromCache) {
             console.log('🔄 Livraisons chargées depuis le cache dans DriverContext');
           }
         },
-        (data) => {
-          
-          setDeliveries(data);
+        async (data) => {
+          await applyDeliveries(data);
           console.log('🔄 Livraisons mises à jour depuis l\'API dans DriverContext');
         },
         (loading) => {

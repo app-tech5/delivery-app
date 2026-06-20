@@ -1,11 +1,27 @@
 import i18n from '../i18n';
 import { colors } from '../global';
+import { getDriverDeliveryEarnings } from './driverDeliveryFee';
 
 export const formatCurrency = (amount, currency = null) => {
   const value = Number(amount);
   const safeAmount = Number.isFinite(value) ? value : 0;
   const currencyObj = currency || { symbol: '€' };
   return `${safeAmount.toFixed(2)}${currencyObj.symbol || '€'}`;
+};
+
+const PAYMENT_METHOD_KEYS = {
+  cash: 'payment.cash',
+  credit_card: 'payment.creditCard',
+  mobile_money: 'payment.mobileMoney',
+  cash_on_delivery: 'payment.cashOnDelivery',
+  paypal: 'payment.paypal',
+  google_pay: 'payment.googlePay',
+  apple_pay: 'payment.applePay',
+};
+
+export const formatPaymentMethod = (method) => {
+  const key = PAYMENT_METHOD_KEYS[method];
+  return key ? i18n.t(key) : i18n.t('common.notAvailable');
 };
 
 export const formatDate = (date) => {
@@ -68,7 +84,10 @@ export const getStatusLabel = (status) => {
 export const calculatePeriodStats = (deliveries, periodFilter = null) => {
   const filteredDeliveries = periodFilter ? deliveries.filter(periodFilter) : deliveries;
 
-  const totalEarnings = filteredDeliveries.reduce((sum, d) => sum + (d.delivery?.deliveryFee || 0), 0);
+  const totalEarnings = filteredDeliveries.reduce(
+    (sum, d) => sum + getDriverDeliveryEarnings(d),
+    0
+  );
   const totalDeliveries = filteredDeliveries.length;
 
   return {

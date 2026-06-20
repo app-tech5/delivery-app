@@ -32,18 +32,22 @@ const FilterButtons = ({
               activeFilter === filter.key && [styles.filterButtonActive, activeButtonStyle]
             ]}
           >
-            <Icon
-              name={filter.icon}
-              type={filter.iconType || iconType}
-              size={18}
-              color={activeFilter === filter.key ? colors.white : colors.primary}
-              testID={`filter-icon-${filter.key}`}
-            />
-            <Text style={[
-              styles.filterText,
-              textStyle,
-              activeFilter === filter.key && [styles.filterTextActive, activeTextStyle]
-            ]}>
+            <View style={styles.iconWrapper}>
+              <Icon
+                name={filter.icon}
+                type={filter.iconType || iconType}
+                size={18}
+                color={activeFilter === filter.key ? colors.white : colors.primary}
+                testID={`filter-icon-${filter.key}`}
+              />
+            </View>
+            <Text
+              style={[
+                styles.filterText,
+                textStyle,
+                activeFilter === filter.key && [styles.filterTextActive, activeTextStyle]
+              ]}
+            >
               {filter.label}
             </Text>
           </TouchableOpacity>
@@ -66,13 +70,21 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.background.secondary,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    minHeight: 40,
     borderRadius: 20,
     marginRight: 8,
     borderWidth: 1,
     borderColor: colors.primary,
+  },
+  iconWrapper: {
+    width: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   filterButtonActive: {
     backgroundColor: colors.primary,
@@ -82,6 +94,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.primary,
     marginLeft: 6,
+    includeFontPadding: false,
+    lineHeight: 18,
+    textAlignVertical: 'center',
   },
   filterTextActive: {
     color: colors.white,

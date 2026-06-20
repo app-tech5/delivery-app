@@ -46,8 +46,12 @@ export default function DeliveriesScreen() {
   };
 
   const filters = getDeliveryFilters();
-  
-  const filteredDeliveries = orders.filter(delivery => {
+
+  const deliveryOrders = orders.filter(
+    (order) => order?.delivery?.type !== 'pickup'
+  );
+
+  const filteredDeliveries = deliveryOrders.filter((delivery) => {
     if (activeFilter === 'all') return true;
     return delivery.status === activeFilter;
   });
@@ -84,7 +88,7 @@ export default function DeliveriesScreen() {
         <ScreenLayout
           testID="deliveries-screen"
           title={i18n.t('navigation.deliveries')}
-          subtitle={`${orders.length} ${orders.length === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')}`}
+          subtitle={`${deliveryOrders.length} ${deliveryOrders.length === 1 ? i18n.t('reports.deliverySingular') : i18n.t('reports.deliveryPlural')}`}
         >
           <FilterButtons
             filters={filters}

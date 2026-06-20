@@ -7,52 +7,53 @@ import { DELIVERY_STATUSES } from '../utils';
 import { deliveryCardStyles as styles } from '../styles/deliveryCardStyles';
 
 const DeliveryActions = ({ delivery, onAccept, onStartDelivery, onMarkDelivered, onViewDetails }) => {
+  const renderButton = ({
+    title,
+    onPress,
+    buttonStyle,
+    titleStyle,
+    iconName,
+    iconColor = colors.white,
+  }) => (
+    <Button
+      title={title}
+      onPress={onPress}
+      containerStyle={styles.actionButtonContainer}
+      buttonStyle={[styles.actionButton, buttonStyle]}
+      titleStyle={[styles.actionButtonTitle, titleStyle]}
+      iconContainerStyle={styles.actionIconContainer}
+      icon={
+        iconName ? (
+          <Icon name={iconName} type="material" size={16} color={iconColor} />
+        ) : undefined
+      }
+    />
+  );
+
   const getActionButton = () => {
     switch (delivery.status) {
       case DELIVERY_STATUSES.PENDING:
-        return (
-          <Button
-            title={i18n.t('reports.acceptButton')}
-            onPress={() => onAccept(delivery._id)}
-            buttonStyle={styles.acceptButton}
-            icon={
-              <Icon
-                name="check"
-                type="material"
-                size={16}
-                color={colors.white}
-                style={{ marginRight: 8 }}
-              />
-            }
-          />
-        );
+        return renderButton({
+          title: i18n.t('reports.acceptButton'),
+          onPress: () => onAccept(delivery._id),
+          buttonStyle: styles.acceptButton,
+          iconName: 'check',
+        });
 
       case DELIVERY_STATUSES.ACCEPTED:
-        return (
-          <Button
-            title={i18n.t('reports.startButton')}
-            onPress={() => onStartDelivery(delivery._id)}
-            buttonStyle={styles.startButton}
-          />
-        );
+        return renderButton({
+          title: i18n.t('reports.startButton'),
+          onPress: () => onStartDelivery(delivery._id),
+          buttonStyle: styles.startButton,
+        });
 
       case DELIVERY_STATUSES.OUT_FOR_DELIVERY:
-        return (
-          <Button
-            title={i18n.t('reports.outForDeliveryButton')}
-            onPress={() => onMarkDelivered(delivery._id)}
-            buttonStyle={styles.outForDeliveryButton}
-            icon={
-              <Icon
-                name="check-circle"
-                type="material"
-                size={16}
-                color={colors.white}
-                style={{ marginRight: 8 }}
-              />
-            }
-          />
-        );
+        return renderButton({
+          title: i18n.t('reports.outForDeliveryButton'),
+          onPress: () => onMarkDelivered(delivery._id),
+          buttonStyle: styles.outForDeliveryButton,
+          iconName: 'check-circle',
+        });
 
       default:
         return null;
@@ -61,26 +62,18 @@ const DeliveryActions = ({ delivery, onAccept, onStartDelivery, onMarkDelivered,
 
   return (
     <View style={styles.actionsContainer}>
-      {onViewDetails && (
-        <Button
-          title={i18n.t('reports.viewDetails')}
-          onPress={() => onViewDetails(delivery._id)}
-          buttonStyle={styles.detailsButton}
-          icon={
-            <Icon
-              name="eye"
-              type="material"
-              size={16}
-              color={colors.primary}
-              style={{ marginRight: 8 }}
-            />
-          }
-        />
-      )}
+      {onViewDetails &&
+        renderButton({
+          title: i18n.t('reports.viewDetails'),
+          onPress: () => onViewDetails(delivery._id),
+          buttonStyle: styles.detailsButton,
+          titleStyle: styles.detailsButtonTitle,
+          iconName: 'visibility',
+          iconColor: colors.primary,
+        })}
       {getActionButton()}
     </View>
   );
 };
 
 export default DeliveryActions;
-

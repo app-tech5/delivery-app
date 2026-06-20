@@ -131,7 +131,8 @@
     "amount": "Montant",
     "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ?",
     "all": "Toutes",
-    "error": "Erreur"
+    "error": "Erreur",
+    "notAvailable": "N/D"
   },
   "reports": {
     "title": "Rapports",
@@ -169,6 +170,7 @@
     "deliveriesRated": "livraisons notées",
     "totalRatedDeliveries": "Livraisons Notées",
     "earnings": "Gains",
+    "deliveryEarnings": "Gain course",
     "deliveriesCount": "{{count}} livraisons",
     "perDayAmount": "{{amount}}/jour",
     "completedOfTotal": "{{completed}}/{{total}} terminées",
@@ -194,7 +196,9 @@
     "methodsAvailable": "méthodes disponibles",
     "noPaymentMethods": "Aucun mode de paiement",
     "addFirstPaymentMethod": "Ajoutez votre premier mode de paiement pour commencer à recevoir des paiements",
+    "cash": "Espèces",
     "creditCard": "Carte de Crédit",
+    "mobileMoney": "Mobile Money",
     "debitCard": "Carte de Débit",
     "paypal": "PayPal",
     "applePay": "Apple Pay",
@@ -284,6 +288,7 @@
     "subtotal": "Sous-total",
     "tax": "Taxe",
     "deliveryFee": "Frais de livraison",
+    "driverEarnings": "Votre gain",
     "grandTotal": "Total général",
     "status": "Statut",
     "paymentMethod": "Mode de paiement",

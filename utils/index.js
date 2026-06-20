@@ -27,6 +27,12 @@ export {
 
 export { getDeliveryFilters } from './deliveryFilters';
 
+export {
+  getDriverDeliveryEarnings,
+  preloadDeliverySettingsForOrders,
+  clearDeliverySettingsCache,
+} from './driverDeliveryFee';
+
 export { buildMapsDirectionsUrl, openMapsNavigation } from './navigationUtils';
 
 export { getAccountEmail, isDemoDriverAccount } from './demoDriverUtils';
@@ -104,6 +110,7 @@ export {
   getStatusColor,
   getTrendIcon,
   formatOrderNumber,
+  formatPaymentMethod,
   getRatingColor,
   truncateText,
   calculatePeriodStats,

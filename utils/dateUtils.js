@@ -1,4 +1,5 @@
 import i18n from '../i18n';
+import { getDriverDeliveryEarnings } from './driverDeliveryFee';
 
 export const TIME_FILTERS = [
   { key: 'all', label: i18n.t('history.filters.all'), icon: 'calendar' },
@@ -91,7 +92,7 @@ export const groupDeliveriesByDate = (deliveries) => {
     }
 
     groups[dateKey].deliveries.push(delivery);
-    groups[dateKey].totalEarnings += delivery.delivery?.deliveryFee || 0;
+    groups[dateKey].totalEarnings += getDriverDeliveryEarnings(delivery);
     groups[dateKey].count += 1;
   });
   
@@ -100,7 +101,10 @@ export const groupDeliveriesByDate = (deliveries) => {
 
 export const calculateHistoryStats = (deliveries, groupedDeliveries) => {
   const completedDeliveries = deliveries.filter(d => d.status === 'delivered');
-  const totalEarnings = completedDeliveries.reduce((sum, d) => sum + (d.delivery?.deliveryFee || 0), 0);
+  const totalEarnings = completedDeliveries.reduce(
+    (sum, d) => sum + getDriverDeliveryEarnings(d),
+    0
+  );
   const totalDeliveries = completedDeliveries.length;
   
   const periodDeliveries = groupedDeliveries.reduce((sum, group) => sum + group.count, 0);

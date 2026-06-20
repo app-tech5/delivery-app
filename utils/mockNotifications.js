@@ -1,4 +1,5 @@
 import i18n from '../i18n';
+import { getDriverDeliveryEarnings } from './driverDeliveryFee';
 
 export const generateMockNotifications = (deliveries, driver) => {
   const notifications = [];
@@ -47,10 +48,10 @@ export const generateMockNotifications = (deliveries, driver) => {
         id: `payment_${delivery._id}`,
         type: 'system',
         title: i18n.t('notifications.paymentReceived'),
-        message: `Payment received for order #${delivery._id.slice(-6)}: €${(delivery.delivery?.deliveryFee || 0).toFixed(2)}`,
+        message: `Payment received for order #${delivery._id.slice(-6)}: €${getDriverDeliveryEarnings(delivery).toFixed(2)}`,
         timestamp: new Date(notificationTime.getTime() + 15 * 60 * 1000), 
         read: Math.random() > 0.4,
-        data: { orderId: delivery._id, amount: delivery.delivery?.deliveryFee || 0 }
+        data: { orderId: delivery._id, amount: getDriverDeliveryEarnings(delivery) }
       });
     }
   });
