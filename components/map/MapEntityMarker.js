@@ -19,6 +19,7 @@ import {
 } from '../../utils/geoUtils';
 
 const DRIVER_ICON_SIZE = 36;
+const ICON_RING_SIZE = 40;
 const MOTION_MIN_KM = 1e-5;
 
 const KIND_DEFAULTS = {
@@ -160,10 +161,18 @@ export function MapEntityMarker({
     ? `${calloutTitle || ''}\n${calloutSubtitle}`
     : calloutTitle || '';
 
-  const calloutContent =
-    calloutOpen && <Callout title={calloutLabel} style={styles.calloutShiftAbovePin} />;
-
   const isDriverCar = kind === 'driver' && !iconName;
+  const markerIconSize = isDriverCar ? DRIVER_ICON_SIZE : ICON_RING_SIZE;
+
+  const calloutStyle = useMemo(
+    () => ({
+      bottom: markerIconSize,
+    }),
+    [markerIconSize]
+  );
+
+  const calloutContent =
+    calloutOpen && <Callout title={calloutLabel} style={calloutStyle} />;
 
   return (
     <Marker
@@ -197,9 +206,6 @@ export function MapEntityMarker({
 export default MapEntityMarker;
 
 const styles = StyleSheet.create({
-  calloutShiftAbovePin: {
-    transform: [{ translateY: -56 }],
-  },
   markerRoot: {
     alignItems: 'center',
   },
