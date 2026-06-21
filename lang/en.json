@@ -448,6 +448,7 @@
     "markReadSuccess": "Notification marked as read",
     "markAllReadSuccess": "All notifications marked as read",
     "deleteSuccess": "Notification deleted",
+    "deleteConfirm": "Are you sure you want to delete this notification?",
     "loadError": "Unable to load notifications"
   },
   "support": {

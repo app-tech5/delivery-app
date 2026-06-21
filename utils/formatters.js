@@ -119,4 +119,4 @@ export const getTrendIcon = (value, threshold = 0) => {
   return { name: 'trending-flat', color: colors.text.secondary };
 };
 
-export { getTransactionTypeColor as getNotificationColor, getTransactionTypeIcon as getNotificationIcon } from './statusUtils';
+export { getNotificationTypeColor as getNotificationColor, getNotificationTypeIcon as getNotificationIcon } from './statusUtils';

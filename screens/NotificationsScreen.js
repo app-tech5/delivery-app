@@ -11,7 +11,6 @@ import EmptyState from '../components/EmptyState';
 
 export default function NotificationsScreen() {
   const {
-    deliveries,
     isAuthenticated,
     driver,
     hasCompletedOnboarding,
@@ -28,7 +27,7 @@ export default function NotificationsScreen() {
     markAsRead,
     markAllAsRead,
     deleteNotification
-  } = useNotifications(deliveries, driver);
+  } = useNotifications(isAuthenticated, driver);
 
   const emptyStateContent = useMemo(() => {
     if (activeFilter === 'all') {
@@ -53,7 +52,7 @@ export default function NotificationsScreen() {
 
   const emptyComponent = useMemo(() => (
     <EmptyState
-      icon="notifications-none"
+      icon="notifications-off"
       title={emptyStateContent.title}
       subtitle={emptyStateContent.subtitle}
     />

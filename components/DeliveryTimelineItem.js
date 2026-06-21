@@ -12,7 +12,11 @@ const DeliveryTimelineItem = ({ delivery, isLast, currency, onPress }) => {
         {!isLast && <View style={timelineStyles.timelineLine} />}
       </View>
 
-      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <TouchableOpacity
+        onPress={onPress}
+        activeOpacity={0.7}
+        style={timelineStyles.deliveryCardWrapper}
+      >
         <Card containerStyle={timelineStyles.deliveryCard}>
           <View style={timelineStyles.deliveryHeader}>
             <View style={timelineStyles.deliveryInfo}>

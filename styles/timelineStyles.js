@@ -9,6 +9,9 @@ export const timelineStyles = StyleSheet.create({
   
   deliveryItem: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    alignSelf: 'stretch',
+    width: '100%',
     marginBottom: 16,
   },
   
@@ -33,11 +36,20 @@ export const timelineStyles = StyleSheet.create({
     marginTop: 8,
   },
   
+  deliveryCardWrapper: {
+    flex: 1,
+    minWidth: 0,
+  },
+
   deliveryCard: {
     flex: 1,
     borderRadius: 12,
     padding: 16,
     marginTop: 8,
+    marginHorizontal: 0,
+    marginLeft: 0,
+    marginRight: 0,
+    width: '100%',
   },
   
   deliveryHeader: {

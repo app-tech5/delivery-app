@@ -6,6 +6,8 @@ const emptyState = () => ({
   registeredDrivers: [],
   driverProfiles: {},
   orderPatches: {},
+  notificationReadIds: [],
+  notificationRemovedIds: [],
 });
 
 export async function getDemoState() {

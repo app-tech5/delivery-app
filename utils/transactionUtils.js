@@ -49,6 +49,17 @@ export const filterTransactionsByPeriod = (transactions, filterKey) => {
 export const filterDeliveriesByPeriod = (deliveries, filterKey) => {
   if (filterKey === 'all') return deliveries;
 
+  if (filterKey === 'last_month') {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+    const end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+    return deliveries.filter((delivery) => {
+      const deliveryDate = getOrderDate(delivery);
+      return deliveryDate >= start && deliveryDate <= end;
+    });
+  }
+
   const cutoffDate = new Date();
   let days = null;
 
@@ -63,7 +74,7 @@ export const filterDeliveriesByPeriod = (deliveries, filterKey) => {
       days = 30;
       break;
     default:
-      return deliveries;
+      return [];
   }
 
   if (days !== null) {

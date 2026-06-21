@@ -65,9 +65,27 @@ export const TRANSACTION_TYPE_COLORS = {
 };
 
 export const TRANSACTION_TYPE_ICONS = {
-  [TRANSACTION_TYPES.DELIVERY_FEE]: 'truck-delivery',
-  [TRANSACTION_TYPES.BONUS]: 'gift',
-  [TRANSACTION_TYPES.PENALTY]: 'alert-circle'
+  [TRANSACTION_TYPES.DELIVERY_FEE]: 'local-shipping',
+  [TRANSACTION_TYPES.BONUS]: 'card-giftcard',
+  [TRANSACTION_TYPES.PENALTY]: 'error-outline'
+};
+
+export const NOTIFICATION_TYPES = {
+  ORDER: 'order',
+  SYSTEM: 'system',
+  PROMOTION: 'promotion',
+};
+
+export const NOTIFICATION_TYPE_COLORS = {
+  [NOTIFICATION_TYPES.ORDER]: colors.success,
+  [NOTIFICATION_TYPES.SYSTEM]: colors.grey[600],
+  [NOTIFICATION_TYPES.PROMOTION]: colors.rating,
+};
+
+export const NOTIFICATION_TYPE_ICONS = {
+  [NOTIFICATION_TYPES.ORDER]: 'local-shipping',
+  [NOTIFICATION_TYPES.SYSTEM]: 'info',
+  [NOTIFICATION_TYPES.PROMOTION]: 'local-offer',
 };
 
 export const getDriverStatusLabel = (status) => {
@@ -89,7 +107,15 @@ export const getTransactionTypeColor = (type) => {
 };
 
 export const getTransactionTypeIcon = (type) => {
-  return TRANSACTION_TYPE_ICONS[type] || 'cash';
+  return TRANSACTION_TYPE_ICONS[type] || 'attach-money';
+};
+
+export const getNotificationTypeColor = (type) => {
+  return NOTIFICATION_TYPE_COLORS[type] || colors.text.secondary;
+};
+
+export const getNotificationTypeIcon = (type) => {
+  return NOTIFICATION_TYPE_ICONS[type] || 'notifications';
 };
 
 export const isDriverStatusActive = (status) => {

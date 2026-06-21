@@ -84,12 +84,14 @@ export default function HistoryScreen() {
   ), []);
 
   const renderItem = useCallback(({ item: delivery }) => (
-    <DeliveryTimelineItem
-      delivery={delivery}
-      isLast={delivery.isLast}
-      currency={currency}
-      onPress={() => handleViewDetails(delivery)}
-    />
+    <View style={styles.itemContainer}>
+      <DeliveryTimelineItem
+        delivery={delivery}
+        isLast={delivery.isLast}
+        currency={currency}
+        onPress={() => handleViewDetails(delivery)}
+      />
+    </View>
   ), [currency, handleViewDetails]);
 
   const emptyComponent = useMemo(() => (
@@ -180,6 +182,9 @@ const styles = StyleSheet.create({
   },
   timelineContainer: {
     paddingHorizontal: 16,
+  },
+  itemContainer: {
+    width: '100%',
   },
   bottomSpacer: {
     height: 20,

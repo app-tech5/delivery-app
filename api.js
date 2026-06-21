@@ -2,6 +2,11 @@
 import { config } from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { calculateDriverStatsFromDeliveries } from './utils/driverDeliveryStats';
+import {
+  mergeDemoNotifications,
+  markDemoNotificationReadLocally,
+  deleteDemoNotificationLocally,
+} from './api/demo/notificationHandlers';
 
 const isDemoMode = () => config.DEMO_MODE === true;
 
@@ -535,12 +540,42 @@ class ApiClient {
   async getSettings() {
     return await this.apiCall('/resource/settings');
   }
-  
+
+  async getNotifications() {
+    const data = await this.apiCall('/resource/notifications');
+
+    if (isDemoMode()) {
+      return mergeDemoNotifications(data);
+    }
+
+    return data;
+  }
+
+  async markNotificationRead(notificationId) {
+    if (isDemoMode()) {
+      return markDemoNotificationReadLocally(notificationId);
+    }
+
+    return await this.apiCall(`/resource/notifications/${notificationId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ isRead: true }),
+    });
+  }
+
+  async deleteNotification(notificationId) {
+    if (isDemoMode()) {
+      return deleteDemoNotificationLocally(notificationId);
+    }
+
+    return await this.apiCall(`/resource/notifications/${notificationId}`, {
+      method: 'DELETE',
+    });
+  }
+
   async getNearbyRestaurants(latitude, longitude, radius = 10) {
     try {
-      
       const restaurants = await this.apiCall('/resource/restaurants');
-      
+
       const nearbyRestaurants = restaurants.filter(restaurant => {
         if (!restaurant.latitude || !restaurant.longitude) return false;
 
@@ -548,9 +583,9 @@ class ApiClient {
         const restaurantLng = parseFloat(restaurant.longitude);
 
         if (isNaN(restaurantLat) || isNaN(restaurantLng)) return false;
-        
+
         const distance = this.calculateDistance(latitude, longitude, restaurantLat, restaurantLng);
-        
+
         restaurant.distance = distance;
 
         return distance <= radius && restaurant.isActivated;

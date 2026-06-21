@@ -1,88 +1,115 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Alert } from 'react-native';
 import i18n from '../i18n';
-import { generateMockNotifications, NOTIFICATION_FILTERS } from '../utils/mockNotifications';
+import apiClient from '../api';
+import { NOTIFICATION_FILTERS, mapBackendNotifications } from '../utils/notificationUtils';
 
-export const useNotifications = (deliveries, driver) => {
+export const useNotifications = (isAuthenticated, driver) => {
+  const [notifications, setNotifications] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
-  const [readState, setReadState] = useState({});
-  const [deletedIds, setDeletedIds] = useState([]);
 
-  const generatedNotifications = useMemo(() => {
-    if (!deliveries?.length || !driver) {
-      return [];
+  const loadNotifications = useCallback(async () => {
+    if (!isAuthenticated || !driver) {
+      setNotifications([]);
+      return;
     }
-    return generateMockNotifications(deliveries, driver);
-  }, [deliveries, driver]);
 
-  const notifications = useMemo(() => {
-    const deleted = new Set(deletedIds);
-    return generatedNotifications
-      .filter((notification) => !deleted.has(notification.id))
-      .map((notification) => ({
-        ...notification,
-        read: readState[notification.id] ?? notification.read,
-      }));
-  }, [generatedNotifications, readState, deletedIds]);
+    try {
+      const data = await apiClient.getNotifications();
+      setNotifications(mapBackendNotifications(Array.isArray(data) ? data : []));
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+      Alert.alert(i18n.t('common.error'), i18n.t('notifications.loadError'));
+    }
+  }, [isAuthenticated, driver]);
+
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
 
   const filteredNotifications = useMemo(() => {
     switch (activeFilter) {
       case 'unread':
-        return notifications.filter((n) => !n.read);
+        return notifications.filter((notification) => !notification.read);
       case 'order':
-        return notifications.filter((n) => n.type === 'order');
+        return notifications.filter((notification) => notification.type === 'order');
       case 'system':
-        return notifications.filter((n) => n.type === 'system');
+        return notifications.filter((notification) => notification.type === 'system');
       case 'promotion':
-        return notifications.filter((n) => n.type === 'promotion');
+        return notifications.filter((notification) => notification.type === 'promotion');
       default:
         return notifications;
     }
   }, [notifications, activeFilter]);
 
   const unreadCount = useMemo(
-    () => notifications.filter((n) => !n.read).length,
+    () => notifications.filter((notification) => !notification.read).length,
     [notifications]
   );
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => {
+    try {
+      await loadNotifications();
+    } finally {
       setRefreshing(false);
-    }, 1000);
+    }
   };
 
-  const markAsRead = (notificationId) => {
-    setReadState((prev) => ({ ...prev, [notificationId]: true }));
-    Alert.alert('Success', i18n.t('notifications.markReadSuccess'));
+  const markAsRead = async (notificationId) => {
+    setNotifications((prev) =>
+      prev.map((notification) =>
+        notification.id === notificationId ? { ...notification, read: true } : notification
+      )
+    );
+
+    try {
+      await apiClient.markNotificationRead(notificationId);
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      await loadNotifications();
+    }
   };
 
-  const markAllAsRead = () => {
-    setReadState((prev) => {
-      const next = { ...prev };
-      generatedNotifications.forEach((notification) => {
-        next[notification.id] = true;
-      });
-      return next;
-    });
-    Alert.alert('Success', i18n.t('notifications.markAllReadSuccess'));
+  const markAllAsRead = async () => {
+    const unreadIds = notifications.filter((notification) => !notification.read).map((n) => n.id);
+    if (unreadIds.length === 0) {
+      return;
+    }
+
+    setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })));
+
+    try {
+      await Promise.all(unreadIds.map((id) => apiClient.markNotificationRead(id)));
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      await loadNotifications();
+    }
   };
 
   const deleteNotification = (notificationId) => {
     Alert.alert(
-      'Delete Notification',
-      'Are you sure you want to delete this notification?',
+      i18n.t('notifications.delete'),
+      i18n.t('notifications.deleteConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: i18n.t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: i18n.t('notifications.delete'),
           style: 'destructive',
-          onPress: () => {
-            setDeletedIds((prev) => [...prev, notificationId]);
-            Alert.alert('Success', i18n.t('notifications.deleteSuccess'));
-          }
-        }
+          onPress: async () => {
+            setNotifications((prev) =>
+              prev.filter((notification) => notification.id !== notificationId)
+            );
+
+            try {
+              await apiClient.deleteNotification(notificationId);
+            } catch (error) {
+              console.error('Error deleting notification:', error);
+              await loadNotifications();
+            }
+          },
+        },
       ]
     );
   };
@@ -98,6 +125,6 @@ export const useNotifications = (deliveries, driver) => {
     onRefresh,
     markAsRead,
     markAllAsRead,
-    deleteNotification
+    deleteNotification,
   };
 };

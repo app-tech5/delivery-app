@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   unreadCard: {
     borderLeftWidth: 4,
     borderLeftColor: colors.primary,
-    backgroundColor: 'rgba(0, 123, 255, 0.05)',
+    backgroundColor: colors.highlight,
   },
   header: {
     flexDirection: 'row',
