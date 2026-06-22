@@ -19,6 +19,7 @@ export {
 } from './ProfileActionsSection';
 
 export { default as ScreenHeader } from './ScreenHeader';
+export { default as HamburgerButton } from './HamburgerButton';
 export { default as ScreenLayout } from './ScreenLayout';
 export { default as EmptyState } from './EmptyState';
 export { default as FilterButtons } from './FilterButtons';

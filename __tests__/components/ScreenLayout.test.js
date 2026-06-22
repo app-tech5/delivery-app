@@ -22,7 +22,38 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
+const mockOpenDrawer = jest.fn();
+
+jest.mock('@react-navigation/native', () => ({
+  DrawerActions: {
+    openDrawer: () => ({ type: 'OPEN_DRAWER' }),
+  },
+  useNavigation: () => ({
+    openDrawer: mockOpenDrawer,
+    dispatch: jest.fn(),
+  }),
+}));
+
 describe('ScreenLayout', () => {
+  beforeEach(() => {
+    mockOpenDrawer.mockClear();
+  });
+
+  it('renders hamburger menu by default and opens the drawer on press', () => {
+    const { getByTestId } = render(
+      <ScreenLayout title="Home">
+        <Text>Body</Text>
+      </ScreenLayout>
+    );
+
+    const menuButton = getByTestId('hamburger-button');
+    expect(menuButton).toBeTruthy();
+
+    const { fireEvent } = require('@testing-library/react-native');
+    fireEvent.press(menuButton);
+    expect(mockOpenDrawer).toHaveBeenTimes(1);
+  });
+
   it('extends the header under the status bar with safe-area top padding', () => {
     const { getByTestId } = render(
       <ScreenLayout title="Deliveries" subtitle="3 deliveries">
