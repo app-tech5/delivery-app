@@ -7,8 +7,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import { Marker, Callout } from '@maplibre/maplibre-react-native';
+import { View, StyleSheet } from 'react-native';
+import { Marker } from '@maplibre/maplibre-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DriverCarTopIcon from './DriverCarTopIcon';
 import {
@@ -51,6 +51,10 @@ export function MapMarkerCalloutScope({ children }) {
   );
 }
 
+export function useMapMarkerCallout() {
+  return useContext(MapMarkerCalloutContext);
+}
+
 export function MapEntityMarker({
   latitude,
   longitude,
@@ -58,8 +62,6 @@ export function MapEntityMarker({
   kind = 'customer',
   iconName,
   iconColor,
-  calloutTitle,
-  calloutSubtitle,
   anchor = 'bottom',
   socket,
   trackingOrderId,
@@ -67,22 +69,18 @@ export function MapEntityMarker({
   headingFallbackPoint,
 }) {
   const scope = useContext(MapMarkerCalloutContext);
-  const [localCalloutOpen, setLocalCalloutOpen] = useState(false);
   const [liveDriverPoint, setLiveDriverPoint] = useState(null);
   const [driverHeadingDeg, setDriverHeadingDeg] = useState(0);
   const prevDriverForHeadingRef = useRef(null);
-
-  const calloutOpen = scope ? scope.activeId === id : localCalloutOpen;
+  const isSelected = scope?.activeId === id;
 
   const handleMarkerPress = () => {
-    if (scope) scope.toggleMarkerId(id);
-    else setLocalCalloutOpen((open) => !open);
+    scope?.toggleMarkerId(id);
   };
 
   const clearIfActive = scope?.clearIfActive;
   useEffect(() => {
-    if (clearIfActive) clearIfActive(id);
-    else setLocalCalloutOpen(false);
+    clearIfActive?.(id);
   }, [latitude, longitude, id, clearIfActive]);
 
   useEffect(() => {
@@ -157,22 +155,7 @@ export function MapEntityMarker({
     prevDriverForHeadingRef.current = { latitude: effectiveLat, longitude: effectiveLng };
   }, [kind, effectiveLat, effectiveLng, routePolyline, headingFallbackPoint]);
 
-  const calloutLabel = calloutSubtitle
-    ? `${calloutTitle || ''}\n${calloutSubtitle}`
-    : calloutTitle || '';
-
   const isDriverCar = kind === 'driver' && !iconName;
-  const markerIconSize = isDriverCar ? DRIVER_ICON_SIZE : ICON_RING_SIZE;
-
-  const calloutStyle = useMemo(
-    () => ({
-      bottom: markerIconSize,
-    }),
-    [markerIconSize]
-  );
-
-  const calloutContent =
-    calloutOpen && <Callout title={calloutLabel} style={calloutStyle} />;
 
   return (
     <Marker
@@ -180,7 +163,6 @@ export function MapEntityMarker({
       id={id}
       anchor={anchor}
       onPress={handleMarkerPress}
-      {...(Platform.OS === 'ios' ? { selected: !!calloutOpen } : {})}
     >
       <View style={styles.markerRoot} collapsable={false}>
         {isDriverCar ? (
@@ -193,11 +175,16 @@ export function MapEntityMarker({
             <DriverCarTopIcon size={DRIVER_ICON_SIZE} color={resolvedColor} />
           </View>
         ) : (
-          <View style={[styles.iconRing, { borderColor: resolvedColor }]}>
+          <View
+            style={[
+              styles.iconRing,
+              isSelected && styles.iconRingSelected,
+              { borderColor: resolvedColor },
+            ]}
+          >
             <Ionicons name={resolvedIcon} size={22} color={resolvedColor} />
           </View>
         )}
-        {calloutContent}
       </View>
     </Marker>
   );
@@ -215,9 +202,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   iconRing: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: ICON_RING_SIZE,
+    height: ICON_RING_SIZE,
+    borderRadius: ICON_RING_SIZE / 2,
     borderWidth: 2,
     backgroundColor: '#ffffff',
     alignItems: 'center',
@@ -227,5 +214,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 2,
     elevation: 3,
+  },
+  iconRingSelected: {
+    borderWidth: 3,
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });

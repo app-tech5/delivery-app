@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors } from '../global';
 import { LoadingOverlay } from './index';
 import DriverNearbyMap from './map/DriverNearbyMap';
+import MapSelectionPanel from './map/MapSelectionPanel';
+import { MapMarkerCalloutScope } from './map/MapEntityMarker';
 import { truncateText } from '../utils';
 import i18n from '../i18n';
 
 const RestaurantMap = ({ driverLocation, nearbyRestaurants, restaurantsLoading }) => {
-  const getRestaurantCallout = (restaurant) => {
+  const getRestaurantCallout = useCallback((restaurant) => {
     const parts = [];
     if (restaurant.distance != null) {
       parts.push(`${restaurant.distance.toFixed(1)} km`);
@@ -25,7 +27,30 @@ const RestaurantMap = ({ driverLocation, nearbyRestaurants, restaurantsLoading }
       title: restaurant.name,
       subtitle: parts.join(' · '),
     };
-  };
+  }, []);
+
+  const resolveCallout = useCallback(
+    (markerId) => {
+      if (markerId === 'home-driver') {
+        return {
+          title: i18n.t('home.mapMarkerDriver'),
+          subtitle: i18n.t('home.mapMarkerDriverSubtitle'),
+        };
+      }
+
+      if (!markerId?.startsWith('restaurant-')) {
+        return null;
+      }
+
+      const restaurantId = markerId.slice('restaurant-'.length);
+      const restaurant = nearbyRestaurants.find(
+        (item) => String(item._id || item.id) === restaurantId
+      );
+
+      return restaurant ? getRestaurantCallout(restaurant) : null;
+    },
+    [nearbyRestaurants, getRestaurantCallout]
+  );
 
   return (
     <View style={styles.container}>
@@ -33,20 +58,21 @@ const RestaurantMap = ({ driverLocation, nearbyRestaurants, restaurantsLoading }
         {i18n.t('home.currentLocation')}
         {nearbyRestaurants.length > 0 && ` (${nearbyRestaurants.length})`}
       </Text>
-      <View style={styles.mapWrapper}>
-        <DriverNearbyMap
-          driverLocation={driverLocation}
-          nearbyRestaurants={nearbyRestaurants}
-          driverCalloutTitle={i18n.t('home.mapMarkerDriver')}
-          driverCalloutSubtitle={i18n.t('home.mapMarkerDriverSubtitle')}
-          getRestaurantCallout={getRestaurantCallout}
-          style={styles.map}
-        />
-        <LoadingOverlay
-          visible={restaurantsLoading}
-          text={i18n.t('home.loadingRestaurants')}
-        />
-      </View>
+
+      <MapMarkerCalloutScope>
+        <MapSelectionPanel resolveCallout={resolveCallout} />
+        <View style={styles.mapWrapper}>
+          <DriverNearbyMap
+            driverLocation={driverLocation}
+            nearbyRestaurants={nearbyRestaurants}
+            style={styles.map}
+          />
+          <LoadingOverlay
+            visible={restaurantsLoading}
+            text={i18n.t('home.loadingRestaurants')}
+          />
+        </View>
+      </MapMarkerCalloutScope>
     </View>
   );
 };

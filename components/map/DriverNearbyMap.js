@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Camera, Map } from '@maplibre/maplibre-react-native';
-import MapEntityMarker, { MapMarkerCalloutScope } from './MapEntityMarker';
+import MapEntityMarker from './MapEntityMarker';
 import { getPointFromLocation } from '../../utils/geoUtils';
 
 const FIT_PADDING = { top: 48, right: 48, bottom: 48, left: 48 };
@@ -18,9 +18,6 @@ const getRestaurantPoint = (restaurant) => {
 export default function DriverNearbyMap({
   driverLocation,
   nearbyRestaurants = [],
-  driverCalloutTitle,
-  driverCalloutSubtitle,
-  getRestaurantCallout,
   style,
 }) {
   const cameraRef = useRef(null);
@@ -92,33 +89,24 @@ export default function DriverNearbyMap({
             zoom: DEFAULT_ZOOM,
           }}
         />
-        <MapMarkerCalloutScope>
-          {driverPoint && (
-            <MapEntityMarker
-              id="home-driver"
-              kind="driver"
-              latitude={driverPoint.latitude}
-              longitude={driverPoint.longitude}
-              anchor="center"
-              calloutTitle={driverCalloutTitle}
-              calloutSubtitle={driverCalloutSubtitle}
-            />
-          )}
-          {restaurantPoints.map(({ restaurant, point }) => {
-            const callout = getRestaurantCallout?.(restaurant) || {};
-            return (
-              <MapEntityMarker
-                key={restaurant._id || restaurant.id}
-                id={`restaurant-${restaurant._id || restaurant.id}`}
-                kind="restaurant"
-                latitude={point.latitude}
-                longitude={point.longitude}
-                calloutTitle={callout.title}
-                calloutSubtitle={callout.subtitle}
-              />
-            );
-          })}
-        </MapMarkerCalloutScope>
+        {driverPoint && (
+          <MapEntityMarker
+            id="home-driver"
+            kind="driver"
+            latitude={driverPoint.latitude}
+            longitude={driverPoint.longitude}
+            anchor="center"
+          />
+        )}
+        {restaurantPoints.map(({ restaurant, point }) => (
+          <MapEntityMarker
+            key={restaurant._id || restaurant.id}
+            id={`restaurant-${restaurant._id || restaurant.id}`}
+            kind="restaurant"
+            latitude={point.latitude}
+            longitude={point.longitude}
+          />
+        ))}
       </Map>
     </View>
   );

@@ -88,6 +88,89 @@ function buildSupportTreeExpression() {
   })()`;
 }
 
+function buildMapSelectionPanelExpression() {
+  return `(function(){
+    var hook = globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+    if (!hook) return JSON.stringify({ error: 'Pas de hook React' });
+
+    var texts = [];
+    var activeId = null;
+    var panelRect = null;
+
+    function fiberName(fiber) {
+      if (!fiber || !fiber.type) return '';
+      var t = fiber.type;
+      if (typeof t === 'string') return t;
+      return t.displayName || t.name || t.render?.displayName || '';
+    }
+
+    function walkTexts(fiber, depth) {
+      if (!fiber || depth > 120) return;
+      if (fiberName(fiber) === 'Text') {
+        var children = fiber.memoizedProps && fiber.memoizedProps.children;
+        if (typeof children === 'string' && children.trim()) {
+          texts.push(children.trim());
+        }
+      }
+      walkTexts(fiber.child, depth + 1);
+      walkTexts(fiber.sibling, depth);
+    }
+
+    function measure(sn) {
+      return new Promise(function(resolve) {
+        if (!sn || typeof sn.measureInWindow !== 'function') {
+          resolve(null);
+          return;
+        }
+        sn.measureInWindow(function(x, y, width, height) {
+          resolve({ x: x, y: y, width: width, height: height, right: x + width, bottom: y + height });
+        });
+      });
+    }
+
+    var panelFiber = null;
+    var scopeValue = null;
+
+    function walk(fiber, depth) {
+      if (!fiber || depth > 300) return;
+      var value = fiber.memoizedProps && fiber.memoizedProps.value;
+      if (value && typeof value.toggleMarkerId === 'function') {
+        scopeValue = value;
+        activeId = value.activeId;
+      }
+      if (fiberName(fiber) === 'MapSelectionPanel') panelFiber = fiber;
+      walk(fiber.child, depth + 1);
+      walk(fiber.sibling, depth);
+    }
+
+    hook.renderers.forEach(function(_, rendererID) {
+      hook.getFiberRoots(rendererID).forEach(function(root) {
+        walk(root.current || root, 0);
+      });
+    });
+
+    if (panelFiber) {
+      walkTexts(panelFiber, 0);
+      var sn = panelFiber.stateNode;
+      return measure(sn).then(function(rect) {
+        return JSON.stringify({
+          activeId: activeId,
+          panelVisible: texts.length > 0,
+          texts: texts,
+          panelRect: rect,
+        });
+      });
+    }
+
+    return JSON.stringify({
+      activeId: activeId,
+      panelVisible: false,
+      texts: [],
+      error: 'MapSelectionPanel introuvable',
+    });
+  })()`;
+}
+
 function buildReactInspectExpression(query) {
   const q = JSON.stringify(query || 'map');
   return `(function(){
@@ -195,4 +278,5 @@ module.exports = {
   buildReactInspectExpression,
   buildOpenCalloutExpression,
   buildSupportTreeExpression,
+  buildMapSelectionPanelExpression,
 };

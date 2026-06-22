@@ -18,6 +18,7 @@ const {
   buildReactInspectExpression,
   buildOpenCalloutExpression,
   buildSupportTreeExpression,
+  buildMapSelectionPanelExpression,
 } = require('./hermes-react-inspect');
 const {
   buildKickMeasureExpression,
@@ -196,6 +197,18 @@ async function main() {
         params: {
           expression: buildSupportTreeExpression(),
           returnByValue: true,
+        },
+      });
+      return;
+    }
+
+    if (sub === 'map-selection') {
+      send({
+        method: 'Runtime.evaluate',
+        params: {
+          expression: buildMapSelectionPanelExpression(),
+          returnByValue: true,
+          awaitPromise: true,
         },
       });
       return;
