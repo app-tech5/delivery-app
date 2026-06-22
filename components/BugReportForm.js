@@ -1,11 +1,93 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Card, Button, Input } from 'react-native-elements';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  ActivityIndicator,
+} from 'react-native';
+import { Card } from 'react-native-elements';
 import { colors } from '../global';
 import i18n from '../i18n';
-import { BUG_CATEGORIES, BUG_PRIORITIES } from '../utils/supportData';
+import { getBugCategories, getBugPriorities } from '../utils/supportUtils';
 
-const BugReportForm = ({ bugReport, setBugReport, onSubmit }) => {
+const INITIAL_CATEGORY = 'general';
+const INITIAL_PRIORITY = 'normal';
+
+const DescriptionSubmit = React.memo(({ category, priority, submitting, resetKey, onSubmit }) => {
+  const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    if (resetKey > 0) {
+      setDescription('');
+    }
+  }, [resetKey]);
+
+  const canSubmit = description.trim().length > 0 && !submitting;
+
+  const handleSubmit = () => {
+    if (!canSubmit) {
+      return;
+    }
+    onSubmit({ category, priority, description });
+  };
+
+  return (
+    <>
+      <TextInput
+        testID="support-bug-description"
+        placeholder={i18n.t('support.issuePlaceholder')}
+        placeholderTextColor={colors.text.secondary}
+        multiline
+        textAlignVertical="top"
+        value={description}
+        onChangeText={setDescription}
+        style={styles.descriptionInput}
+        editable={!submitting}
+      />
+
+      <Pressable
+        testID="support-send-report"
+        accessibilityRole="button"
+        accessibilityState={{ disabled: !canSubmit, busy: submitting }}
+        onPress={handleSubmit}
+        disabled={!canSubmit}
+        style={({ pressed }) => [
+          styles.submitButton,
+          !canSubmit && styles.submitButtonDisabled,
+          pressed && canSubmit && styles.submitButtonPressed,
+        ]}
+      >
+        {submitting ? (
+          <ActivityIndicator color={colors.white} />
+        ) : (
+          <Text style={[styles.submitButtonText, !canSubmit && styles.submitButtonTextDisabled]}>
+            {i18n.t('support.sendReport')}
+          </Text>
+        )}
+      </Pressable>
+    </>
+  );
+});
+
+DescriptionSubmit.displayName = 'DescriptionSubmit';
+
+const BugReportForm = ({ onSubmit, submitting, resetKey = 0 }) => {
+  const [category, setCategory] = useState(INITIAL_CATEGORY);
+  const [priority, setPriority] = useState(INITIAL_PRIORITY);
+
+  useEffect(() => {
+    if (resetKey > 0) {
+      setCategory(INITIAL_CATEGORY);
+      setPriority(INITIAL_PRIORITY);
+    }
+  }, [resetKey]);
+
+  const bugCategories = useMemo(() => getBugCategories(), []);
+  const bugPriorities = useMemo(() => getBugPriorities(), []);
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{i18n.t('support.bugReport')}</Text>
@@ -13,75 +95,66 @@ const BugReportForm = ({ bugReport, setBugReport, onSubmit }) => {
       <Card containerStyle={styles.bugReportCard}>
         <Text style={styles.bugReportTitle}>{i18n.t('support.describeIssue')}</Text>
 
-        {}
         <View style={styles.selectorContainer}>
           <Text style={styles.selectorLabel}>{i18n.t('support.category')}</Text>
           <View style={styles.selectorButtons}>
-            {BUG_CATEGORIES.map((category) => (
+            {bugCategories.map((item) => (
               <TouchableOpacity
-                key={category.key}
-                onPress={() => setBugReport(prev => ({ ...prev, category: category.key }))}
+                key={item.key}
+                onPress={() => setCategory(item.key)}
                 style={[
                   styles.selectorButton,
-                  bugReport.category === category.key && styles.selectorButtonActive
+                  category === item.key && styles.selectorButtonActive,
                 ]}
               >
-                <Text style={[
-                  styles.selectorButtonText,
-                  bugReport.category === category.key && styles.selectorButtonTextActive
-                ]}>
-                  {category.label}
+                <Text
+                  style={[
+                    styles.selectorButtonText,
+                    category === item.key && styles.selectorButtonTextActive,
+                  ]}
+                >
+                  {item.label}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        {}
         <View style={styles.selectorContainer}>
           <Text style={styles.selectorLabel}>{i18n.t('support.priority')}</Text>
           <View style={styles.selectorButtons}>
-            {BUG_PRIORITIES.map((priority) => (
+            {bugPriorities.map((item) => (
               <TouchableOpacity
-                key={priority.key}
-                onPress={() => setBugReport(prev => ({ ...prev, priority: priority.key }))}
+                key={item.key}
+                onPress={() => setPriority(item.key)}
                 style={[
                   styles.selectorButton,
                   styles.priorityButton,
-                  bugReport.priority === priority.key && [
+                  priority === item.key && [
                     styles.selectorButtonActive,
-                    { borderColor: priority.color }
-                  ]
+                    { borderColor: item.color },
+                  ],
                 ]}
               >
-                <Text style={[
-                  styles.selectorButtonText,
-                  bugReport.priority === priority.key && styles.selectorButtonTextActive
-                ]}>
-                  {priority.label}
+                <Text
+                  style={[
+                    styles.selectorButtonText,
+                    priority === item.key && styles.selectorButtonTextActive,
+                  ]}
+                >
+                  {item.label}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
-        {}
-        <Input
-          placeholder={i18n.t('support.issuePlaceholder')}
-          multiline
-          numberOfLines={4}
-          value={bugReport.description}
-          onChangeText={(text) => setBugReport(prev => ({ ...prev, description: text }))}
-          containerStyle={styles.descriptionInput}
-          inputContainerStyle={styles.descriptionInputContainer}
-          inputStyle={styles.descriptionInputText}
-        />
-
-        <Button
-          title={i18n.t('support.sendReport')}
-          onPress={onSubmit}
-          buttonStyle={styles.submitButton}
-          disabled={!bugReport.description.trim()}
+        <DescriptionSubmit
+          category={category}
+          priority={priority}
+          submitting={submitting}
+          resetKey={resetKey}
+          onSubmit={onSubmit}
         />
       </Card>
     </View>
@@ -146,27 +219,39 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   descriptionInput: {
-    paddingHorizontal: 0,
-    marginBottom: 16,
-  },
-  descriptionInputContainer: {
     borderWidth: 1,
     borderColor: colors.background.secondary,
     borderRadius: 8,
     paddingHorizontal: 12,
+    paddingVertical: 12,
     minHeight: 100,
-  },
-  descriptionInputText: {
     fontSize: 14,
     color: colors.text.primary,
-    textAlignVertical: 'top',
+    marginBottom: 16,
   },
   submitButton: {
     backgroundColor: colors.primary,
     borderRadius: 8,
-    paddingVertical: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 48,
+  },
+  submitButtonDisabled: {
+    backgroundColor: colors.background.secondary,
+    opacity: 0.85,
+  },
+  submitButtonPressed: {
+    opacity: 0.9,
+  },
+  submitButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  submitButtonTextDisabled: {
+    color: colors.text.secondary,
   },
 });
 
-export default BugReportForm;
-
+export default React.memo(BugReportForm);

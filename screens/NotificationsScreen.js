@@ -33,14 +33,18 @@ export default function NotificationsScreen() {
     if (activeFilter === 'all') {
       return {
         title: i18n.t('notifications.noNotifications'),
-        subtitle: "You're all caught up!"
+        subtitle: i18n.t('notifications.allCaughtUp'),
       };
     }
+
+    const filterLabel = filters.find((filter) => filter.key === activeFilter)?.label
+      || i18n.t(`notifications.${activeFilter}`);
+
     return {
-      title: `No ${activeFilter} notifications`,
-      subtitle: 'No notifications in this category yet.'
+      title: i18n.t('notifications.emptyFilterTitle', { filter: filterLabel }),
+      subtitle: i18n.t('notifications.emptyFilterSubtitle'),
     };
-  }, [activeFilter]);
+  }, [activeFilter, filters]);
 
   const renderNotification = useCallback(({ item: notification }) => (
     <NotificationItem
@@ -63,7 +67,7 @@ export default function NotificationsScreen() {
       <AuthGuard
         isAuthenticated={isAuthenticated}
         driver={driver}
-        subtitle="Please reconnect to view notifications"
+        subtitle={i18n.t('notifications.reconnectSubtitle')}
       />
     );
   }

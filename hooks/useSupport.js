@@ -1,81 +1,126 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Alert, Linking, Platform } from 'react-native';
 import i18n from '../i18n';
-import { CONTACT_ACTIONS } from '../utils/supportData';
+import { config } from '../config';
+import apiClient from '../api';
+import { buildContactActions, mapSupportFaqs, getPlatformLabel } from '../utils/supportUtils';
 
 export const useSupport = (currency, driver) => {
   const [expandedFAQ, setExpandedFAQ] = useState(null);
-  const [bugReport, setBugReport] = useState({
-    category: 'general',
-    priority: 'normal',
-    description: ''
-  });
-  
+  const [appConfig, setAppConfig] = useState(null);
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [formResetKey, setFormResetKey] = useState(0);
+  const [error, setError] = useState(null);
+
+  const loadSupportInfo = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const [configData, faqData] = await Promise.all([
+        apiClient.getAppConfig().catch(() => null),
+        apiClient.getSupportFaqs().catch(() => []),
+      ]);
+
+      setAppConfig(configData);
+      setFaqs(mapSupportFaqs(faqData));
+
+      if (!configData && faqData.length === 0) {
+        setError(i18n.t('support.loadError'));
+      }
+    } catch (err) {
+      console.error('Error loading support info:', err);
+      setError(i18n.t('support.loadError'));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSupportInfo();
+  }, [loadSupportInfo]);
+
+  const contactActions = useMemo(
+    () => buildContactActions(appConfig),
+    [appConfig]
+  );
+
   const toggleFAQ = (faqId) => {
     setExpandedFAQ(expandedFAQ === faqId ? null : faqId);
   };
-  
-  const submitBugReport = () => {
+
+  const submitBugReport = useCallback(async (bugReport) => {
     if (!bugReport.description.trim()) {
-      Alert.alert('Error', 'Please describe the issue before submitting.');
+      Alert.alert(i18n.t('common.error'), i18n.t('support.describeIssueRequired'));
       return;
     }
-    
-    Alert.alert(
-      'Success',
-      i18n.t('support.reportSent'),
-      [
+
+    if (!apiClient.user?.id && !apiClient.user?._id) {
+      Alert.alert(i18n.t('common.error'), i18n.t('support.authRequired'));
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      await apiClient.submitSupportTicket(bugReport);
+      Alert.alert(i18n.t('common.success'), i18n.t('support.reportSent'), [
         {
-          text: 'OK',
-          onPress: () => {
-            setBugReport({
-              category: 'general',
-              priority: 'normal',
-              description: ''
-            });
-          }
+          text: i18n.t('common.ok'),
+          onPress: () => setFormResetKey((key) => key + 1),
+        },
+      ]);
+    } catch (err) {
+      console.error('Error submitting support ticket:', err);
+      Alert.alert(i18n.t('common.error'), i18n.t('support.reportError'));
+    } finally {
+      setSubmitting(false);
+    }
+  }, []);
+
+  const handleContactAction = async (action) => {
+    if (action.actionType === 'email' && action.value) {
+      const url = `mailto:${action.value}?subject=${encodeURIComponent(i18n.t('support.emailSubject'))}`;
+      try {
+        const canOpen = await Linking.canOpenURL(url);
+        if (!canOpen) {
+          throw new Error('Cannot open mail client');
         }
-      ]
-    );
-  };
-  
-  const handleContactAction = (actionType) => {
-    switch (actionType) {
-      case 'call':
-        Linking.openURL('tel:+15551234567');
-        break;
-      case 'email':
-        Linking.openURL('mailto:support@goodfood.com');
-        break;
-      case 'chat':
-        Alert.alert('Chat', 'Live chat feature coming soon!');
-        break;
-      default:
-        break;
+        await Linking.openURL(url);
+      } catch (err) {
+        console.error('Error opening email:', err);
+        Alert.alert(i18n.t('common.error'), i18n.t('support.emailError'));
+      }
     }
   };
-  
-  const getSystemInfo = () => {
-    return {
-      appVersion: '1.0.0',
-      platform: Platform.OS,
-      osVersion: Platform.Version,
-      device: 'Unknown Device', 
-      currency: currency?.code || 'EUR'
-    };
-  };
 
-  const systemInfo = getSystemInfo();
+  const systemInfo = useMemo(
+    () => ({
+      appVersion: config.VERSION,
+      platform: getPlatformLabel(Platform.OS),
+      osVersion: Platform.Version,
+      device: i18n.t('support.unknownDevice'),
+      currency: currency?.code || 'EUR',
+    }),
+    [currency?.code]
+  );
 
   return {
     expandedFAQ,
-    bugReport,
-    setBugReport,
     systemInfo,
+    contactActions,
+    faqs,
+    loading,
+    submitting,
+    formResetKey,
+    error,
+    supportEmail: appConfig?.supportEmail || null,
     toggleFAQ,
     submitBugReport,
     handleContactAction,
-    driver
+    reloadSupportInfo: loadSupportInfo,
+    driver,
   };
 };
-

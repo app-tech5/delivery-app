@@ -8,6 +8,7 @@ const emptyState = () => ({
   orderPatches: {},
   notificationReadIds: [],
   notificationRemovedIds: [],
+  supportTickets: [],
 });
 
 export async function getDemoState() {

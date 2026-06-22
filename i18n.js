@@ -7,13 +7,13 @@ const i18n = new I18n({
   en
 });
 
-i18n.enableFallback = true; 
-i18n.defaultLocale = 'en'; 
+i18n.enableFallback = true;
+i18n.defaultLocale = 'en';
 
-let deviceLanguage = 'en'; 
+let deviceLanguage = 'en';
 try {
   if (Localization && Localization.locale) {
-    deviceLanguage = Localization.locale.split('-')[0]; 
+    deviceLanguage = Localization.locale.split('-')[0];
   }
 } catch (error) {
   console.warn('Error detecting language:', error.message);
@@ -36,4 +36,3 @@ export const isLanguageSupported = (language) => !!i18n.translations[language];
 export const supportedLanguages = Object.keys(i18n.translations);
 
 export default i18n;
-

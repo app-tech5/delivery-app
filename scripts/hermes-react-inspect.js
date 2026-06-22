@@ -3,6 +3,7 @@
  *
  *   node scripts/hermes-cdp.js react map
  *   node scripts/hermes-cdp.js react open restaurant-<id>
+ *   node scripts/hermes-cdp.js react support
  *   node scripts/hermes-cdp.js react measure restaurant-<id>
  */
 
@@ -39,6 +40,51 @@ function buildOpenCalloutExpression(markerId) {
     });
 
     return JSON.stringify({ markerId: markerId, opened: toggled, activeId: activeId }, null, 2);
+  })()`;
+}
+
+function buildSupportTreeExpression() {
+  return `(function(){
+    var hook = globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+    if (!hook) return JSON.stringify({ error: 'Pas de hook React' });
+
+    var texts = [];
+
+    function fiberName(fiber) {
+      if (!fiber || !fiber.type) return '';
+      var t = fiber.type;
+      if (typeof t === 'string') return t;
+      return t.displayName || t.name || t.render?.displayName || '';
+    }
+
+    function walkSubtree(fiber, depth) {
+      if (!fiber || depth > 400) return;
+      if (fiberName(fiber) === 'Text') {
+        var children = fiber.memoizedProps && fiber.memoizedProps.children;
+        if (typeof children === 'string' && children.trim()) {
+          texts.push(children.trim());
+        }
+      }
+      walkSubtree(fiber.child, depth + 1);
+      walkSubtree(fiber.sibling, depth);
+    }
+
+    function findSupportScreen(fiber, depth) {
+      if (!fiber || depth > 400) return;
+      if (fiberName(fiber) === 'SupportScreen') {
+        walkSubtree(fiber.child, 0);
+      }
+      findSupportScreen(fiber.child, depth + 1);
+      findSupportScreen(fiber.sibling, depth);
+    }
+
+    hook.renderers.forEach(function(_, rendererID) {
+      hook.getFiberRoots(rendererID).forEach(function(root) {
+        findSupportScreen(root.current || root, 0);
+      });
+    });
+
+    return JSON.stringify({ screen: 'SupportScreen', count: texts.length, texts: texts }, null, 2);
   })()`;
 }
 
@@ -148,4 +194,5 @@ function buildReactInspectExpression(query) {
 module.exports = {
   buildReactInspectExpression,
   buildOpenCalloutExpression,
+  buildSupportTreeExpression,
 };

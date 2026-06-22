@@ -7,6 +7,11 @@ import {
   markDemoNotificationReadLocally,
   deleteDemoNotificationLocally,
 } from './api/demo/notificationHandlers';
+import { submitDemoSupportTicketLocally } from './api/demo/supportHandlers';
+import {
+  buildSupportTicketSubject,
+  mapSupportPriority,
+} from './utils/supportUtils';
 
 const isDemoMode = () => config.DEMO_MODE === true;
 
@@ -541,6 +546,48 @@ class ApiClient {
     return await this.apiCall('/resource/settings');
   }
 
+  async getAppConfig() {
+    try {
+      const data = await this.apiCall('/resource/app_settings');
+      if (Array.isArray(data)) {
+        return data[0] || null;
+      }
+      return data || null;
+    } catch (error) {
+      console.error('Error fetching app config:', error);
+      return null;
+    }
+  }
+
+  async getSupportFaqs() {
+    const data = await this.apiCall('/resource/customersupports?type=faq');
+    return Array.isArray(data) ? data : [];
+  }
+
+  async submitSupportTicket({ category, priority, description }) {
+    const userId = this.user?.id || this.user?._id;
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    const payload = {
+      type: 'ticket',
+      user: userId,
+      subject: buildSupportTicketSubject(category),
+      description,
+      priority: mapSupportPriority(priority),
+    };
+
+    if (isDemoMode()) {
+      return submitDemoSupportTicketLocally(payload);
+    }
+
+    return await this.apiCall('/resource/customersupports', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   async getNotifications() {
     const data = await this.apiCall('/resource/notifications');
 
@@ -643,4 +690,7 @@ export const {
 } = apiClient;
 
 export const getSettings = () => apiClient.getSettings();
+export const getAppConfig = () => apiClient.getAppConfig();
+export const getSupportFaqs = () => apiClient.getSupportFaqs();
+export const submitSupportTicket = (payload) => apiClient.submitSupportTicket(payload);
 export const getNearbyRestaurants = (latitude, longitude, radius) => apiClient.getNearbyRestaurants(latitude, longitude, radius);

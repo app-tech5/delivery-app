@@ -254,6 +254,7 @@
     "confirmLogout": "Are you sure you want to log out?",
     "all": "All",
     "error": "Error",
+    "success": "Success",
     "notAvailable": "N/A"
   },
   "reports": {
@@ -449,7 +450,11 @@
     "markAllReadSuccess": "All notifications marked as read",
     "deleteSuccess": "Notification deleted",
     "deleteConfirm": "Are you sure you want to delete this notification?",
-    "loadError": "Unable to load notifications"
+    "loadError": "Unable to load notifications",
+    "allCaughtUp": "You're all caught up!",
+    "emptyFilterTitle": "No {{filter}} notifications",
+    "emptyFilterSubtitle": "No notifications in this category yet.",
+    "reconnectSubtitle": "Please reconnect to view notifications"
   },
   "support": {
     "title": "Support",
@@ -471,7 +476,14 @@
     "sendReport": "Send Report",
     "reportSent": "Report sent successfully",
     "reportError": "Unable to send report",
+    "loadError": "Unable to load support information",
+    "noFaqs": "No FAQs available at the moment.",
+    "contactUnavailable": "Support email is not configured. Please try again later.",
+    "emailSubject": "Good Food Driver — Support request",
+    "emailError": "Unable to open your email app.",
+    "authRequired": "Please sign in to submit a support request.",
     "describeIssue": "Describe your issue",
+    "describeIssueRequired": "Please describe the issue before submitting.",
     "issuePlaceholder": "Please describe the problem you're experiencing...",
     "urgent": "Urgent",
     "normal": "Normal",
@@ -482,6 +494,9 @@
     "technical": "Technical",
     "payment": "Payment",
     "account": "Account",
+    "unknownDevice": "Unknown device",
+    "platformIos": "iOS",
+    "platformAndroid": "Android",
     "submit": "Submit",
     "cancel": "Cancel",
     "helpTopics": {

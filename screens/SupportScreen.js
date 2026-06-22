@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, Text } from 'react-native';
 import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
@@ -17,12 +17,17 @@ export default function SupportScreen() {
 
   const {
     expandedFAQ,
-    bugReport,
-    setBugReport,
     systemInfo,
+    contactActions,
+    faqs,
+    loading,
+    submitting,
+    formResetKey,
+    error,
     toggleFAQ,
     submitBugReport,
-    handleContactAction
+    handleContactAction,
+    reloadSupportInfo,
   } = useSupport(currency, driver);
 
   return (
@@ -30,18 +35,42 @@ export default function SupportScreen() {
       title={i18n.t('support.title')}
       subtitle={i18n.t('support.subtitle')}
     >
-      <ScrollView style={styles.scrollView}>
-        <ContactActions onContactAction={handleContactAction} />
+      <ScrollView
+        style={styles.scrollView}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        nestedScrollEnabled
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={reloadSupportInfo}
+            colors={[colors.primary]}
+          />
+        }
+      >
+        {error ? (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
+
+        <ContactActions
+          contactActions={contactActions}
+          loading={loading}
+          onContactAction={handleContactAction}
+        />
 
         <FAQSection
+          faqs={faqs}
           expandedFAQ={expandedFAQ}
+          loading={loading}
           onToggleFAQ={toggleFAQ}
         />
 
         <BugReportForm
-          bugReport={bugReport}
-          setBugReport={setBugReport}
           onSubmit={submitBugReport}
+          submitting={submitting}
+          resetKey={formResetKey}
         />
 
         <SystemInfo
@@ -60,6 +89,17 @@ export default function SupportScreen() {
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
+  },
+  errorBanner: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: colors.background.secondary,
+  },
+  errorText: {
+    color: colors.error,
+    fontSize: 14,
   },
   bottomSpacer: {
     height: 20,

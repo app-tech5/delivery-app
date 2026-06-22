@@ -6,6 +6,7 @@
  *   node scripts/hermes-cdp.js react map
  *   node scripts/hermes-cdp.js react list
  *   node scripts/hermes-cdp.js react open restaurant-<id>
+ *   node scripts/hermes-cdp.js react support
  *   node scripts/hermes-cdp.js react measure restaurant-<id>
  *
  * Par défaut : evaluate SANS Runtime.enable (évite le replay des logs console).
@@ -16,6 +17,7 @@ const WebSocket = require('ws');
 const {
   buildReactInspectExpression,
   buildOpenCalloutExpression,
+  buildSupportTreeExpression,
 } = require('./hermes-react-inspect');
 const {
   buildKickMeasureExpression,
@@ -184,6 +186,17 @@ async function main() {
       send({
         method: 'Runtime.evaluate',
         params: { expression: buildOpenCalloutExpression(markerId), returnByValue: true },
+      });
+      return;
+    }
+
+    if (sub === 'support') {
+      send({
+        method: 'Runtime.evaluate',
+        params: {
+          expression: buildSupportTreeExpression(),
+          returnByValue: true,
+        },
       });
       return;
     }
