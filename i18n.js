@@ -2,9 +2,11 @@ import { I18n } from 'i18n-js';
 import * as Localization from 'expo-localization';
 
 import en from './lang/en.json';
+import fr from './lang/fr.json';
 
 const i18n = new I18n({
-  en
+  en,
+  fr,
 });
 
 i18n.enableFallback = true;

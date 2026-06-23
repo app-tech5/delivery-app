@@ -123,8 +123,8 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
       { value: 'credit_card', label: i18n.t('payment.creditCard'), icon: 'credit-card' },
       { value: 'debit_card', label: i18n.t('payment.debitCard'), icon: 'credit-card' },
       { value: 'paypal', label: i18n.t('payment.paypal'), icon: 'paypal' },
-      { value: 'apple_pay', label: 'Apple Pay', icon: 'apple' },
-      { value: 'google_pay', label: 'Google Pay', icon: 'google' },
+      { value: 'apple_pay', label: i18n.t('payment.applePay'), icon: 'apple' },
+      { value: 'google_pay', label: i18n.t('payment.googlePay'), icon: 'google' },
     ];
 
     return (
@@ -201,7 +201,7 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
           />
           <TextInput
             style={styles.input}
-            placeholder="CVV"
+            placeholder={i18n.t('payment.cvv')}
             value={cvv}
             onChangeText={(text) => setCvv(text.replace(/[^0-9]/g, '').slice(0, 4))}
             keyboardType="numeric"

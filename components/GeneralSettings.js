@@ -1,12 +1,90 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { colors } from '../global';
-import i18n from '../i18n';
+import i18n, { getCurrentLanguage } from '../i18n';
 import { SettingRow } from './index';
-import { THEME_OPTIONS } from '../utils/settingsData';
+import { THEME_OPTIONS, LANGUAGE_OPTIONS } from '../utils/settingsData';
+import SettingsPickerModal from './SettingsPickerModal';
 
-const GeneralSettings = ({ localSettings = {}, currency, onThemeChange, onFeatureComingSoon }) => {
+const GeneralSettings = ({
+  localSettings = {},
+  currency,
+  onThemeChange,
+  onLanguageChange,
+  onCurrencyChange,
+  getAvailableLanguages,
+  getAvailableCurrencies,
+}) => {
+  const [languageModalVisible, setLanguageModalVisible] = useState(false);
+  const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
+  const [languageItems, setLanguageItems] = useState([]);
+  const [currencyItems, setCurrencyItems] = useState([]);
+  const [loadingCurrencies, setLoadingCurrencies] = useState(false);
+
+  const currentLanguageCode = getCurrentLanguage();
+  const currentLanguageLabel =
+    LANGUAGE_OPTIONS.find((lang) => lang.key === currentLanguageCode)?.label
+    || currentLanguageCode.toUpperCase();
+
+  const openLanguagePicker = useCallback(() => {
+    const languages = typeof getAvailableLanguages === 'function'
+      ? getAvailableLanguages()
+      : [];
+    setLanguageItems(
+      languages.map((lang) => ({
+        id: lang.key,
+        label: lang.label,
+        leading: lang.flag,
+      }))
+    );
+    setLanguageModalVisible(true);
+  }, [getAvailableLanguages]);
+
+  const openCurrencyPicker = useCallback(async () => {
+    setCurrencyModalVisible(true);
+    setLoadingCurrencies(true);
+    try {
+      const currencies = typeof getAvailableCurrencies === 'function'
+        ? await getAvailableCurrencies()
+        : [];
+      setCurrencyItems(
+        currencies.map((item) => ({
+          id: item._id || item.id || item.code,
+          raw: item,
+          label: `${item.symbol || ''} ${item.name || item.label || item.code}`.trim(),
+          subtitle: item.code,
+        }))
+      );
+    } catch (error) {
+      console.error('Currency picker error:', error);
+      Alert.alert(i18n.t('common.error'), i18n.t('settings.currencyLoadError'));
+      setCurrencyModalVisible(false);
+    } finally {
+      setLoadingCurrencies(false);
+    }
+  }, [getAvailableCurrencies]);
+
+  const handleLanguageSelect = async (item) => {
+    setLanguageModalVisible(false);
+    try {
+      await onLanguageChange?.(item.id);
+      Alert.alert(i18n.t('common.success'), i18n.t('settings.languageChanged'));
+    } catch (error) {
+      Alert.alert(i18n.t('common.error'), i18n.t('settings.languageSaveError'));
+    }
+  };
+
+  const handleCurrencySelect = async (item) => {
+    setCurrencyModalVisible(false);
+    try {
+      await onCurrencyChange?.(item.raw || item);
+      Alert.alert(i18n.t('common.success'), i18n.t('settings.currencyChanged'));
+    } catch (error) {
+      Alert.alert(i18n.t('common.error'), i18n.t('settings.currencySaveError'));
+    }
+  };
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{i18n.t('settings.general')}</Text>
@@ -14,18 +92,18 @@ const GeneralSettings = ({ localSettings = {}, currency, onThemeChange, onFeatur
       <Card containerStyle={styles.card}>
         <SettingRow
           title={i18n.t('settings.language')}
-          subtitle={i18n.t('settings.currentLanguage')}
-          value="English"
-          showChevron={true}
-          onPress={() => onFeatureComingSoon('Language selection')}
+          subtitle={i18n.t('settings.currentLanguageLabel')}
+          value={currentLanguageLabel}
+          showChevron
+          onPress={openLanguagePicker}
         />
 
         <SettingRow
           title={i18n.t('settings.currency')}
-          subtitle="Display currency for prices"
+          subtitle={i18n.t('settings.currencySubtitle')}
           value={`${currency?.symbol || '€'} (${currency?.code || 'EUR'})`}
-          showChevron={true}
-          onPress={() => onFeatureComingSoon('Currency selection')}
+          showChevron
+          onPress={openCurrencyPicker}
         />
 
         <View style={styles.themeSelector}>
@@ -37,7 +115,7 @@ const GeneralSettings = ({ localSettings = {}, currency, onThemeChange, onFeatur
                 onPress={() => onThemeChange(theme.key)}
                 style={[
                   styles.themeOption,
-                  localSettings.theme === theme.key && styles.themeOptionSelected
+                  localSettings.theme === theme.key && styles.themeOptionSelected,
                 ]}
               >
                 <Icon
@@ -46,10 +124,12 @@ const GeneralSettings = ({ localSettings = {}, currency, onThemeChange, onFeatur
                   size={20}
                   color={localSettings.theme === theme.key ? colors.white : colors.primary}
                 />
-                <Text style={[
-                  styles.themeOptionText,
-                  localSettings.theme === theme.key && styles.themeOptionTextSelected
-                ]}>
+                <Text
+                  style={[
+                    styles.themeOptionText,
+                    localSettings.theme === theme.key && styles.themeOptionTextSelected,
+                  ]}
+                >
                   {theme.label}
                 </Text>
               </TouchableOpacity>
@@ -57,6 +137,25 @@ const GeneralSettings = ({ localSettings = {}, currency, onThemeChange, onFeatur
           </View>
         </View>
       </Card>
+
+      <SettingsPickerModal
+        visible={languageModalVisible}
+        title={i18n.t('settings.selectLanguage')}
+        items={languageItems}
+        selectedId={currentLanguageCode}
+        onSelect={handleLanguageSelect}
+        onClose={() => setLanguageModalVisible(false)}
+      />
+
+      <SettingsPickerModal
+        visible={currencyModalVisible}
+        title={i18n.t('settings.selectCurrency')}
+        items={currencyItems}
+        selectedId={currency?._id || currency?.id || currency?.code}
+        loading={loadingCurrencies}
+        onSelect={handleCurrencySelect}
+        onClose={() => setCurrencyModalVisible(false)}
+      />
     </View>
   );
 };

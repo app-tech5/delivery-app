@@ -575,6 +575,18 @@ class ApiClient {
     return await this.apiCall('/resource/settings');
   }
 
+  async listCurrencies() {
+    const raw = await this.apiCall('/resource/currencies');
+    return Array.isArray(raw) ? raw : [];
+  }
+
+  async updateSettingsDocument(settingsId, patch) {
+    return await this.apiCall(`/resource/settings/${settingsId}`, {
+      method: 'PUT',
+      body: JSON.stringify(patch),
+    });
+  }
+
   async getAppConfig() {
     try {
       const data = await this.apiCall('/resource/app_settings');

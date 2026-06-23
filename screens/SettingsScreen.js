@@ -4,7 +4,7 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { useDriver } from '../contexts/DriverContext';
 import { useSettings } from '../contexts/SettingContext';
-import { useSettingsManager } from '../hooks/useSettingsManager';
+import { useSettingsScreen } from '../hooks/useSettingsScreen';
 import { ScreenLayout } from '../components';
 import GeneralSettings from '../components/GeneralSettings';
 import PaymentSettings from '../components/PaymentSettings';
@@ -15,8 +15,16 @@ import AboutSection from '../components/AboutSection';
 import SettingsActions from '../components/SettingsActions';
 
 export default function SettingsScreen() {
-  const { isAuthenticated, logout } = useDriver();
-  const { settings, currency, language, refreshSettings, invalidateCache } = useSettings();
+  const { logout } = useDriver();
+  const {
+    currency,
+    invalidateCache,
+    getAvailableLanguages,
+    getAvailableCurrencies,
+    changeLanguage,
+    changeCurrency,
+    localeVersion,
+  } = useSettings();
 
   const {
     localSettings,
@@ -27,17 +35,20 @@ export default function SettingsScreen() {
     handleClearCache,
     handleClearData,
     openURL,
-    handleFeatureComingSoon
-  } = useSettingsManager(invalidateCache, logout);
+    handleFeatureComingSoon,
+  } = useSettingsScreen(invalidateCache, logout);
 
   return (
-    <ScreenLayout title={i18n.t('navigation.settings')}>
+    <ScreenLayout title={i18n.t('navigation.settings')} key={`settings-${localeVersion}`}>
       <ScrollView style={styles.scrollView}>
         <GeneralSettings
           localSettings={localSettings}
           currency={currency}
           onThemeChange={handleThemeChange}
-          onFeatureComingSoon={handleFeatureComingSoon}
+          onLanguageChange={changeLanguage}
+          onCurrencyChange={changeCurrency}
+          getAvailableLanguages={getAvailableLanguages}
+          getAvailableCurrencies={getAvailableCurrencies}
         />
 
         <PaymentSettings />

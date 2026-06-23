@@ -13,7 +13,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "hermes": "node scripts/hermes-cdp.js",
-    "hermes:support-form": "node scripts/hermes-support-form-test.js"
+    "hermes:support-form": "node scripts/hermes-support-form-test.js",
+    "hermes:settings": "node scripts/hermes-settings-test.js"
   },
   "keywords": [],
   "author": "",
