@@ -1,13 +1,22 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator, Alert } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+  Alert,
+  Pressable,
+} from 'react-native';
+import { Card } from 'react-native-elements';
+import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../global';
 import i18n from '../i18n';
 
 export function ProfileEditButton({ onPress }) {
   return (
     <TouchableOpacity onPress={onPress} style={styles.editButton}>
-      <Icon name="edit" type="material" size={20} color={colors.white} />
+      <MaterialIcons name="edit" size={20} color={colors.white} />
     </TouchableOpacity>
   );
 }
@@ -35,36 +44,31 @@ export function ProfileSaveButton({ onPress, saving }) {
 export default function ProfileActionsSection({ onLogout }) {
   return (
     <View style={styles.section}>
-      <Button
-        title={i18n.t('profile.changePassword')}
-        buttonStyle={styles.secondaryButton}
-        titleStyle={styles.secondaryButtonText}
-        icon={
-          <Icon
-            name="lock"
-            type="material"
-            size={16}
-            color={colors.primary}
-            style={{ marginRight: 8 }}
-          />
-        }
-      />
+      <Card containerStyle={styles.card}>
+        <Pressable
+          style={({ pressed }) => [styles.actionRow, pressed && styles.actionPressed]}
+          accessibilityRole="button"
+        >
+          <View style={[styles.iconWrap, styles.primaryIconWrap]}>
+            <MaterialIcons name="lock-outline" size={20} color={colors.primary} />
+          </View>
+          <Text style={styles.actionLabel}>{i18n.t('profile.changePassword')}</Text>
+          <MaterialIcons name="chevron-right" size={22} color={colors.text.secondary} />
+        </Pressable>
 
-      <Button
-        title={i18n.t('navigation.logout')}
-        buttonStyle={styles.logoutButton}
-        titleStyle={styles.logoutButtonText}
-        onPress={onLogout}
-        icon={
-          <Icon
-            name="logout"
-            type="material"
-            size={16}
-            color={colors.error}
-            style={{ marginRight: 8 }}
-          />
-        }
-      />
+        <View style={styles.divider} />
+
+        <Pressable
+          style={({ pressed }) => [styles.actionRow, pressed && styles.actionPressed]}
+          onPress={onLogout}
+          accessibilityRole="button"
+        >
+          <View style={[styles.iconWrap, styles.logoutIconWrap]}>
+            <MaterialIcons name="logout" size={20} color={colors.error} />
+          </View>
+          <Text style={[styles.actionLabel, styles.logoutLabel]}>{i18n.t('navigation.logout')}</Text>
+        </Pressable>
+      </Card>
     </View>
   );
 }
@@ -83,7 +87,7 @@ export function confirmLogout(onLogout) {
             await onLogout();
           } catch (error) {
             console.error('Logout error:', error);
-            Alert.alert('Error', 'Failed to logout');
+            Alert.alert(i18n.t('common.error'), 'Failed to logout');
           }
         },
       },
@@ -109,22 +113,50 @@ const styles = StyleSheet.create({
   },
   section: {
     padding: 16,
+    paddingTop: 0,
   },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.primary,
-    marginBottom: 12,
+  card: {
+    borderRadius: 12,
+    padding: 0,
+    margin: 0,
+    overflow: 'hidden',
   },
-  secondaryButtonText: {
-    color: colors.primary,
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    minHeight: 56,
   },
-  logoutButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.error,
+  actionPressed: {
+    backgroundColor: colors.background.secondary,
   },
-  logoutButtonText: {
+  iconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  primaryIconWrap: {
+    backgroundColor: `${colors.primary}15`,
+  },
+  logoutIconWrap: {
+    backgroundColor: `${colors.error}15`,
+  },
+  actionLabel: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary,
+  },
+  logoutLabel: {
     color: colors.error,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.background.secondary,
+    marginHorizontal: 16,
   },
 });

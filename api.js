@@ -9,6 +9,13 @@ import {
 } from './api/demo/notificationHandlers';
 import { submitDemoSupportTicketLocally } from './api/demo/supportHandlers';
 import {
+  mergeDemoDriverProfile,
+  updateDemoUserLocally,
+  updateDemoDriverProfileLocally,
+  uploadDemoPublicFileLocally,
+  uploadDemoFileLocally,
+} from './api/demo/profileHandlers';
+import {
   buildSupportTicketSubject,
   mapSupportPriority,
 } from './utils/supportUtils';
@@ -445,8 +452,8 @@ class ApiClient {
       const result = await this.apiCall('/resource/drivers/byUserId');
       const profile = Array.isArray(result) ? result[0] : result;
       if (profile?._id || profile?.id) {
-        this.driver = profile;
-        return profile;
+        this.driver = isDemoMode() ? await mergeDemoDriverProfile(profile) : profile;
+        return this.driver;
       }
       this.driver = null;
       return null;
@@ -464,6 +471,13 @@ class ApiClient {
   }
 
   async updateUser(userData) {
+    if (isDemoMode()) {
+      const updatedUser = await updateDemoUserLocally(userData, this.user);
+      this.user = updatedUser;
+      await this.saveDriverToStorage();
+      return updatedUser;
+    }
+
     return await this.apiCall('/users/me', {
       method: 'PUT',
       body: JSON.stringify(userData),
@@ -471,6 +485,13 @@ class ApiClient {
   }
   
   async updateDriverProfile(profileData) {
+    if (isDemoMode()) {
+      const updatedDriver = await updateDemoDriverProfileLocally(profileData, this.driver);
+      this.driver = updatedDriver;
+      await this.saveDriverToStorage();
+      return updatedDriver;
+    }
+
     const updatedDriver = await this.apiCall('/drivers/profile', {
       method: 'PUT',
       body: JSON.stringify(profileData),
@@ -490,6 +511,10 @@ class ApiClient {
   }
 
   async uploadFile(asset) {
+    if (isDemoMode()) {
+      return uploadDemoFileLocally(asset);
+    }
+
     const uri = typeof asset === 'string' ? asset : asset.uri;
     const mimeType = typeof asset === 'string'
       ? 'image/jpeg'
@@ -512,6 +537,10 @@ class ApiClient {
   }
 
   async uploadPublicFile(asset, folder = 'avatars') {
+    if (isDemoMode()) {
+      return uploadDemoPublicFileLocally(asset);
+    }
+
     const uri = typeof asset === 'string' ? asset : asset.uri;
     const formData = new FormData();
     formData.append('folder', folder);

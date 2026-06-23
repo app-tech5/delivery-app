@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api';
+import { config } from '../config';
+import { mergeDemoDriverProfile } from '../api/demo/profileHandlers';
 import { clearAllLocalAppDataOnLogout } from '../utils/cacheUtils';
 import { updateDriverCache, getDriverSessionFromCache } from '../utils/driverUtils';
 
@@ -59,7 +61,11 @@ export const useDriverAuth = () => {
         const cachedDriverId = cached.driver?._id || cached.driver?.id;
         setNeedsOnboarding(!cached.user || !cachedDriverId);
         if (cachedDriverId) {
-          setDriver(cached.driver);
+          const driverFromCache = config.DEMO_MODE
+            ? await mergeDemoDriverProfile(cached.driver)
+            : cached.driver;
+          apiClient.driver = driverFromCache;
+          setDriver(driverFromCache);
         }
 
         setIsAuthenticated(true);
