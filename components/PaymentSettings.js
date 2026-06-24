@@ -3,14 +3,20 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { useDriver } from '../contexts/DriverContext';
 import { usePaymentMethods } from '../hooks';
+import { formatPayoutMethodLabel } from '../utils/paymentMethodUtils';
 
 const PaymentSettings = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const { driver, hasCompletedOnboarding } = useDriver();
-  const { paymentMethods, loading } = usePaymentMethods(driver, hasCompletedOnboarding);
+  const { paymentMethods, loading } = usePaymentMethods(
+    driver,
+    hasCompletedOnboarding,
+    isFocused
+  );
 
   const handlePaymentMethodsPress = () => {
     
@@ -23,27 +29,12 @@ const PaymentSettings = () => {
 
   const formatPaymentMethodName = (method) => {
     if (!method) return i18n.t('payment.noDefaultMethod');
-
-    switch (method.methodType) {
-      case 'credit_card':
-      case 'debit_card':
-        return `${method.cardBrand?.toUpperCase() || 'CARD'} ****${method.cardDetails?.cardNumberLast4 || '****'}`;
-      case 'paypal':
-        return `PayPal ${method.paypalEmail?.split('@')[0] || ''}`;
-      case 'apple_pay':
-        return 'Apple Pay';
-      case 'google_pay':
-        return 'Google Pay';
-      case 'cash_on_delivery':
-        return i18n.t('payment.cashOnDelivery');
-      default:
-        return i18n.t('payment.otherMethod');
-    }
+    return formatPayoutMethodLabel(method) || i18n.t('payment.otherMethod');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>{i18n.t('settings.payment')}</Text>
+      <Text style={styles.sectionTitle}>{i18n.t('settings.payout')}</Text>
 
       <TouchableOpacity
         style={styles.settingItem}
@@ -52,22 +43,19 @@ const PaymentSettings = () => {
         <View style={styles.settingLeft}>
           <View style={styles.iconContainer}>
             <MaterialIcons
-              name="payment"
+              name="account-balance-wallet"
               size={20}
               color={colors.primary}
             />
           </View>
           <View style={styles.settingContent}>
             <Text style={styles.settingTitle}>
-              {i18n.t('payment.paymentMethodsTitle')}
+              {i18n.t('payment.payoutMethodsTitle')}
             </Text>
             <Text style={styles.settingSubtitle}>
               {loading
                 ? i18n.t('common.loading')
-                : paymentMethods.length > 0
-                  ? `${paymentMethods.length} ${i18n.t('payment.methodsAvailable')}`
-                  : i18n.t('payment.noPaymentMethods')
-              }
+                : i18n.t('payment.payoutMethodsSubtitle')}
             </Text>
           </View>
         </View>

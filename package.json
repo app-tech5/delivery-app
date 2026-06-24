@@ -14,7 +14,8 @@
     "web": "expo start --web",
     "hermes": "node scripts/hermes-cdp.js",
     "hermes:support-form": "node scripts/hermes-support-form-test.js",
-    "hermes:settings": "node scripts/hermes-settings-test.js"
+    "hermes:settings": "node scripts/hermes-settings-test.js",
+    "hermes:payment-methods": "node scripts/hermes-payment-methods-test.js"
   },
   "keywords": [],
   "author": "",

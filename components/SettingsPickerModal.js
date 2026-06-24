@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  Platform,
   ActivityIndicator,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors } from '../global';
 import i18n from '../i18n';
@@ -22,6 +22,8 @@ export default function SettingsPickerModal({
   onSelect,
   onClose,
 }) {
+  const insets = useSafeAreaInsets();
+
   return (
     <Modal
       visible={visible}
@@ -30,7 +32,7 @@ export default function SettingsPickerModal({
       onRequestClose={onClose}
     >
       <View style={styles.backdrop}>
-        <View style={styles.card}>
+        <View style={[styles.card, { paddingBottom: Math.max(insets.bottom, 20) }]}>
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -47,6 +49,7 @@ export default function SettingsPickerModal({
             <FlatList
               data={items}
               keyExtractor={(item) => String(item.id)}
+              contentContainerStyle={styles.listContent}
               renderItem={({ item }) => {
                 const selected = String(item.id) === String(selectedId);
                 return (
@@ -94,8 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '70%',
-    paddingBottom: Platform.OS === 'ios' ? 28 : 16,
+    maxHeight: '75%',
   },
   header: {
     flexDirection: 'row',
@@ -129,6 +131,9 @@ const styles = StyleSheet.create({
   loadingText: {
     color: colors.text.secondary,
     fontSize: 14,
+  },
+  listContent: {
+    paddingBottom: 8,
   },
   row: {
     flexDirection: 'row',

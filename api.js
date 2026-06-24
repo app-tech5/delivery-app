@@ -16,6 +16,18 @@ import {
   uploadDemoFileLocally,
 } from './api/demo/profileHandlers';
 import {
+  mergeDemoPaymentMethods,
+  createDemoPaymentMethod,
+  updateDemoPaymentMethod,
+  deleteDemoPaymentMethod,
+  setDemoDefaultPaymentMethod,
+} from './api/demo/paymentHandlers';
+import {
+  startDemoStripeConnectOnboarding,
+  getDemoStripeConnectStatus,
+  syncDemoStripeConnectPayoutMethod,
+} from './api/demo/connectHandlers';
+import {
   buildSupportTicketSubject,
   mapSupportPriority,
 } from './utils/supportUtils';
@@ -321,93 +333,149 @@ class ApiClient {
     }
   }
   
-  async getPaymentMethods() {
-    try {
-      
-      if (isDemoMode()) {
-        
-        console.log('🔄 Mode démo détecté - Retour des méthodes de paiement mockées');
-        return [
-          {
-            _id: 'demo_card_1',
-            methodType: 'credit_card',
-            isDefault: true,
-            isActive: true,
-            cardBrand: 'visa',
-            last4: '4242',
-            expiryMonth: 12,
-            expiryYear: 2025,
-            cardholderName: 'John Doe',
-            verificationStatus: 'verified',
-            createdAt: new Date().toISOString()
-          },
-          {
-            _id: 'demo_paypal_1',
-            methodType: 'paypal',
-            isDefault: false,
-            isActive: true,
-            paypalEmail: 'john.doe@example.com',
-            verificationStatus: 'verified',
-            createdAt: new Date().toISOString()
-          }
-        ];
-      }
-      
-      const paymentMethods = await this.apiCall('/resource/paymentmethods');
-      return paymentMethods || [];
+  getUserId() {
+    return this.user?.id || this.user?._id || null;
+  }
 
+  async getPaymentMethods() {
+    if (!this.getUserId()) return [];
+
+    try {
+      const paymentMethods = await this.apiCall('/resource/paymentMethods/byUserId');
+      const data = Array.isArray(paymentMethods) ? paymentMethods : [];
+      const payoutMethods = data.filter((method) => (method.purpose || 'payment') === 'payout');
+
+      if (isDemoMode()) {
+        return mergeDemoPaymentMethods(payoutMethods);
+      }
+
+      return payoutMethods;
     } catch (error) {
       console.error('Error fetching payment methods:', error);
       return [];
     }
   }
-  
+
   async createPaymentMethod(paymentMethodData) {
+    const userId = this.getUserId();
+    if (!userId) throw new Error('User not authenticated');
+
     try {
-      const result = await this.apiCall('/resource/paymentmethods', {
+      if (isDemoMode()) {
+        return await createDemoPaymentMethod({
+          ...paymentMethodData,
+          purpose: 'payout',
+        });
+      }
+
+      return await this.apiCall('/resource/paymentMethods', {
         method: 'POST',
-        body: JSON.stringify(paymentMethodData),
+        body: JSON.stringify({
+          ...paymentMethodData,
+          user: userId,
+          purpose: 'payout',
+          id: paymentMethodData.id || `pm_${Date.now()}`,
+        }),
       });
-      return result;
     } catch (error) {
       console.error('Error creating payment method:', error);
       throw error;
     }
   }
-  
+
   async updatePaymentMethod(paymentMethodId, paymentMethodData) {
     try {
-      const result = await this.apiCall(`/resource/paymentmethods/${paymentMethodId}`, {
+      if (isDemoMode()) {
+        return await updateDemoPaymentMethod(paymentMethodId, paymentMethodData);
+      }
+      return await this.apiCall(`/resource/paymentMethods/${paymentMethodId}`, {
         method: 'PUT',
-        body: JSON.stringify(paymentMethodData),
+        body: JSON.stringify({
+          ...paymentMethodData,
+          purpose: 'payout',
+        }),
       });
-      return result;
     } catch (error) {
       console.error('Error updating payment method:', error);
       throw error;
     }
   }
-  
+
   async deletePaymentMethod(paymentMethodId) {
+    if (!this.getUserId()) throw new Error('User not authenticated');
+
     try {
-      const result = await this.apiCall(`/resource/paymentmethods/${paymentMethodId}`, {
+      if (isDemoMode()) {
+        return await deleteDemoPaymentMethod(paymentMethodId);
+      }
+      return await this.apiCall(`/resource/paymentMethods/${paymentMethodId}`, {
         method: 'DELETE',
       });
-      return result;
     } catch (error) {
       console.error('Error deleting payment method:', error);
       throw error;
     }
   }
-  
+
   async setDefaultPaymentMethod(paymentMethodId) {
+    if (!this.getUserId()) throw new Error('User not authenticated');
+
     try {
-      const result = await this.apiCall(`/resource/paymentmethods/${paymentMethodId}/set-default`, {
+      if (isDemoMode()) {
+        return await setDemoDefaultPaymentMethod(paymentMethodId);
+      }
+      return await this.apiCall(`/resource/paymentMethods/${paymentMethodId}`, {
         method: 'PUT',
+        body: JSON.stringify({ isDefault: true, purpose: 'payout' }),
       });
-      return result;
     } catch (error) {
       console.error('Error setting default payment method:', error);
+      throw error;
+    }
+  }
+
+  async startStripeConnectOnboarding() {
+    const returnUrl = 'goodfooddriver://stripe-connect/return';
+    const refreshUrl = 'goodfooddriver://stripe-connect/refresh';
+
+    try {
+      if (isDemoMode()) {
+        return await startDemoStripeConnectOnboarding();
+      }
+
+      return await this.apiCall('/connect/onboarding', {
+        method: 'POST',
+        body: JSON.stringify({ returnUrl, refreshUrl }),
+      });
+    } catch (error) {
+      console.error('Error starting Stripe Connect onboarding:', error);
+      throw error;
+    }
+  }
+
+  async getStripeConnectStatus() {
+    try {
+      if (isDemoMode()) {
+        return await getDemoStripeConnectStatus();
+      }
+
+      return await this.apiCall('/connect/status');
+    } catch (error) {
+      console.error('Error fetching Stripe Connect status:', error);
+      throw error;
+    }
+  }
+
+  async syncStripeConnectPayoutMethod() {
+    try {
+      if (isDemoMode()) {
+        return await syncDemoStripeConnectPayoutMethod();
+      }
+
+      const result = await this.apiCall('/connect/sync', { method: 'POST' });
+      return result.paymentMethod;
+    } catch (error) {
+      console.error('Error syncing Stripe Connect payout method:', error);
       throw error;
     }
   }
@@ -721,6 +789,9 @@ export const {
   updatePaymentMethod,
   deletePaymentMethod,
   setDefaultPaymentMethod,
+  startStripeConnectOnboarding,
+  getStripeConnectStatus,
+  syncStripeConnectPayoutMethod,
   logout,
   getDriverProfile,
   createDriverProfile,

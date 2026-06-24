@@ -1,31 +1,52 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
+import {
+  normalizePaymentMethod,
+  formatMaskedCard,
+  formatMaskedBank,
+  isStripeConnectMethod,
+  getPaypalDisplayEmail,
+} from '../utils/paymentMethodUtils';
 
-const PaymentMethodsList = ({ paymentMethods, loading, onRefresh, onEdit, onDelete, onSetDefault }) => {
-  
+const PaymentMethodsList = ({
+  paymentMethods,
+  loading,
+  onEdit,
+  onDelete,
+  onSetDefault,
+}) => {
   const getPaymentIcon = (methodType) => {
     switch (methodType) {
       case 'credit_card':
       case 'debit_card':
-        return 'credit-card';
+        return { set: 'material', name: 'payment' };
       case 'paypal':
-        return 'paypal';
+        return { set: 'fontawesome', name: 'paypal' };
       case 'apple_pay':
-        return 'apple';
+        return { set: 'material', name: 'phone-iphone' };
       case 'google_pay':
-        return 'google';
+        return { set: 'material', name: 'account-balance-wallet' };
       case 'cash_on_delivery':
-        return 'money';
+        return { set: 'material', name: 'attach-money' };
       case 'bank_transfer':
-        return 'bank';
+        return { set: 'material', name: 'account-balance' };
       default:
-        return 'payment';
+        return { set: 'material', name: 'payment' };
     }
   };
-  
+
+  const renderPaymentIcon = (methodType, isDefault) => {
+    const icon = getPaymentIcon(methodType);
+    const iconColor = isDefault ? colors.primary : colors.text.primary;
+    if (icon.set === 'fontawesome') {
+      return <FontAwesome name={icon.name} size={24} color={iconColor} />;
+    }
+    return <MaterialIcons name={icon.name} size={24} color={iconColor} />;
+  };
+
   const getPaymentTypeName = (methodType) => {
     switch (methodType) {
       case 'credit_card':
@@ -46,22 +67,7 @@ const PaymentMethodsList = ({ paymentMethods, loading, onRefresh, onEdit, onDele
         return i18n.t('payment.other');
     }
   };
-  
-  const formatMaskedDetails = (method) => {
-    switch (method.methodType) {
-      case 'credit_card':
-      case 'debit_card':
-        return `•••• •••• •••• ${method.cardDetails?.cardNumberLast4 || '****'}`;
-      case 'paypal':
-        return method.paypalEmail?.replace(/(.{1,3})(.*)(@.*)/, (m, a, b, c) => a + b.replace(/./g, '*') + c) || '';
-      case 'apple_pay':
-      case 'google_pay':
-        return '••••••••••••••••';
-      default:
-        return '';
-    }
-  };
-  
+
   const getStatusColor = (verificationStatus) => {
     switch (verificationStatus) {
       case 'verified':
@@ -77,7 +83,7 @@ const PaymentMethodsList = ({ paymentMethods, loading, onRefresh, onEdit, onDele
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={styles.loadingContainer} testID="payment-methods-loading">
         <Text style={styles.loadingText}>{i18n.t('common.loading')}</Text>
       </View>
     );
@@ -85,117 +91,114 @@ const PaymentMethodsList = ({ paymentMethods, loading, onRefresh, onEdit, onDele
 
   if (!paymentMethods || paymentMethods.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={styles.emptyContainer} testID="payment-methods-empty">
         <MaterialIcons name="payment" size={48} color={colors.text.secondary} />
-        <Text style={styles.emptyTitle}>{i18n.t('payment.noPaymentMethods')}</Text>
-        <Text style={styles.emptySubtitle}>{i18n.t('payment.addFirstPaymentMethod')}</Text>
+        <Text style={styles.emptyTitle}>{i18n.t('payment.noOtherPayoutMethods')}</Text>
+        <Text style={styles.emptySubtitle}>{i18n.t('payment.addPaypalPayoutMethod')}</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {paymentMethods.map((method) => (
-        <TouchableOpacity
-          key={method._id}
-          style={[
-            styles.paymentMethodItem,
-            method.isDefault && styles.defaultItem
-          ]}
-          onPress={() => {
-            const actions = [
-              { text: i18n.t('common.cancel'), style: 'cancel' }
-            ];
-
-            if (!method.isDefault) {
-              actions.push({
-                text: i18n.t('payment.setAsDefault'),
-                onPress: () => onSetDefault?.(method)
-              });
-            }
-
-            actions.push({
-              text: i18n.t('common.edit'),
-              onPress: () => onEdit?.(method)
-            });
-
-            actions.push({
-              text: i18n.t('common.delete'),
-              style: 'destructive',
-              onPress: () => onDelete?.(method)
-            });
-
-            Alert.alert(
-              getPaymentTypeName(method.methodType),
-              formatMaskedDetails(method),
-              actions
-            );
-          }}
-        >
-          <View style={styles.paymentIconContainer}>
-            {method.methodType === 'paypal' ? (
-              <FontAwesome
-                name={getPaymentIcon(method.methodType)}
-                size={24}
-                color={method.isDefault ? colors.primary : colors.text.primary}
-              />
-            ) : (
-              <MaterialIcons
-                name={getPaymentIcon(method.methodType)}
-                size={24}
-                color={method.isDefault ? colors.primary : colors.text.primary}
-              />
-            )}
-          </View>
-
-          <View style={styles.paymentDetails}>
-            <View style={styles.paymentHeader}>
-              <Text style={[
-                styles.paymentType,
-                method.isDefault && styles.defaultText
-              ]}>
-                {getPaymentTypeName(method.methodType)}
-              </Text>
-              {method.isDefault && (
-                <View style={styles.defaultBadge}>
-                  <Text style={styles.defaultBadgeText}>{i18n.t('payment.default')}</Text>
-                </View>
-              )}
+    <View style={styles.container} testID="payment-methods-list">
+      {paymentMethods.map((rawMethod) => {
+        const method = normalizePaymentMethod(rawMethod);
+        const stripeManaged = isStripeConnectMethod(method);
+        return (
+          <View
+            key={method._id}
+            style={[styles.paymentMethodItem, method.isDefault && styles.defaultItem]}
+            testID={`payment-method-item-${method._id}`}
+          >
+            <View style={styles.paymentIconContainer}>
+              {renderPaymentIcon(method.methodType, method.isDefault)}
             </View>
 
-            <Text style={styles.paymentMasked}>
-              {formatMaskedDetails(method)}
-            </Text>
-
-            <View style={styles.paymentFooter}>
-              <View style={styles.statusContainer}>
-                <View style={[
-                  styles.statusDot,
-                  { backgroundColor: getStatusColor(method.verificationStatus) }
-                ]} />
-                <Text style={styles.statusText}>
-                  {method.verificationStatus === 'verified' ? i18n.t('payment.verified') :
-                   method.verificationStatus === 'pending' ? i18n.t('payment.pending') :
-                   method.verificationStatus === 'failed' ? i18n.t('payment.failed') :
-                   i18n.t('payment.unverified')}
+            <View style={styles.paymentDetails}>
+              <View style={styles.paymentHeader}>
+                <Text style={[styles.paymentType, method.isDefault && styles.defaultText]}>
+                  {getPaymentTypeName(method.methodType)}
                 </Text>
+                {method.isDefault ? (
+                  <View style={styles.defaultBadge}>
+                    <Text style={styles.defaultBadgeText}>{i18n.t('payment.default')}</Text>
+                  </View>
+                ) : null}
               </View>
 
-              {method.cardDetails?.expiryMonth && method.cardDetails?.expiryYear && (
-                <Text style={styles.expiryText}>
-                  {i18n.t('payment.expires')} {method.cardDetails.expiryMonth}/{method.cardDetails.expiryYear}
-                </Text>
-              )}
+              <Text style={styles.paymentMasked} testID={`payment-method-masked-${method._id}`}>
+                {method.methodType === 'paypal'
+                  ? getPaypalDisplayEmail(method)
+                  : method.methodType === 'bank_transfer'
+                    ? formatMaskedBank(method)
+                    : formatMaskedCard(method)}
+              </Text>
+
+              <View style={styles.paymentFooter}>
+                <View style={styles.statusContainer}>
+                  <View
+                    style={[
+                      styles.statusDot,
+                      { backgroundColor: getStatusColor(method.verificationStatus) },
+                    ]}
+                  />
+                  <Text style={styles.statusText}>
+                    {method.verificationStatus === 'verified'
+                      ? i18n.t('payment.verified')
+                      : method.verificationStatus === 'pending'
+                        ? i18n.t('payment.pending')
+                        : method.verificationStatus === 'failed'
+                          ? i18n.t('payment.failed')
+                          : i18n.t('payment.unverified')}
+                  </Text>
+                </View>
+
+                {method.cardDetails?.expiryMonth && method.cardDetails?.expiryYear ? (
+                  <Text style={styles.expiryText}>
+                    {i18n.t('payment.expires')}{' '}
+                    {method.cardDetails.expiryMonth}/{method.cardDetails.expiryYear}
+                  </Text>
+                ) : null}
+              </View>
+
+              <View style={styles.actionsRow}>
+                {!method.isDefault ? (
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => onSetDefault?.(method)}
+                    testID={`payment-method-default-${method._id}`}
+                  >
+                    <MaterialIcons name="star-outline" size={18} color={colors.primary} />
+                    <Text style={styles.actionText}>{i18n.t('payment.setAsDefault')}</Text>
+                  </TouchableOpacity>
+                ) : null}
+
+                {!stripeManaged ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => onEdit?.(method)}
+                      testID={`payment-method-edit-${method._id}`}
+                    >
+                      <MaterialIcons name="edit" size={18} color={colors.primary} />
+                      <Text style={styles.actionText}>{i18n.t('common.edit')}</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => onDelete?.(method)}
+                      testID={`payment-method-delete-${method._id}`}
+                    >
+                      <MaterialIcons name="delete-outline" size={18} color={colors.error} />
+                      <Text style={[styles.actionText, styles.deleteText]}>{i18n.t('common.delete')}</Text>
+                    </TouchableOpacity>
+                  </>
+                ) : null}
+              </View>
             </View>
           </View>
-
-          <MaterialIcons
-            name="chevron-right"
-            size={20}
-            color={colors.text.secondary}
-          />
-        </TouchableOpacity>
-      ))}
+        );
+      })}
     </View>
   );
 };
@@ -230,7 +233,7 @@ const styles = StyleSheet.create({
   },
   paymentMethodItem: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: colors.background.primary,
     borderRadius: 12,
     padding: 16,
@@ -292,6 +295,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 10,
   },
   statusContainer: {
     flexDirection: 'row',
@@ -310,6 +314,29 @@ const styles = StyleSheet.create({
   expiryText: {
     fontSize: 12,
     color: colors.text.secondary,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border.light,
+    paddingTop: 10,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 4,
+    paddingRight: 8,
+  },
+  actionText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  deleteText: {
+    color: colors.error,
   },
 });
 

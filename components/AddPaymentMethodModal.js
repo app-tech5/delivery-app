@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,100 +8,71 @@ import {
   TextInput,
   Alert,
   ScrollView,
-  Platform
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
 import apiClient from '../api';
+import { normalizePaymentMethod, getPaypalDisplayEmail } from '../utils/paymentMethodUtils';
 
 const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = null }) => {
-  const [methodType, setMethodType] = useState(editingMethod?.methodType || 'credit_card');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiryMonth, setExpiryMonth] = useState('');
-  const [expiryYear, setExpiryYear] = useState('');
-  const [cardholderName, setCardholderName] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [paypalEmail, setPaypalEmail] = useState(editingMethod?.paypalEmail || '');
+  const insets = useSafeAreaInsets();
+  const [methodType] = useState('paypal');
+  const [paypalEmail, setPaypalEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const resetForm = () => {
-    setMethodType('credit_card');
-    setCardNumber('');
-    setExpiryMonth('');
-    setExpiryYear('');
-    setCardholderName('');
-    setCvv('');
     setPaypalEmail('');
   };
-  
+
+  useEffect(() => {
+    if (!visible) return;
+
+    if (editingMethod) {
+      const method = normalizePaymentMethod(editingMethod);
+      setPaypalEmail(getPaypalDisplayEmail(method));
+      return;
+    }
+
+    resetForm();
+  }, [visible, editingMethod]);
+
   const validateForm = () => {
-    if (methodType === 'credit_card' || methodType === 'debit_card') {
-      if (!cardNumber || !expiryMonth || !expiryYear || !cardholderName || !cvv) {
-        Alert.alert(i18n.t('common.error'), i18n.t('payment.fillAllFields'));
-        return false;
-      }
-      if (cardNumber.replace(/\s/g, '').length < 13) {
-        Alert.alert(i18n.t('common.error'), i18n.t('payment.invalidCardNumber'));
-        return false;
-      }
-    } else if (methodType === 'paypal') {
-      if (!paypalEmail || !paypalEmail.includes('@')) {
-        Alert.alert(i18n.t('common.error'), i18n.t('payment.invalidEmail'));
-        return false;
-      }
+    if (!paypalEmail || !paypalEmail.includes('@')) {
+      Alert.alert(i18n.t('common.error'), i18n.t('payment.invalidEmail'));
+      return false;
     }
     return true;
   };
-  
-  const formatCardNumber = (text) => {
-    const cleaned = text.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const match = cleaned.match(/\d{1,4}/g);
-    const formatted = match ? match.join(' ') : '';
-    setCardNumber(formatted);
-  };
-  
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
     setLoading(true);
     try {
-      let paymentData = {
-        methodType,
-        isDefault: false, 
-        isActive: true
+      const paymentData = {
+        methodType: 'paypal',
+        purpose: 'payout',
+        isDefault: editingMethod?.isDefault || false,
+        isActive: true,
       };
 
-      if (methodType === 'credit_card' || methodType === 'debit_card') {
-        paymentData.cardDetails = {
-          cardNumberLast4: cardNumber.slice(-4),
-          cardBrand: getCardBrand(cardNumber),
-          expiryMonth: parseInt(expiryMonth),
-          expiryYear: parseInt(expiryYear),
-          cardholderName: cardholderName.trim()
-        };
-      } else if (methodType === 'paypal') {
+      const isMaskedEdit = editingMethod && paypalEmail.includes('*');
+      if (!isMaskedEdit) {
         paymentData.paypalEmail = paypalEmail.trim();
-      } else if (methodType === 'apple_pay' || methodType === 'google_pay') {
-        
-        paymentData.walletToken = Math.random().toString(36).substring(2, 15);
       }
 
-      let result;
-      if (editingMethod) {
-        result = await apiClient.updatePaymentMethod(editingMethod._id, paymentData);
-      } else {
-        result = await apiClient.createPaymentMethod(paymentData);
-      }
+      const result = editingMethod
+        ? await apiClient.updatePaymentMethod(editingMethod._id, paymentData)
+        : await apiClient.createPaymentMethod(paymentData);
 
+      resetForm();
+      onSuccess?.(result);
       Alert.alert(
         i18n.t('common.success'),
-        editingMethod ? i18n.t('payment.methodUpdated') : i18n.t('payment.methodAdded'),
-        [{ text: i18n.t('common.ok'), onPress: () => {
-          resetForm();
-          onSuccess?.(result);
-          onClose();
-        }}]
+        editingMethod ? i18n.t('payment.methodUpdated') : i18n.t('payment.methodAdded')
       );
     } catch (error) {
       Alert.alert(i18n.t('common.error'), error.message || i18n.t('payment.saveError'));
@@ -109,132 +80,22 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
       setLoading(false);
     }
   };
-  
-  const getCardBrand = (cardNumber) => {
-    const number = cardNumber.replace(/\s/g, '');
-    if (number.startsWith('4')) return 'visa';
-    if (number.startsWith('5') || number.startsWith('2')) return 'mastercard';
-    if (number.startsWith('3')) return 'amex';
-    return 'other';
-  };
-  
-  const renderPaymentTypeSelector = () => {
-    const types = [
-      { value: 'credit_card', label: i18n.t('payment.creditCard'), icon: 'credit-card' },
-      { value: 'debit_card', label: i18n.t('payment.debitCard'), icon: 'credit-card' },
-      { value: 'paypal', label: i18n.t('payment.paypal'), icon: 'paypal' },
-      { value: 'apple_pay', label: i18n.t('payment.applePay'), icon: 'apple' },
-      { value: 'google_pay', label: i18n.t('payment.googlePay'), icon: 'google' },
-    ];
 
-    return (
-      <View style={styles.typeSelector}>
-        <Text style={styles.sectionTitle}>{i18n.t('payment.selectPaymentType')}</Text>
-        <View style={styles.typeOptions}>
-          {types.map((type) => (
-            <TouchableOpacity
-              key={type.value}
-              style={[
-                styles.typeOption,
-                methodType === type.value && styles.typeOptionSelected
-              ]}
-              onPress={() => setMethodType(type.value)}
-            >
-              <MaterialIcons
-                name={type.icon === 'paypal' ? 'paypal' : 'credit-card'}
-                size={20}
-                color={methodType === type.value ? colors.primary : colors.text.secondary}
-              />
-              <Text style={[
-                styles.typeOptionText,
-                methodType === type.value && styles.typeOptionTextSelected
-              ]}>
-                {type.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-    );
-  };
-  
-  const renderPaymentFields = () => {
-    if (methodType === 'credit_card' || methodType === 'debit_card') {
-      return (
-        <View style={styles.fieldsContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder={i18n.t('payment.cardNumber')}
-            value={cardNumber}
-            onChangeText={formatCardNumber}
-            keyboardType="numeric"
-            maxLength={19}
-            placeholderTextColor={colors.text.secondary}
-          />
-          <View style={styles.row}>
-            <TextInput
-              style={[styles.input, styles.halfInput]}
-              placeholder={i18n.t('payment.expiryMonth')}
-              value={expiryMonth}
-              onChangeText={(text) => setExpiryMonth(text.replace(/[^0-9]/g, '').slice(0, 2))}
-              keyboardType="numeric"
-              maxLength={2}
-              placeholderTextColor={colors.text.secondary}
-            />
-            <TextInput
-              style={[styles.input, styles.halfInput]}
-              placeholder={i18n.t('payment.expiryYear')}
-              value={expiryYear}
-              onChangeText={(text) => setExpiryYear(text.replace(/[^0-9]/g, '').slice(0, 4))}
-              keyboardType="numeric"
-              maxLength={4}
-              placeholderTextColor={colors.text.secondary}
-            />
-          </View>
-          <TextInput
-            style={styles.input}
-            placeholder={i18n.t('payment.cardholderName')}
-            value={cardholderName}
-            onChangeText={setCardholderName}
-            autoCapitalize="words"
-            placeholderTextColor={colors.text.secondary}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder={i18n.t('payment.cvv')}
-            value={cvv}
-            onChangeText={(text) => setCvv(text.replace(/[^0-9]/g, '').slice(0, 4))}
-            keyboardType="numeric"
-            maxLength={4}
-            secureTextEntry
-            placeholderTextColor={colors.text.secondary}
-          />
-        </View>
-      );
-    } else if (methodType === 'paypal') {
-      return (
-        <View style={styles.fieldsContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder={i18n.t('auth.email')}
-            value={paypalEmail}
-            onChangeText={setPaypalEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            placeholderTextColor={colors.text.secondary}
-          />
-        </View>
-      );
-    }
-
-    return (
-      <View style={styles.fieldsContainer}>
-        <Text style={styles.noteText}>
-          {i18n.t('payment.walletSetupNote')}
-        </Text>
-      </View>
-    );
-  };
+  const renderPaymentFields = () => (
+    <View style={styles.fieldsContainer}>
+      <Text style={styles.noteText}>{i18n.t('payment.paypalPayoutNote')}</Text>
+      <TextInput
+        style={styles.input}
+        placeholder={i18n.t('auth.email')}
+        value={paypalEmail}
+        onChangeText={setPaypalEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        placeholderTextColor={colors.text.secondary}
+        testID="payment-form-paypal-email"
+      />
+    </View>
+  );
 
   return (
     <Modal
@@ -242,30 +103,28 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
       animationType="slide"
       presentationStyle="pageSheet"
       onRequestClose={onClose}
+      testID="payment-method-modal"
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton} testID="payment-modal-close">
             <MaterialIcons name="close" size={24} color={colors.text.primary} />
           </TouchableOpacity>
           <Text style={styles.title}>
-            {editingMethod ? i18n.t('payment.editPaymentMethod') : i18n.t('payment.addPaymentMethod')}
+            {editingMethod ? i18n.t('payment.editPayoutMethod') : i18n.t('payment.addPayoutMethod')}
           </Text>
           <View style={styles.placeholder} />
         </View>
 
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          {renderPaymentTypeSelector()}
           {renderPaymentFields()}
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
           <TouchableOpacity
             style={[styles.button, styles.cancelButton]}
-            onPress={() => {
-              resetForm();
-              onClose();
-            }}
+            onPress={onClose}
+            testID="payment-modal-cancel"
           >
             <Text style={[styles.buttonText, styles.cancelButtonText]}>
               {i18n.t('common.cancel')}
@@ -275,9 +134,14 @@ const AddPaymentMethodModal = ({ visible, onClose, onSuccess, editingMethod = nu
             style={[styles.button, styles.saveButton, loading && styles.saveButtonDisabled]}
             onPress={handleSubmit}
             disabled={loading}
+            testID="payment-modal-submit"
           >
             <Text style={[styles.buttonText, styles.saveButtonText]}>
-              {loading ? i18n.t('common.loading') : (editingMethod ? i18n.t('common.update') : i18n.t('common.add'))}
+              {loading
+                ? i18n.t('common.loading')
+                : editingMethod
+                  ? i18n.t('common.update')
+                  : i18n.t('common.add')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -324,6 +188,7 @@ const styles = StyleSheet.create({
   },
   typeSelector: {
     marginBottom: 30,
+    marginTop: 16,
   },
   sectionTitle: {
     fontSize: 16,
@@ -390,7 +255,6 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    paddingBottom: Platform.OS === 'ios' ? 30 : 20,
     paddingTop: 20,
     borderTopWidth: 1,
     borderTopColor: colors.background.secondary,
@@ -424,4 +288,3 @@ const styles = StyleSheet.create({
 });
 
 export default AddPaymentMethodModal;
-

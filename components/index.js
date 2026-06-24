@@ -51,6 +51,7 @@ export { default as RatingStats } from './RatingStats';
 
 export { default as PaymentMethodsList } from './PaymentMethodsList';
 export { default as AddPaymentMethodModal } from './AddPaymentMethodModal';
+export { default as StripeConnectPayoutCard } from './StripeConnectPayoutCard';
 
 export { default as PaymentSettings } from './PaymentSettings';
 export { default as VehicleInfoCard } from './VehicleInfoCard';

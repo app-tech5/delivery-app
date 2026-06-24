@@ -10,6 +10,7 @@ const emptyState = () => ({
   notificationRemovedIds: [],
   supportTickets: [],
   profilePatch: null,
+  paymentMethodsPatch: null,
 });
 
 export async function getDemoState() {
