@@ -58,6 +58,9 @@ const StripeConnectPayoutCard = ({ onPayoutMethodsUpdated }) => {
 
       if (result.demoCompleted) {
         await loadStatus();
+        if (config.DEMO_MODE === true) {
+          await apiClient.syncStripeConnectPayoutMethod();
+        }
         await onPayoutMethodsUpdated?.();
         if (config.DEMO_MODE === true) {
           Alert.alert(

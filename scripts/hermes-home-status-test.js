@@ -10,6 +10,8 @@
 const fs = require('fs');
 const path = require('path');
 const WebSocket = require('ws');
+const { installAutoOkAlerts } = require('./hermes/cdpClient');
+const { buildNavigateExpression } = require('./hermes/navHelpers');
 
 const METRO = process.env.METRO_URL || 'http://127.0.0.1:8081';
 const DEMO_EMAIL = process.env.DEMO_EMAIL || 'driver@demo.com';
@@ -237,6 +239,8 @@ function buildPressStatus(labelOptions) {
   })()`;
 }
 
+const NAV_TO_HOME = buildNavigateExpression('Home');
+
 const INVOKE_DRIVER_LOGOUT = `(async function(){
   var hook = globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__;
   if (!hook) return JSON.stringify({ error: 'Pas de hook React' });
@@ -454,6 +458,9 @@ async function signupNewAccount(ws) {
 }
 
 async function ensureNewSignupHome(ws) {
+  await evaluate(ws, NAV_TO_HOME).catch(() => null);
+  await sleep(600);
+
   let home = await readHome(ws);
 
   if (home.onHome && home.isLocalSignupAccount && !home.isSeededDemoAccount) {
@@ -475,7 +482,7 @@ async function ensureNewSignupHome(ws) {
 async function testStatusTransition(ws, fromStatus, targetStatus) {
   const before = await readHome(ws);
   const press = await pressStatus(ws, targetStatus);
-  await sleep(1200);
+  await sleep(targetStatus === 'available' ? 1800 : 1200);
   const after = await readHome(ws);
 
   const ok = press.pressed === true && after.driverStatus === targetStatus;
@@ -506,11 +513,13 @@ async function main() {
     ws.once('open', resolve);
     ws.once('error', reject);
   });
+  await installAutoOkAlerts(ws);
 
   const steps = [];
   let failed = false;
 
   const homeReady = await ensureNewSignupHome(ws);
+  await sleep(1500);
   steps.push({
     step: 'nouveau compte SignUp sur Home',
     ok: homeReady.ready === true && homeReady.home?.isLocalSignupAccount === true,
@@ -541,7 +550,19 @@ async function main() {
   const sequence = ['available', 'busy', 'offline', 'available'];
   const transitions = [];
 
-  for (const status of sequence) {
+  for (let i = 0; i < sequence.length; i++) {
+    const status = sequence[i];
+    const beforeClick = await readHome(ws);
+    const isFirstOfflineToAvailable =
+      i === 0
+      && status === 'available'
+      && beforeClick.driverStatus === 'offline';
+
+    if (isFirstOfflineToAvailable) {
+      console.log('\n⏳ Pause 2.5s avant le 1er clic Available (offline → available)');
+      await sleep(2500);
+    }
+
     const result = await testStatusTransition(ws, null, status);
     transitions.push(result);
     console.log(`\n=== Statut → ${status} ===`);

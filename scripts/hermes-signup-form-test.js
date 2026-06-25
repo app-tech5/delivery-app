@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Teste SignUp + onboarding livreur via Hermes CDP.
- * Ouvrez l'app sur Login ou SignUp + Metro actif.
+ * Déconnecte si besoin, puis navigue vers SignUp. Metro + app ouverts.
  *
  *   node scripts/hermes-signup-form-test.js
  */
@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const WebSocket = require('ws');
+const { installAutoOkAlerts } = require('./hermes/cdpClient');
 
 const HOME_SNAPSHOT_PATH = path.join(__dirname, 'hermes-signup-home-snapshot.json');
 
@@ -92,7 +93,7 @@ const READ_FORM = `(function(){
   });
 
   if (!signupFiber) {
-    return JSON.stringify({ error: 'SignUpScreen introuvable — ouvrez Sign Up depuis Login' });
+    return JSON.stringify({ error: 'SignUpScreen introuvable après navigation' });
   }
 
   var states = readUseState(signupFiber);
@@ -153,6 +154,25 @@ const NAV_TO_SIGNUP = `(function(){
   });
 
   return JSON.stringify({ onSignup: onSignup, navigated: navigated && !onSignup });
+})()`;
+
+const INVOKE_DRIVER_LOGOUT = `(async function(){
+  var hook = globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+  if (!hook) return JSON.stringify({ error: 'Pas de hook React' });
+  var logoutFn = null;
+  function walk(fiber, depth) {
+    if (!fiber || depth > 600) return;
+    var props = fiber.memoizedProps || {};
+    if (props.value && typeof props.value.logout === 'function') logoutFn = props.value.logout;
+    walk(fiber.child, depth + 1);
+    walk(fiber.sibling, depth);
+  }
+  hook.renderers.forEach(function(_, rendererID) {
+    hook.getFiberRoots(rendererID).forEach(function(root) { walk(root.current || root, 0); });
+  });
+  if (!logoutFn) return JSON.stringify({ skipped: true });
+  await logoutFn();
+  return JSON.stringify({ loggedOut: true });
 })()`;
 
 function buildSetFieldExpression(screenName, placeholder, value) {
@@ -652,7 +672,7 @@ async function getWebSocketUrl() {
   return target.webSocketDebuggerUrl;
 }
 
-function evaluate(ws, expression) {
+function evaluate(ws, expression, { awaitPromise = false } = {}) {
   return new Promise((resolve, reject) => {
     const id = Math.floor(Math.random() * 1e6);
     const timer = setTimeout(() => reject(new Error('Timeout CDP')), 20000);
@@ -678,7 +698,7 @@ function evaluate(ws, expression) {
     ws.send(JSON.stringify({
       id,
       method: 'Runtime.evaluate',
-      params: { expression, returnByValue: true },
+      params: { expression, returnByValue: true, awaitPromise },
     }));
   });
 }
@@ -721,6 +741,11 @@ async function main() {
     ws.once('open', resolve);
     ws.once('error', reject);
   });
+
+  await installAutoOkAlerts(ws);
+
+  await evaluate(ws, INVOKE_DRIVER_LOGOUT, { awaitPromise: true }).catch(() => null);
+  await sleep(1000);
 
   let nav = await evaluate(ws, NAV_TO_SIGNUP);
   console.log('\n=== Navigation SignUp ===');

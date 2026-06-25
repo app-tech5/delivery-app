@@ -1,8 +1,8 @@
 {
-  "capturedAt": "2026-06-25T00:49:13.962Z",
-  "passed": 4,
+  "capturedAt": "2026-06-25T13:45:35.873Z",
+  "passed": 3,
   "total": 4,
-  "ok": true,
+  "ok": false,
   "steps": [
     {
       "step": "nouveau compte SignUp sur Home",
@@ -11,9 +11,9 @@
       "created": false,
       "home": {
         "onHome": true,
-        "statusBadgeText": "available",
-        "driverStatus": "available",
-        "driverId": "demo_driver_1782348462521_utfpt7",
+        "statusBadgeText": "offline",
+        "driverStatus": "offline",
+        "driverId": "demo_driver_1782395119799_u0g8gj",
         "isApproved": true,
         "isDemoDriver": true,
         "userEmail": null,
@@ -61,12 +61,8 @@
         "mapDriverMarker": {
           "id": "home-driver"
         },
-        "storedLocation": {
-          "longitude": 9.6583237,
-          "latitude": 4.0976244,
-          "source": "driver.location"
-        },
-        "parisFallbackWouldApply": false
+        "storedLocation": null,
+        "parisFallbackWouldApply": true
       }
     },
     {
@@ -74,9 +70,9 @@
       "ok": true,
       "initial": {
         "onHome": true,
-        "statusBadgeText": "available",
-        "driverStatus": "available",
-        "driverId": "demo_driver_1782348462521_utfpt7",
+        "statusBadgeText": "offline",
+        "driverStatus": "offline",
+        "driverId": "demo_driver_1782395119799_u0g8gj",
         "isApproved": true,
         "isDemoDriver": true,
         "userEmail": null,
@@ -124,22 +120,18 @@
         "mapDriverMarker": {
           "id": "home-driver"
         },
-        "storedLocation": {
-          "longitude": 9.6583237,
-          "latitude": 4.0976244,
-          "source": "driver.location"
-        },
-        "parisFallbackWouldApply": false
+        "storedLocation": null,
+        "parisFallbackWouldApply": true
       }
     },
     {
       "step": "status transitions",
-      "ok": true,
+      "ok": false,
       "transitions": [
         {
-          "from": "available",
+          "from": "offline",
           "target": "available",
-          "ok": true,
+          "ok": false,
           "press": {
             "pressed": true,
             "button": {
@@ -150,17 +142,17 @@
             }
           },
           "before": {
-            "driverStatus": "available",
-            "statusBadgeText": "available"
+            "driverStatus": "offline",
+            "statusBadgeText": "offline"
           },
           "after": {
-            "driverStatus": "available",
-            "statusBadgeText": "available",
+            "driverStatus": "offline",
+            "statusBadgeText": "offline",
             "isApproved": true
           }
         },
         {
-          "from": "available",
+          "from": "offline",
           "target": "busy",
           "ok": true,
           "press": {
@@ -173,8 +165,8 @@
             }
           },
           "before": {
-            "driverStatus": "available",
-            "statusBadgeText": "available"
+            "driverStatus": "offline",
+            "statusBadgeText": "offline"
           },
           "after": {
             "driverStatus": "busy",
@@ -235,8 +227,8 @@
       "ok": true,
       "mapAnalysis": {
         "storedLocation": {
-          "longitude": 9.6583237,
-          "latitude": 4.0976244,
+          "longitude": 9.657614,
+          "latitude": 4.0984143,
           "source": "driver.location"
         },
         "mapDriverMarker": {
@@ -252,7 +244,7 @@
         "onHome": true,
         "statusBadgeText": "available",
         "driverStatus": "available",
-        "driverId": "demo_driver_1782348462521_utfpt7",
+        "driverId": "demo_driver_1782395119799_u0g8gj",
         "isApproved": true,
         "isDemoDriver": true,
         "userEmail": null,
@@ -301,8 +293,8 @@
           "id": "home-driver"
         },
         "storedLocation": {
-          "longitude": 9.6583237,
-          "latitude": 4.0976244,
+          "longitude": 9.657614,
+          "latitude": 4.0984143,
           "source": "driver.location"
         },
         "parisFallbackWouldApply": false
@@ -311,8 +303,8 @@
   ],
   "mapAnalysis": {
     "storedLocation": {
-      "longitude": 9.6583237,
-      "latitude": 4.0976244,
+      "longitude": 9.657614,
+      "latitude": 4.0984143,
       "source": "driver.location"
     },
     "mapDriverMarker": {

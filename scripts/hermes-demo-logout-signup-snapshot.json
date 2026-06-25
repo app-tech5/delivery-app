@@ -1,63 +1,17 @@
 {
-  "capturedAt": "2026-06-25T00:33:34.786Z",
+  "capturedAt": "2026-06-25T13:45:24.397Z",
   "demoEmail": "driver@demo.com",
-  "newAccountEmail": "hermes.afterlogout.1782347608900@demo.com",
-  "passed": 5,
+  "newAccountEmail": "hermes.afterlogout.1782395118881@demo.com",
+  "passed": 6,
   "total": 6,
-  "failed": [
-    {
-      "step": "logout",
-      "ok": false,
-      "logoutResult": {
-        "className": "Object",
-        "description": "Object",
-        "type": "object",
-        "value": {
-          "_h": 0,
-          "_i": 0,
-          "_j": null,
-          "_k": null
-        }
-      },
-      "nav": {
-        "routes": [
-          "DrawerNavigator",
-          "Home",
-          "Deliveries",
-          "DeliveriesMain",
-          "Earnings",
-          "Transactions",
-          "History",
-          "Reports",
-          "Notifications",
-          "Support",
-          "Profile",
-          "ProfileMain",
-          "OrderDetails",
-          "Settings",
-          "SettingsMain"
-        ],
-        "screens": {
-          "DrawerNavigator": true,
-          "HomeScreen": true
-        },
-        "auth": {
-          "hasDriver": false,
-          "isLoading": false,
-          "isAuthenticated": false,
-          "needsOnboarding": false
-        }
-      }
-    }
-  ],
-  "ok": false,
+  "failed": [],
+  "ok": true,
   "steps": [
     {
       "step": "login screen ready",
       "ok": true,
       "nav": {
         "routes": [
-          "Splash",
           "Login"
         ],
         "screens": {
@@ -154,7 +108,7 @@
     },
     {
       "step": "logout",
-      "ok": false,
+      "ok": true,
       "logoutResult": {
         "className": "Object",
         "description": "Object",
@@ -168,25 +122,10 @@
       },
       "nav": {
         "routes": [
-          "DrawerNavigator",
-          "Home",
-          "Deliveries",
-          "DeliveriesMain",
-          "Earnings",
-          "Transactions",
-          "History",
-          "Reports",
-          "Notifications",
-          "Support",
-          "Profile",
-          "ProfileMain",
-          "OrderDetails",
-          "Settings",
-          "SettingsMain"
+          "Login"
         ],
         "screens": {
-          "DrawerNavigator": true,
-          "HomeScreen": true
+          "LoginScreen": true
         },
         "auth": {
           "hasDriver": false,
@@ -199,7 +138,7 @@
     {
       "step": "signup after logout",
       "ok": true,
-      "email": "hermes.afterlogout.1782347608900@demo.com",
+      "email": "hermes.afterlogout.1782395118881@demo.com",
       "nav": {
         "routes": [
           "DriverOnboarding",
@@ -253,7 +192,7 @@
           "Rating"
         ],
         "driver": {
-          "id": "demo_driver_1782347611372_g6wmwn",
+          "id": "demo_driver_1782395119799_u0g8gj",
           "licenseNumber": "HERMES-LIC-002",
           "email": null,
           "isDemo": true
@@ -314,7 +253,7 @@
       "Rating"
     ],
     "driver": {
-      "id": "demo_driver_1782347611372_g6wmwn",
+      "id": "demo_driver_1782395119799_u0g8gj",
       "licenseNumber": "HERMES-LIC-002",
       "email": null,
       "isDemo": true

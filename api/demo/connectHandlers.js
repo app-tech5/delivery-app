@@ -73,5 +73,53 @@ export async function getDemoStripeConnectStatus() {
 }
 
 export async function syncDemoStripeConnectPayoutMethod() {
-  return null;
+  const state = await getDemoState();
+  const connect = state.stripeConnectDemo;
+
+  if (!connect?.connected) {
+    return null;
+  }
+
+  const accountId = connect.accountId || DEMO_CONNECT_ACCOUNT_ID;
+  const patch = state.paymentMethodsPatch || { added: [], updatedById: {}, deletedIds: [], defaultId: null };
+  const existing = (patch.added || []).find(
+    (method) =>
+      method.methodType === 'bank_transfer' &&
+      method.stripeConnectAccountId === accountId
+  );
+
+  if (existing) {
+    return existing;
+  }
+
+  const method = {
+    _id: `demo_pm_stripe_${Date.now()}`,
+    id: `demo_pm_stripe_${Date.now()}`,
+    methodType: 'bank_transfer',
+    purpose: 'payout',
+    stripeConnectAccountId: accountId,
+    bankDetails: {
+      ibanLast4: '7890',
+      accountHolderName: 'Demo Driver',
+      bankName: 'Stripe',
+    },
+    verificationStatus: 'verified',
+    isDefault: !(patch.added || []).some((m) => m.isDefault),
+    isActive: true,
+    createdAt: new Date().toISOString(),
+  };
+
+  await updateDemoState((current) => {
+    const currentPatch = current.paymentMethodsPatch || { added: [], updatedById: {}, deletedIds: [], defaultId: null };
+    return {
+      ...current,
+      paymentMethodsPatch: {
+        ...currentPatch,
+        added: [...stripDuplicateStripeConnectFromPatch(currentPatch), method],
+        defaultId: currentPatch.defaultId || String(method._id),
+      },
+    };
+  });
+
+  return method;
 }

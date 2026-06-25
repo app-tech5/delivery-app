@@ -1,7 +1,7 @@
 {
-  "capturedAt": "2026-06-25T00:28:12.906Z",
+  "capturedAt": "2026-06-25T13:45:52.255Z",
   "snapshotPath": "/Users/nass/Documents/delivery-app/scripts/hermes-signup-home-snapshot.json",
-  "email": "hermes.signup.1782347285913@demo.com",
+  "email": "hermes.signup.1782395145889@demo.com",
   "passed": 11,
   "total": 11,
   "failed": [],
@@ -29,7 +29,7 @@
     {
       "step": "full valid form",
       "ok": true,
-      "email": "hermes.signup.1782347285913@demo.com",
+      "email": "hermes.signup.1782395145889@demo.com",
       "canSubmitExpected": true,
       "fieldsFound": [
         "Full Name",
@@ -40,7 +40,7 @@
       ],
       "state": {
         "name": "Hermes Driver",
-        "email": "hermes.signup.1782347285913@demo.com",
+        "email": "hermes.signup.1782395145889@demo.com",
         "phone": "+33601020304",
         "password": "driver123",
         "confirmPassword": "driver123",
@@ -230,7 +230,7 @@
       "home": {
         "hasHomeTestId": true,
         "driver": {
-          "id": "demo_driver_1782347288760_84ujay",
+          "id": "demo_driver_1782395147374_m0hafy",
           "licenseNumber": "HERMES-LIC-001",
           "status": "offline",
           "isDemo": true
@@ -316,7 +316,7 @@
       "Rating"
     ],
     "driver": {
-      "id": "demo_driver_1782347288760_84ujay",
+      "id": "demo_driver_1782395147374_m0hafy",
       "licenseNumber": "HERMES-LIC-001",
       "status": "offline",
       "isDemo": true

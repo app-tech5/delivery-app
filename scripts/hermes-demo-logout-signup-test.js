@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const WebSocket = require('ws');
+const { installAutoOkAlerts } = require('./hermes/cdpClient');
 
 const METRO = process.env.METRO_URL || 'http://127.0.0.1:8081';
 const DEMO_EMAIL = process.env.DEMO_EMAIL || 'driver@demo.com';
@@ -508,6 +509,7 @@ async function main() {
     ws.once('open', resolve);
     ws.once('error', reject);
   });
+  await installAutoOkAlerts(ws);
 
   const steps = [];
   let failed = false;

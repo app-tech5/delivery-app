@@ -6,56 +6,12 @@
  */
 
 const WebSocket = require('ws');
+const { installAutoOkAlerts } = require('./hermes/cdpClient');
+const { buildNavigateExpression, fiberHelpers } = require('./hermes/navHelpers');
 
 const METRO = process.env.METRO_URL || 'http://127.0.0.1:8081';
 
-const fiberHelpers = `
-  function fiberName(fiber) {
-    if (!fiber || !fiber.type) return '';
-    var t = fiber.type;
-    if (typeof t === 'string') return t;
-    if (t && typeof t === 'object' && t.type) {
-      var inner = t.type;
-      return inner.displayName || inner.name || 'Memo';
-    }
-    return t.displayName || t.name || t.render?.displayName || '';
-  }
-
-  function walkAll(fiber, depth, visit) {
-    if (!fiber || depth > 700) return;
-    visit(fiber, depth);
-    walkAll(fiber.child, depth + 1, visit);
-    walkAll(fiber.sibling, depth, visit);
-  }
-
-  function getRoots(hook) {
-    var roots = [];
-    hook.renderers.forEach(function(_, rendererID) {
-      hook.getFiberRoots(rendererID).forEach(function(root) {
-        roots.push(root.current || root);
-      });
-    });
-    return roots;
-  }
-`;
-
-const NAVIGATE_PAYMENT_METHODS = `(function(){
-  ${fiberHelpers}
-  var hook = globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__;
-  if (!hook) return JSON.stringify({ error: 'Pas de hook React' });
-  var nav = null;
-  walkAll(getRoots(hook)[0], 0, function(fiber) {
-    var props = fiber.memoizedProps || {};
-    if (props.navigation && typeof props.navigation.navigate === 'function') nav = props.navigation;
-  });
-  if (!nav) return JSON.stringify({ error: 'navigation introuvable' });
-  try {
-    nav.navigate('Settings', { screen: 'PaymentMethods' });
-    return JSON.stringify({ navigated: true });
-  } catch (e) {
-    return JSON.stringify({ error: String(e) });
-  }
-})()`;
+const NAVIGATE_PAYMENT_METHODS = buildNavigateExpression('Settings', { screen: 'PaymentMethods' });
 
 const READ_SCREEN = `(function(){
   ${fiberHelpers}
@@ -200,6 +156,8 @@ async function main() {
     ws.once('open', resolve);
     ws.once('error', reject);
   });
+
+  await installAutoOkAlerts(ws);
 
   const results = [];
 

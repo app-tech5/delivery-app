@@ -1,18 +1,22 @@
 #!/usr/bin/env node
 /**
  * Teste l'état du bouton Send Report sur SupportScreen via Hermes CDP.
- * Simule plusieurs saisies et mesure le délai avant disabled=false.
+ * Navigue automatiquement vers Support (session connectée requise).
  *
  *   node scripts/hermes-support-form-test.js
  *   node scripts/hermes-support-form-test.js --attempts 5
  */
 
 const WebSocket = require('ws');
+const { installAutoOkAlerts } = require('./hermes/cdpClient');
+const { buildNavigateExpression } = require('./hermes/navHelpers');
 
 const METRO = process.env.METRO_URL || 'http://127.0.0.1:8081';
 const ATTEMPTS = Number(process.argv.includes('--attempts')
   ? process.argv[process.argv.indexOf('--attempts') + 1]
   : 5);
+
+const NAV_TO_SUPPORT = buildNavigateExpression('Support');
 
 const READ_FORM_STATE = `(function(){
   var hook = globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__;
@@ -141,7 +145,7 @@ async function getWebSocketUrl() {
   const targets = await res.json();
   const target = targets.find((t) => t.description?.includes('Bridgeless')) || targets[0];
   if (!target?.webSocketDebuggerUrl) {
-    throw new Error('Pas de cible Hermes. App ouverte sur SupportScreen + Metro actif ?');
+    throw new Error('Pas de cible Hermes. App ouverte + Metro actif ?');
   }
   return target.webSocketDebuggerUrl;
 }
@@ -207,6 +211,16 @@ async function main() {
     ws.once('open', resolve);
     ws.once('error', reject);
   });
+
+  await installAutoOkAlerts(ws);
+
+  const nav = await evaluate(ws, NAV_TO_SUPPORT);
+  if (nav.error) {
+    console.error('Navigation Support:', nav.error);
+    ws.close();
+    process.exit(1);
+  }
+  await sleep(700);
 
   await evaluate(ws, CLEAR_TEXT);
   await sleep(150);

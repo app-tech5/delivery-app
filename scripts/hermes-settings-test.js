@@ -1,45 +1,18 @@
 #!/usr/bin/env node
 /**
  * Teste SettingsScreen via Hermes CDP.
- * Navigue vers Settings, inspecte l'arbre React, teste un switch et le thème.
+ * Navigue automatiquement vers Settings (session connectée requise).
  *
  *   node scripts/hermes-settings-test.js
  */
 
 const WebSocket = require('ws');
+const { installAutoOkAlerts } = require('./hermes/cdpClient');
+const { buildNavigateExpression } = require('./hermes/navHelpers');
 
 const METRO = process.env.METRO_URL || 'http://127.0.0.1:8081';
 
-const NAVIGATE_SETTINGS = `(function(){
-  var hook = globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__;
-  if (!hook) return JSON.stringify({ error: 'Pas de hook React' });
-
-  var nav = null;
-
-  function walk(fiber, depth) {
-    if (!fiber || depth > 600) return;
-    var props = fiber.memoizedProps || {};
-    if (props.navigation && typeof props.navigation.navigate === 'function') {
-      nav = props.navigation;
-    }
-    walk(fiber.child, depth + 1);
-    walk(fiber.sibling, depth);
-  }
-
-  hook.renderers.forEach(function(_, rendererID) {
-    hook.getFiberRoots(rendererID).forEach(function(root) {
-      walk(root.current || root, 0);
-    });
-  });
-
-  if (!nav) return JSON.stringify({ error: 'navigation introuvable' });
-  try {
-    nav.navigate('Settings');
-    return JSON.stringify({ navigated: true, route: 'Settings' });
-  } catch (e) {
-    return JSON.stringify({ error: String(e) });
-  }
-})()`;
+const NAVIGATE_SETTINGS = buildNavigateExpression('Settings', { screen: 'SettingsMain' });
 
 const READ_SETTINGS_STATE = `(function(){
   var hook = globalThis.__REACT_DEVTOOLS_GLOBAL_HOOK__;
@@ -113,7 +86,7 @@ const READ_SETTINGS_STATE = `(function(){
 
   if (!settingsScreen) {
     return JSON.stringify({
-      error: 'SettingsScreen introuvable — ouvrez Settings ou relancez le script',
+      error: 'SettingsScreen introuvable après navigation',
       sections: sections,
       sampleTexts: texts.slice(0, 20),
     });
@@ -229,6 +202,8 @@ async function main() {
     ws.once('open', resolve);
     ws.once('error', reject);
   });
+
+  await installAutoOkAlerts(ws);
 
   console.log('\n=== Navigation → Settings ===');
   const nav = await evaluate(ws, NAVIGATE_SETTINGS);
