@@ -1,0 +1,326 @@
+{
+  "capturedAt": "2026-06-25T00:33:34.786Z",
+  "demoEmail": "driver@demo.com",
+  "newAccountEmail": "hermes.afterlogout.1782347608900@demo.com",
+  "passed": 5,
+  "total": 6,
+  "failed": [
+    {
+      "step": "logout",
+      "ok": false,
+      "logoutResult": {
+        "className": "Object",
+        "description": "Object",
+        "type": "object",
+        "value": {
+          "_h": 0,
+          "_i": 0,
+          "_j": null,
+          "_k": null
+        }
+      },
+      "nav": {
+        "routes": [
+          "DrawerNavigator",
+          "Home",
+          "Deliveries",
+          "DeliveriesMain",
+          "Earnings",
+          "Transactions",
+          "History",
+          "Reports",
+          "Notifications",
+          "Support",
+          "Profile",
+          "ProfileMain",
+          "OrderDetails",
+          "Settings",
+          "SettingsMain"
+        ],
+        "screens": {
+          "DrawerNavigator": true,
+          "HomeScreen": true
+        },
+        "auth": {
+          "hasDriver": false,
+          "isLoading": false,
+          "isAuthenticated": false,
+          "needsOnboarding": false
+        }
+      }
+    }
+  ],
+  "ok": false,
+  "steps": [
+    {
+      "step": "login screen ready",
+      "ok": true,
+      "nav": {
+        "routes": [
+          "Splash",
+          "Login"
+        ],
+        "screens": {
+          "LoginScreen": true
+        },
+        "auth": {
+          "hasDriver": false,
+          "isLoading": false,
+          "isAuthenticated": false,
+          "needsOnboarding": false
+        }
+      },
+      "loginForm": {
+        "email": "driver@demo.com",
+        "password": "***",
+        "passwordSet": true,
+        "submitButton": {
+          "title": "Forgot password?",
+          "loading": false
+        }
+      }
+    },
+    {
+      "step": "demo login",
+      "ok": true,
+      "loginPress": {
+        "pressed": true,
+        "title": "Sign In"
+      },
+      "nav": {
+        "routes": [
+          "Login",
+          "DrawerNavigator",
+          "Home",
+          "Deliveries",
+          "DeliveriesMain",
+          "Earnings",
+          "Transactions",
+          "History",
+          "Reports",
+          "Notifications",
+          "Support",
+          "Profile",
+          "ProfileMain",
+          "OrderDetails",
+          "Settings",
+          "SettingsMain"
+        ],
+        "screens": {
+          "LoginScreen": true,
+          "DrawerNavigator": true,
+          "HomeScreen": true
+        },
+        "auth": {
+          "hasDriver": true,
+          "isLoading": false,
+          "isAuthenticated": true,
+          "needsOnboarding": false
+        }
+      }
+    },
+    {
+      "step": "demo account home deliveries",
+      "ok": true,
+      "home": {
+        "activeDeliveriesSectionVisible": false,
+        "deliveryCardCount": 0,
+        "deliveryCardTestIds": [],
+        "visibleTexts": [
+          "Jean Dupont",
+          "ID: DEMO123456",
+          "available",
+          "Available",
+          "Busy",
+          "Offline",
+          "Today's Deliveries",
+          "Today's Deliveries",
+          "0.00€",
+          "Earnings",
+          "Rating",
+          "Loading nearby restaurants…"
+        ],
+        "driver": {
+          "id": "6979f43d81158605b78de666",
+          "licenseNumber": "DEMO123456",
+          "email": "driver@demo.com",
+          "isDemo": false
+        },
+        "deliveriesInContext": 0,
+        "activeDeliveriesInContext": [],
+        "activeCount": 0
+      },
+      "note": "Référence compte seedé (peut avoir des livraisons actives)"
+    },
+    {
+      "step": "logout",
+      "ok": false,
+      "logoutResult": {
+        "className": "Object",
+        "description": "Object",
+        "type": "object",
+        "value": {
+          "_h": 0,
+          "_i": 0,
+          "_j": null,
+          "_k": null
+        }
+      },
+      "nav": {
+        "routes": [
+          "DrawerNavigator",
+          "Home",
+          "Deliveries",
+          "DeliveriesMain",
+          "Earnings",
+          "Transactions",
+          "History",
+          "Reports",
+          "Notifications",
+          "Support",
+          "Profile",
+          "ProfileMain",
+          "OrderDetails",
+          "Settings",
+          "SettingsMain"
+        ],
+        "screens": {
+          "DrawerNavigator": true,
+          "HomeScreen": true
+        },
+        "auth": {
+          "hasDriver": false,
+          "isLoading": false,
+          "isAuthenticated": false,
+          "needsOnboarding": false
+        }
+      }
+    },
+    {
+      "step": "signup after logout",
+      "ok": true,
+      "email": "hermes.afterlogout.1782347608900@demo.com",
+      "nav": {
+        "routes": [
+          "DriverOnboarding",
+          "DrawerNavigator",
+          "Home",
+          "Deliveries",
+          "DeliveriesMain",
+          "Earnings",
+          "Transactions",
+          "History",
+          "Reports",
+          "Notifications",
+          "Support",
+          "Profile",
+          "ProfileMain",
+          "OrderDetails",
+          "Settings",
+          "SettingsMain"
+        ],
+        "screens": {
+          "DriverOnboardingScreen": true,
+          "DrawerNavigator": true,
+          "HomeScreen": true
+        },
+        "auth": {
+          "hasDriver": true,
+          "isLoading": false,
+          "isAuthenticated": true,
+          "needsOnboarding": false
+        }
+      }
+    },
+    {
+      "step": "new account has no active deliveries",
+      "ok": true,
+      "home": {
+        "activeDeliveriesSectionVisible": false,
+        "deliveryCardCount": 0,
+        "deliveryCardTestIds": [],
+        "visibleTexts": [
+          "Driver",
+          "ID: HERMES-LIC-002",
+          "offline",
+          "Available",
+          "Busy",
+          "Offline",
+          "Today's Deliveries",
+          "Today's Deliveries",
+          "0.00€",
+          "Earnings",
+          "Rating"
+        ],
+        "driver": {
+          "id": "demo_driver_1782347611372_g6wmwn",
+          "licenseNumber": "HERMES-LIC-002",
+          "email": null,
+          "isDemo": true
+        },
+        "deliveriesInContext": 0,
+        "activeDeliveriesInContext": [],
+        "activeCount": 0
+      },
+      "comparedToDemo": {
+        "demoActiveCount": 0,
+        "newActiveCount": 0
+      }
+    }
+  ],
+  "demoHome": {
+    "activeDeliveriesSectionVisible": false,
+    "deliveryCardCount": 0,
+    "deliveryCardTestIds": [],
+    "visibleTexts": [
+      "Jean Dupont",
+      "ID: DEMO123456",
+      "available",
+      "Available",
+      "Busy",
+      "Offline",
+      "Today's Deliveries",
+      "Today's Deliveries",
+      "0.00€",
+      "Earnings",
+      "Rating",
+      "Loading nearby restaurants…"
+    ],
+    "driver": {
+      "id": "6979f43d81158605b78de666",
+      "licenseNumber": "DEMO123456",
+      "email": "driver@demo.com",
+      "isDemo": false
+    },
+    "deliveriesInContext": 0,
+    "activeDeliveriesInContext": [],
+    "activeCount": 0
+  },
+  "newHome": {
+    "activeDeliveriesSectionVisible": false,
+    "deliveryCardCount": 0,
+    "deliveryCardTestIds": [],
+    "visibleTexts": [
+      "Driver",
+      "ID: HERMES-LIC-002",
+      "offline",
+      "Available",
+      "Busy",
+      "Offline",
+      "Today's Deliveries",
+      "Today's Deliveries",
+      "0.00€",
+      "Earnings",
+      "Rating"
+    ],
+    "driver": {
+      "id": "demo_driver_1782347611372_g6wmwn",
+      "licenseNumber": "HERMES-LIC-002",
+      "email": null,
+      "isDemo": true
+    },
+    "deliveriesInContext": 0,
+    "activeDeliveriesInContext": [],
+    "activeCount": 0
+  }
+}

@@ -153,8 +153,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
   },
-  screenHeader: { backgroundColor: 'transparent', padding: 0, marginTop: 16 },
-  screenHeaderContent: { alignItems: 'center' },
+  screenHeader: {
+    backgroundColor: 'transparent',
+    padding: 0,
+    marginTop: 16,
+    alignSelf: 'stretch',
+    width: '100%',
+  },
+  screenHeaderContent: { alignItems: 'center', width: '100%' },
   title: { fontSize: 24, fontWeight: 'bold', color: colors.white, marginBottom: 6 },
   subtitle: { fontSize: 14, color: colors.grey[200], textAlign: 'center' },
   footer: {

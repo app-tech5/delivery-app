@@ -12,3 +12,14 @@ export const isDemoDriverAccount = (user, driver) => {
   }
   return getAccountEmail(user, driver) === demoEmail;
 };
+
+export const isLocalDemoDriverProfile = (driver) => {
+  if (!driver) {
+    return false;
+  }
+  if (driver.isDemo === true) {
+    return true;
+  }
+  const id = String(driver._id || driver.id || '');
+  return id.startsWith('demo_driver_');
+};

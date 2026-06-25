@@ -2,7 +2,8 @@ import { useState, useRef } from 'react';
 import { Alert } from 'react-native';
 import apiClient from '../api';
 import { useDriver } from '../contexts/DriverContext';
-import { isDemoDriverAccount } from '../utils/demoDriverUtils';
+import { config } from '../config';
+import { isDemoDriverAccount, isLocalDemoDriverProfile } from '../utils/demoDriverUtils';
 import { requestDriverLocationPermissions } from '../utils/locationUtils';
 import { isDriverOnline, isDriverApproved } from '../utils/statusUtils';
 import i18n from '../i18n';
@@ -27,7 +28,11 @@ export const useDriverStatus = () => {
         return;
       }
 
-      if (goingOnline && !isDemoDriverAccount(apiClient.user, driver)) {
+      const skipsLocationPermission =
+        isDemoDriverAccount(apiClient.user, driver)
+        || (config.DEMO_MODE && isLocalDemoDriverProfile(driver));
+
+      if (goingOnline && !skipsLocationPermission) {
         const { foreground } = await requestDriverLocationPermissions(apiClient.user, driver);
         if (!foreground) {
           Alert.alert(i18n.t('errors.networkError'), i18n.t('errors.locationError'));

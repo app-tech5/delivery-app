@@ -14,6 +14,38 @@ const ScreenHeader = ({
   children,
   contentStyle
 }) => {
+  const isStandalone = !leftComponent && !rightComponent;
+
+  if (isStandalone) {
+    return (
+      <View style={[styles.header, styles.headerStandalone, containerStyle]} testID="screen-header">
+        <View style={[styles.standaloneContent, contentStyle]}>
+          {!!title && (
+            <View style={styles.standaloneTitleLine}>
+              <Text style={[styles.headerTitle, styles.standaloneTitle, titleStyle]}>{title}</Text>
+              {titleAccessory ? (
+                <View style={styles.titleAccessory}>
+                  {titleAccessory}
+                </View>
+              ) : null}
+            </View>
+          )}
+          {subtitle ? (
+            <Text style={[styles.headerSubtitle, styles.standaloneSubtitle, subtitleStyle]}>
+              {subtitle}
+            </Text>
+          ) : null}
+        </View>
+
+        {children ? (
+          <View style={styles.childrenContainer}>
+            {children}
+          </View>
+        ) : null}
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.header, containerStyle]} testID="screen-header">
       <View style={styles.topRow}>
@@ -62,6 +94,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     padding: 20,
     paddingTop: 30,
+  },
+  headerStandalone: {
+    alignSelf: 'stretch',
+    width: '100%',
+  },
+  standaloneContent: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  standaloneTitleLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    width: '100%',
+  },
+  standaloneTitle: {
+    textAlign: 'center',
+  },
+  standaloneSubtitle: {
+    textAlign: 'center',
   },
   topRow: {
     flexDirection: 'row',

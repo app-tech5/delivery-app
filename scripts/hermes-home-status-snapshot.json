@@ -1,0 +1,327 @@
+{
+  "capturedAt": "2026-06-25T00:49:13.962Z",
+  "passed": 4,
+  "total": 4,
+  "ok": true,
+  "steps": [
+    {
+      "step": "nouveau compte SignUp sur Home",
+      "ok": true,
+      "email": null,
+      "created": false,
+      "home": {
+        "onHome": true,
+        "statusBadgeText": "available",
+        "driverStatus": "available",
+        "driverId": "demo_driver_1782348462521_utfpt7",
+        "isApproved": true,
+        "isDemoDriver": true,
+        "userEmail": null,
+        "apiTokenPrefix": null,
+        "isLocalSignupAccount": true,
+        "isSeededDemoAccount": false,
+        "statusButtons": [
+          {
+            "labels": [
+              "Available"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Available"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Busy"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Busy"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Offline"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Offline"
+            ],
+            "disabled": false
+          }
+        ],
+        "mapDriverMarker": {
+          "id": "home-driver"
+        },
+        "storedLocation": {
+          "longitude": 9.6583237,
+          "latitude": 4.0976244,
+          "source": "driver.location"
+        },
+        "parisFallbackWouldApply": false
+      }
+    },
+    {
+      "step": "status buttons visible",
+      "ok": true,
+      "initial": {
+        "onHome": true,
+        "statusBadgeText": "available",
+        "driverStatus": "available",
+        "driverId": "demo_driver_1782348462521_utfpt7",
+        "isApproved": true,
+        "isDemoDriver": true,
+        "userEmail": null,
+        "apiTokenPrefix": null,
+        "isLocalSignupAccount": true,
+        "isSeededDemoAccount": false,
+        "statusButtons": [
+          {
+            "labels": [
+              "Available"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Available"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Busy"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Busy"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Offline"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Offline"
+            ],
+            "disabled": false
+          }
+        ],
+        "mapDriverMarker": {
+          "id": "home-driver"
+        },
+        "storedLocation": {
+          "longitude": 9.6583237,
+          "latitude": 4.0976244,
+          "source": "driver.location"
+        },
+        "parisFallbackWouldApply": false
+      }
+    },
+    {
+      "step": "status transitions",
+      "ok": true,
+      "transitions": [
+        {
+          "from": "available",
+          "target": "available",
+          "ok": true,
+          "press": {
+            "pressed": true,
+            "button": {
+              "label": "Available",
+              "labels": [
+                "Available"
+              ]
+            }
+          },
+          "before": {
+            "driverStatus": "available",
+            "statusBadgeText": "available"
+          },
+          "after": {
+            "driverStatus": "available",
+            "statusBadgeText": "available",
+            "isApproved": true
+          }
+        },
+        {
+          "from": "available",
+          "target": "busy",
+          "ok": true,
+          "press": {
+            "pressed": true,
+            "button": {
+              "label": "Busy",
+              "labels": [
+                "Busy"
+              ]
+            }
+          },
+          "before": {
+            "driverStatus": "available",
+            "statusBadgeText": "available"
+          },
+          "after": {
+            "driverStatus": "busy",
+            "statusBadgeText": "busy",
+            "isApproved": true
+          }
+        },
+        {
+          "from": "busy",
+          "target": "offline",
+          "ok": true,
+          "press": {
+            "pressed": true,
+            "button": {
+              "label": "Offline",
+              "labels": [
+                "Offline"
+              ]
+            }
+          },
+          "before": {
+            "driverStatus": "busy",
+            "statusBadgeText": "busy"
+          },
+          "after": {
+            "driverStatus": "offline",
+            "statusBadgeText": "offline",
+            "isApproved": true
+          }
+        },
+        {
+          "from": "offline",
+          "target": "available",
+          "ok": true,
+          "press": {
+            "pressed": true,
+            "button": {
+              "label": "Available",
+              "labels": [
+                "Available"
+              ]
+            }
+          },
+          "before": {
+            "driverStatus": "offline",
+            "statusBadgeText": "offline"
+          },
+          "after": {
+            "driverStatus": "available",
+            "statusBadgeText": "available",
+            "isApproved": true
+          }
+        }
+      ]
+    },
+    {
+      "step": "map location analysis",
+      "ok": true,
+      "mapAnalysis": {
+        "storedLocation": {
+          "longitude": 9.6583237,
+          "latitude": 4.0976244,
+          "source": "driver.location"
+        },
+        "mapDriverMarker": {
+          "id": "home-driver"
+        },
+        "parisFallbackWouldApply": false,
+        "account": null,
+        "isApproved": true,
+        "note": "Carte sur driver.location enregistré (GPS envoyé après passage en ligne)",
+        "realGpsExpected": "Oui pour nouveau compte SignUp : GPS appareil quand approuvé + available/busy"
+      },
+      "final": {
+        "onHome": true,
+        "statusBadgeText": "available",
+        "driverStatus": "available",
+        "driverId": "demo_driver_1782348462521_utfpt7",
+        "isApproved": true,
+        "isDemoDriver": true,
+        "userEmail": null,
+        "apiTokenPrefix": null,
+        "isLocalSignupAccount": true,
+        "isSeededDemoAccount": false,
+        "statusButtons": [
+          {
+            "labels": [
+              "Available"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Available"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Busy"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Busy"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Offline"
+            ],
+            "disabled": false
+          },
+          {
+            "labels": [
+              "Offline"
+            ],
+            "disabled": false
+          }
+        ],
+        "mapDriverMarker": {
+          "id": "home-driver"
+        },
+        "storedLocation": {
+          "longitude": 9.6583237,
+          "latitude": 4.0976244,
+          "source": "driver.location"
+        },
+        "parisFallbackWouldApply": false
+      }
+    }
+  ],
+  "mapAnalysis": {
+    "storedLocation": {
+      "longitude": 9.6583237,
+      "latitude": 4.0976244,
+      "source": "driver.location"
+    },
+    "mapDriverMarker": {
+      "id": "home-driver"
+    },
+    "parisFallbackWouldApply": false,
+    "account": null,
+    "isApproved": true,
+    "note": "Carte sur driver.location enregistré (GPS envoyé après passage en ligne)",
+    "realGpsExpected": "Oui pour nouveau compte SignUp : GPS appareil quand approuvé + available/busy"
+  }
+}

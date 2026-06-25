@@ -15,7 +15,10 @@
     "hermes": "node scripts/hermes-cdp.js",
     "hermes:support-form": "node scripts/hermes-support-form-test.js",
     "hermes:settings": "node scripts/hermes-settings-test.js",
-    "hermes:payment-methods": "node scripts/hermes-payment-methods-test.js"
+    "hermes:payment-methods": "node scripts/hermes-payment-methods-test.js",
+    "hermes:signup-form": "node scripts/hermes-signup-form-test.js",
+    "hermes:demo-logout-signup": "node scripts/hermes-demo-logout-signup-test.js",
+    "hermes:home-status": "node scripts/hermes-home-status-test.js"
   },
   "keywords": [],
   "author": "",

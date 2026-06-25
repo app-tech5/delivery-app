@@ -69,6 +69,8 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'stretch',
+    width: '100%',
   },
   iconContainer: {
     marginBottom: 20,

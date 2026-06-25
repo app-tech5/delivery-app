@@ -31,6 +31,12 @@ import {
   buildSupportTicketSubject,
   mapSupportPriority,
 } from './utils/supportUtils';
+import {
+  handleDemoAuthWrite,
+  mergeDemoAuthRead,
+  getLocalDemoDriverProfile,
+  handleDemoRead,
+} from './api/demo/authHandlers';
 
 const isDemoMode = () => config.DEMO_MODE === true;
 
@@ -78,18 +84,33 @@ class ApiClient {
   }
   
   async apiCall(endpoint, options = {}) {
+    const method = (options.method || 'GET').toUpperCase();
     try {
+      if (isDemoMode()) {
+        const localWrite = await handleDemoAuthWrite(this, endpoint, method, options);
+        if (localWrite !== null) {
+          return localWrite;
+        }
+
+        if (method === 'GET') {
+          const localRead = await handleDemoRead(this, endpoint, method);
+          if (localRead !== null) {
+            return localRead;
+          }
+        }
+      }
+
       const url = `${API_BASE_URL}${endpoint}`;
-      const config = {
+      const requestConfig = {
         headers: this.getHeaders(),
         ...options,
       };
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
-      config.signal = controller.signal;
+      requestConfig.signal = controller.signal;
 
-      const response = await fetch(url, config);
+      const response = await fetch(url, requestConfig);
       clearTimeout(timeoutId);
 
       if (!response.ok) {
@@ -103,7 +124,12 @@ class ApiClient {
         throw error;
       }
 
-      return await response.json();
+      const data = await response.json();
+      if (isDemoMode() && method === 'GET') {
+        return mergeDemoAuthRead(endpoint, data, this);
+      }
+
+      return data;
     } catch (error) {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout - check your connection');
@@ -114,7 +140,15 @@ class ApiClient {
   }
 
   async apiCallMultipart(endpoint, options = {}) {
+    const method = (options.method || 'POST').toUpperCase();
     try {
+      if (isDemoMode()) {
+        const localWrite = await handleDemoAuthWrite(this, endpoint, method, options);
+        if (localWrite !== null) {
+          return localWrite;
+        }
+      }
+
       const url = `${API_BASE_URL}${endpoint}`;
       const headers = {};
       if (this.token) {
@@ -523,11 +557,23 @@ class ApiClient {
         this.driver = isDemoMode() ? await mergeDemoDriverProfile(profile) : profile;
         return this.driver;
       }
-      this.driver = null;
-      return null;
     } catch (error) {
-      return null;
+      if (!isDemoMode()) {
+        return null;
+      }
     }
+
+    if (isDemoMode()) {
+      const userId = this.user?._id || this.user?.id;
+      const localProfile = await getLocalDemoDriverProfile(userId);
+      if (localProfile?._id || localProfile?.id) {
+        this.driver = await mergeDemoDriverProfile(localProfile);
+        return this.driver;
+      }
+    }
+
+    this.driver = null;
+    return null;
   }
 
   async getDriverProfile() {

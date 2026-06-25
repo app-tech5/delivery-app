@@ -181,6 +181,8 @@ const styles = StyleSheet.create({
   },
   headerContent: {
     alignItems: 'center',
+    alignSelf: 'stretch',
+    width: '100%',
   },
   screenHeader: {
     backgroundColor: 'transparent',

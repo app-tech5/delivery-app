@@ -1,0 +1,365 @@
+{
+  "capturedAt": "2026-06-25T00:28:12.906Z",
+  "snapshotPath": "/Users/nass/Documents/delivery-app/scripts/hermes-signup-home-snapshot.json",
+  "email": "hermes.signup.1782347285913@demo.com",
+  "passed": 11,
+  "total": 11,
+  "failed": [],
+  "ok": true,
+  "steps": [
+    {
+      "step": "partial fill",
+      "ok": true,
+      "state": {
+        "name": "Jean Demo",
+        "email": "jean@demo.com",
+        "phone": "",
+        "password": "",
+        "confirmPassword": "",
+        "showPassword": false,
+        "showConfirmPassword": false,
+        "isLoading": false
+      }
+    },
+    {
+      "step": "password mismatch",
+      "ok": true,
+      "canSubmitExpected": false
+    },
+    {
+      "step": "full valid form",
+      "ok": true,
+      "email": "hermes.signup.1782347285913@demo.com",
+      "canSubmitExpected": true,
+      "fieldsFound": [
+        "Full Name",
+        "Email",
+        "Phone",
+        "Password",
+        "Confirm Password"
+      ],
+      "state": {
+        "name": "Hermes Driver",
+        "email": "hermes.signup.1782347285913@demo.com",
+        "phone": "+33601020304",
+        "password": "driver123",
+        "confirmPassword": "driver123",
+        "showPassword": false,
+        "showConfirmPassword": false,
+        "isLoading": false
+      },
+      "submitButton": {
+        "title": "Sign Up",
+        "disabled": false,
+        "loading": false
+      }
+    },
+    {
+      "step": "submit local demo signup",
+      "ok": true,
+      "pressed": {
+        "pressed": true,
+        "title": "Sign Up"
+      },
+      "apiSnapshot": {
+        "error": "apiClient introuvable",
+        "hasMetroRequire": true
+      },
+      "navState": {
+        "routes": [
+          "SignUp",
+          "DriverOnboarding"
+        ],
+        "screens": {
+          "SignUpScreen": true,
+          "DriverOnboardingScreen": true
+        },
+        "auth": {
+          "hasDriver": false,
+          "isLoading": false,
+          "isAuthenticated": true,
+          "needsOnboarding": true
+        }
+      },
+      "signUpStillVisible": true,
+      "demoSignupOk": true,
+      "onboardingOk": true,
+      "authenticatedOk": true
+    },
+    {
+      "step": "onboarding screen",
+      "ok": true,
+      "navState": {
+        "routes": [
+          "SignUp",
+          "DriverOnboarding"
+        ],
+        "screens": {
+          "SignUpScreen": true,
+          "DriverOnboardingScreen": true
+        },
+        "auth": {
+          "hasDriver": false,
+          "isLoading": false,
+          "isAuthenticated": true,
+          "needsOnboarding": true
+        }
+      }
+    },
+    {
+      "step": "onboarding form visible",
+      "ok": true,
+      "onboardingState": {
+        "fields": [
+          "License Number",
+          "Vehicle Type",
+          "Vehicle Model",
+          "License Plate"
+        ],
+        "state": {
+          "licenseNumber": "",
+          "vehicleType": "",
+          "vehicleModel": "",
+          "licensePlate": "",
+          "saving": false
+        },
+        "submitButton": {
+          "title": "Create driver profile",
+          "disabled": false,
+          "loading": false
+        }
+      }
+    },
+    {
+      "step": "onboarding fill",
+      "ok": true,
+      "state": {
+        "licenseNumber": "HERMES-LIC-001",
+        "vehicleType": "bike",
+        "vehicleModel": "City Runner",
+        "licensePlate": "AB-123-CD",
+        "saving": false
+      },
+      "fieldsFound": [
+        "License Number",
+        "Vehicle Type",
+        "Vehicle Model",
+        "License Plate"
+      ]
+    },
+    {
+      "step": "onboarding submit local profile",
+      "ok": true,
+      "pressed": {
+        "pressed": true,
+        "title": "Create driver profile"
+      },
+      "navState": {
+        "routes": [
+          "DriverOnboarding",
+          "DrawerNavigator",
+          "Home",
+          "Deliveries",
+          "DeliveriesMain",
+          "Earnings",
+          "Transactions",
+          "History",
+          "Reports",
+          "Notifications",
+          "Support",
+          "Profile",
+          "ProfileMain",
+          "OrderDetails",
+          "Settings",
+          "SettingsMain"
+        ],
+        "screens": {
+          "DriverOnboardingScreen": true,
+          "DrawerNavigator": true,
+          "HomeScreen": true
+        },
+        "auth": {
+          "hasDriver": true,
+          "isLoading": false,
+          "isAuthenticated": true,
+          "needsOnboarding": false
+        }
+      },
+      "profileCreated": true,
+      "drawerReached": true,
+      "onboardingStillVisible": true
+    },
+    {
+      "step": "main app after onboarding",
+      "ok": true,
+      "navState": {
+        "routes": [
+          "DriverOnboarding",
+          "DrawerNavigator",
+          "Home",
+          "Deliveries",
+          "DeliveriesMain",
+          "Earnings",
+          "Transactions",
+          "History",
+          "Reports",
+          "Notifications",
+          "Support",
+          "Profile",
+          "ProfileMain",
+          "OrderDetails",
+          "Settings",
+          "SettingsMain"
+        ],
+        "screens": {
+          "DriverOnboardingScreen": true,
+          "DrawerNavigator": true,
+          "HomeScreen": true
+        },
+        "auth": {
+          "hasDriver": true,
+          "isLoading": false,
+          "isAuthenticated": true,
+          "needsOnboarding": false
+        }
+      }
+    },
+    {
+      "step": "home screen visible",
+      "ok": true,
+      "home": {
+        "hasHomeTestId": true,
+        "driver": {
+          "id": "demo_driver_1782347288760_84ujay",
+          "licenseNumber": "HERMES-LIC-001",
+          "status": "offline",
+          "isDemo": true
+        },
+        "visibleTexts": [
+          "Driver",
+          "ID: HERMES-LIC-001",
+          "offline",
+          "Available",
+          "Busy",
+          "Offline",
+          "Today's Deliveries",
+          "Today's Deliveries",
+          "0.00€",
+          "Earnings",
+          "Rating"
+        ],
+        "deliveriesInContext": 0,
+        "activeDeliveriesInContext": [],
+        "activeDeliveriesSectionVisible": false,
+        "deliveryCardCount": 0
+      },
+      "nav": {
+        "routes": [
+          "DrawerNavigator",
+          "Home",
+          "Deliveries",
+          "DeliveriesMain",
+          "Earnings",
+          "Transactions",
+          "History",
+          "Reports",
+          "Notifications",
+          "Support",
+          "Profile",
+          "ProfileMain",
+          "OrderDetails",
+          "Settings",
+          "SettingsMain"
+        ],
+        "screens": {
+          "DrawerNavigator": true,
+          "HomeScreen": true
+        },
+        "auth": {
+          "hasDriver": true,
+          "isLoading": false,
+          "isAuthenticated": true,
+          "needsOnboarding": false
+        }
+      },
+      "api": {
+        "error": "apiClient introuvable",
+        "hasMetroRequire": true
+      }
+    },
+    {
+      "step": "fresh account has no active deliveries",
+      "ok": true,
+      "activeCount": 0,
+      "activeDeliveriesSectionVisible": false,
+      "deliveryCardCount": 0
+    }
+  ],
+  "home": {
+    "homeScreenMounted": true,
+    "hasHomeTestId": true,
+    "hasDriverStatusBadge": true,
+    "activeDeliveriesSectionVisible": false,
+    "deliveryCardCount": 0,
+    "deliveryCardTestIds": [],
+    "visibleTexts": [
+      "Driver",
+      "ID: HERMES-LIC-001",
+      "offline",
+      "Available",
+      "Busy",
+      "Offline",
+      "Today's Deliveries",
+      "Today's Deliveries",
+      "0.00€",
+      "Earnings",
+      "Rating"
+    ],
+    "driver": {
+      "id": "demo_driver_1782347288760_84ujay",
+      "licenseNumber": "HERMES-LIC-001",
+      "status": "offline",
+      "isDemo": true
+    },
+    "deliveriesInContext": 0,
+    "activeDeliveriesInContext": [],
+    "allTestIdsOnHome": [
+      "home-screen",
+      "driver-status-badge",
+      "driver-status-badge"
+    ]
+  },
+  "nav": {
+    "routes": [
+      "DrawerNavigator",
+      "Home",
+      "Deliveries",
+      "DeliveriesMain",
+      "Earnings",
+      "Transactions",
+      "History",
+      "Reports",
+      "Notifications",
+      "Support",
+      "Profile",
+      "ProfileMain",
+      "OrderDetails",
+      "Settings",
+      "SettingsMain"
+    ],
+    "screens": {
+      "DrawerNavigator": true,
+      "HomeScreen": true
+    },
+    "auth": {
+      "hasDriver": true,
+      "isLoading": false,
+      "isAuthenticated": true,
+      "needsOnboarding": false
+    }
+  },
+  "api": {
+    "error": "apiClient introuvable",
+    "hasMetroRequire": true
+  }
+}
