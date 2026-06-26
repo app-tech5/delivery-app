@@ -20,6 +20,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify GitHub Variables
+        run: |
+          missing=""
+          for var in APK_FILENAME VPS_DOWNLOADS_DIR PUBLIC_SITE_URL EXPO_PUBLIC_API_URL EXPO_PUBLIC_DEMO_EMAIL EXPO_PUBLIC_DEMO_PASSWORD; do
+            eval "val=\$$var"
+            if [ -z "$val" ]; then missing="$missing $var"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "Variables GitHub manquantes:$missing"
+            echo "Configurez-les : gh variable set NAME --body VALUE --repo app-tech5/delivery-app"
+            exit 1
+          fi
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -75,6 +88,10 @@ jobs:
 
       - name: Prepare APK artifact
         run: |
+          if [ -z "$APK_FILENAME" ]; then
+            echo "APK_FILENAME is empty — set vars.APK_FILENAME in GitHub (Settings → Variables)"
+            exit 1
+          fi
           APK_PATH=$(find android/app/build/outputs/apk/release -name '*-release.apk' -type f | head -1)
           if [ -z "$APK_PATH" ]; then
             echo "No release APK found"
