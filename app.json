@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Good Food Driver",
+    "name": "Good Food Driver Demo",
     "icon": "./assets/images/logo512.png",
     "splash": {
       "image": "./assets/images/splash-screen.png",
@@ -27,7 +27,7 @@
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_LOCATION"
       ],
-      "package": "com.goodfood.driver",
+      "package": "com.goodfood.driver.demo",
       "versionCode": 2
     },
     "plugins": [

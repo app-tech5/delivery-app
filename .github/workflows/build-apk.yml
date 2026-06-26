@@ -2,7 +2,7 @@ name: Build and publish APK
 
 on:
   push:
-    branches: [master]
+    branches: [envato-demo]
   workflow_dispatch:
 
 jobs:

@@ -9,7 +9,22 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "envato-demo": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "$EXPO_PUBLIC_API_URL",
+        "EXPO_PUBLIC_DEMO_MODE": "true",
+        "EXPO_PUBLIC_DEMO_EMAIL": "$EXPO_PUBLIC_DEMO_EMAIL",
+        "EXPO_PUBLIC_DEMO_PASSWORD": "$EXPO_PUBLIC_DEMO_PASSWORD"
+      }
     },
     "production": {
       "autoIncrement": true
