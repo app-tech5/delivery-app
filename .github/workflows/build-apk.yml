@@ -51,6 +51,23 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Prepare standalone demo APK
+        run: |
+          npm uninstall expo-dev-client
+          node <<'NODE'
+          const fs = require('fs');
+          const appJsonPath = 'app.json';
+          const appJson = JSON.parse(fs.readFileSync(appJsonPath, 'utf8'));
+          appJson.expo.name = 'Good Food Driver Demo';
+          appJson.expo.android.package = 'com.goodfood.driver.demo';
+          fs.writeFileSync(appJsonPath, `${JSON.stringify(appJson, null, 2)}\n`);
+          NODE
+          sed -i.bak "s/applicationId 'com.goodfood.driver'/applicationId 'com.goodfood.driver.demo'/" android/app/build.gradle
+          rm -f android/app/build.gradle.bak
+          sed -i.bak 's/<string name="app_name">Good Food Driver<\/string>/<string name="app_name">Good Food Driver Demo<\/string>/' android/app/src/main/res/values/strings.xml
+          rm -f android/app/src/main/res/values/strings.xml.bak
+          npm install
+
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
