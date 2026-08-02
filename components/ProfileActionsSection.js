@@ -86,7 +86,7 @@ export function confirmLogout(onLogout) {
           try {
             await onLogout();
           } catch (error) {
-            Alert.alert(i18n.t('common.error'), 'Failed to logout');
+            Alert.alert(i18n.t('common.error'), i18n.t('settings.logoutFailed'));
           }
         },
       },

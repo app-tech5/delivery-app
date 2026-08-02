@@ -6,14 +6,13 @@ import DeliveriesStackNavigator from './DeliveriesStackNavigator';
 import EarningsScreen from '../screens/EarningsScreen';
 import TransactionsScreen from '../screens/TransactionsScreen';
 import ReportsScreen from '../screens/ReportsScreen';
-import RatingScreen from '../screens/RatingScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ProfileStackNavigator from './ProfileStackNavigator';
 import SettingsStackNavigator from './SettingsStackNavigator';
 import HistoryScreen from '../screens/HistoryScreen';
 import SupportScreen from '../screens/SupportScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
-import { Ionicons, MaterialIcons, Feather, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import i18n from '../i18n';
 import { colors } from '../global';
 import { useDriver } from '../contexts/DriverContext';
@@ -196,8 +195,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {}
-
       <Drawer.Screen
         name="Notifications"
         component={NotificationsScreen}
@@ -260,8 +257,6 @@ export default function DrawerNavigator() {
           }
         }}
       />
-
-      {}
 
       <Drawer.Screen
         name="Settings"

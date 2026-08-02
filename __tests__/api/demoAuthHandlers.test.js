@@ -155,7 +155,7 @@ describe('demo authHandlers', () => {
       expect(profile.licenseNumber).toBe('LIC-READ');
 
       const settings = await handleDemoRead(client, '/resource/settings', 'GET');
-      expect(settings[0].appName).toBe('Good Food Delivery');
+      expect(settings[0].appName).toBe('Good Food Pro Driver');
       expect(settings[0].currency.code).toBe('EUR');
     });
 

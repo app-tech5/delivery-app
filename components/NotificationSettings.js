@@ -13,7 +13,7 @@ const NotificationSettings = ({ localSettings = {}, onSwitchChange }) => {
       <Card containerStyle={styles.card}>
         <SettingRow
           title={i18n.t('settings.orderAlerts')}
-          subtitle="Get notified when new orders are available"
+          subtitle={i18n.t('settings.orderAlertsSubtitle')}
           switchProps={{
             value: localSettings.orderAlerts,
             onValueChange: (value) => onSwitchChange('orderAlerts', value)
@@ -22,7 +22,7 @@ const NotificationSettings = ({ localSettings = {}, onSwitchChange }) => {
 
         <SettingRow
           title={i18n.t('settings.paymentAlerts')}
-          subtitle="Receive payment confirmations and updates"
+          subtitle={i18n.t('settings.paymentAlertsSubtitle')}
           switchProps={{
             value: localSettings.paymentAlerts,
             onValueChange: (value) => onSwitchChange('paymentAlerts', value)
@@ -31,7 +31,7 @@ const NotificationSettings = ({ localSettings = {}, onSwitchChange }) => {
 
         <SettingRow
           title={i18n.t('settings.systemUpdates')}
-          subtitle="Important app updates and maintenance notices"
+          subtitle={i18n.t('settings.systemUpdatesSubtitle')}
           switchProps={{
             value: localSettings.systemUpdates,
             onValueChange: (value) => onSwitchChange('systemUpdates', value)
@@ -40,7 +40,7 @@ const NotificationSettings = ({ localSettings = {}, onSwitchChange }) => {
 
         <SettingRow
           title={i18n.t('settings.marketing')}
-          subtitle="Promotional offers and marketing communications"
+          subtitle={i18n.t('settings.marketingSubtitle')}
           switchProps={{
             value: localSettings.marketing,
             onValueChange: (value) => onSwitchChange('marketing', value)
@@ -51,7 +51,7 @@ const NotificationSettings = ({ localSettings = {}, onSwitchChange }) => {
 
         <SettingRow
           title={i18n.t('settings.sound')}
-          subtitle="Play notification sounds"
+          subtitle={i18n.t('settings.soundSubtitle')}
           switchProps={{
             value: localSettings.sound,
             onValueChange: (value) => onSwitchChange('sound', value)
@@ -60,7 +60,7 @@ const NotificationSettings = ({ localSettings = {}, onSwitchChange }) => {
 
         <SettingRow
           title={i18n.t('settings.vibration')}
-          subtitle="Vibrate on notifications"
+          subtitle={i18n.t('settings.vibrationSubtitle')}
           switchProps={{
             value: localSettings.vibration,
             onValueChange: (value) => onSwitchChange('vibration', value)

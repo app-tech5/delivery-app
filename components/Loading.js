@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { colors } from '../global';
+import i18n from '../i18n';
 
-const Loading = ({ message = "Loading..." }) => {
+const Loading = ({ message = i18n.t('common.loading') }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>

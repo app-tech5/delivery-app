@@ -801,10 +801,9 @@ export const {
   driverLogin,
   driverRegister,
   updateDriverStatus,
-  getAvailableDeliveries,
-  acceptDelivery,
-  getDriverDeliveries,
-  updateDeliveryStatus,
+  getAvailableOrders,
+  getDriverOrders,
+  updateOrder,
   getDriverStats,
   getPaymentMethods,
   createPaymentMethod,
@@ -821,6 +820,13 @@ export const {
   updateDriverProfile,
   updateDriver,
   uploadDriverDocument,
+  getNotifications,
+  markNotificationRead,
+  deleteNotification,
+  uploadFile,
+  uploadPublicFile,
+  listCurrencies,
+  updateSettingsDocument,
 } = apiClient;
 
 export const getSettings = () => apiClient.getSettings();

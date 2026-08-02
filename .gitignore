@@ -51,6 +51,11 @@ project.xcworkspace
 .maestro/
 scripts/screenshots/
 .vscode/
+.idea/
+.cursor/
+*.code-workspace
+sgconfig.yml
+rules/
 coverage/
 *.log
 

@@ -1,7 +1,4 @@
-/**
- * Vector data for the driver map pin (react-native-svg).
- * Canonical artwork: driver-car-top.svg — keep path and viewBox in sync when replacing the asset.
- */
+
 export const DRIVER_CAR_TOP_VIEWBOX = '0 0 313 512.52';
 
 export const DRIVER_CAR_TOP_PATH_D =

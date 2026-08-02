@@ -11,7 +11,7 @@ export const useEarningsRefresh = ({ invalidateDeliveriesCache, loadDriverOrders
       await invalidateDeliveriesCache();
       await loadDriverOrders();
     } catch (error) {
-      Alert.alert('Error', i18n.t('reports.refreshStatsError'));
+      Alert.alert(i18n.t('common.error'), i18n.t('reports.refreshStatsError'));
     } finally {
       setRefreshing(false);
     }

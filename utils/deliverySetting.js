@@ -1,7 +1,4 @@
-/**
- * Coût livraison côté driver : formule distance uniquement.
- * Sans promos client (FREE, seuil), sans minFee/maxFee, sans maxDeliveryDistance.
- */
+
 export function calculateDriverDeliveryFeeFromSetting(
   setting,
   distanceKm = null,

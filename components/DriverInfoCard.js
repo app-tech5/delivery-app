@@ -21,7 +21,7 @@ const DriverInfoCard = ({ order }) => {
         if (supported) {
           Linking.openURL(url);
         } else {
-          Alert.alert('Error', 'Phone calls are not supported on this device');
+          Alert.alert(i18n.t('common.error'), i18n.t('settings.phoneCallsUnsupported'));
         }
       });
     }

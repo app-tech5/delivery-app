@@ -13,7 +13,7 @@ const PrivacySettings = ({ localSettings = {}, onSwitchChange, onFeatureComingSo
       <Card containerStyle={styles.card}>
         <SettingRow
           title={i18n.t('settings.locationServices')}
-          subtitle="Allow access to location for delivery services"
+          subtitle={i18n.t('settings.locationServicesSubtitle')}
           switchProps={{
             value: localSettings.locationServices,
             onValueChange: (value) => onSwitchChange('locationServices', value)
@@ -22,7 +22,7 @@ const PrivacySettings = ({ localSettings = {}, onSwitchChange, onFeatureComingSo
 
         <SettingRow
           title={i18n.t('settings.backgroundLocation')}
-          subtitle="Continue tracking location in background"
+          subtitle={i18n.t('settings.backgroundLocationSubtitle')}
           switchProps={{
             value: localSettings.backgroundLocation,
             onValueChange: (value) => onSwitchChange('backgroundLocation', value),
@@ -32,7 +32,7 @@ const PrivacySettings = ({ localSettings = {}, onSwitchChange, onFeatureComingSo
 
         <SettingRow
           title={i18n.t('settings.analytics')}
-          subtitle="Help improve the app by sharing usage data"
+          subtitle={i18n.t('settings.analyticsSubtitle')}
           switchProps={{
             value: localSettings.analytics,
             onValueChange: (value) => onSwitchChange('analytics', value)
@@ -43,14 +43,14 @@ const PrivacySettings = ({ localSettings = {}, onSwitchChange, onFeatureComingSo
 
         <SettingRow
           title={i18n.t('settings.changePassword')}
-          subtitle="Update your account password"
+          subtitle={i18n.t('settings.changePasswordSubtitle')}
           showChevron={true}
-          onPress={() => onFeatureComingSoon('Change password')}
+          onPress={() => onFeatureComingSoon(i18n.t('settings.changePasswordFeature'))}
         />
 
         <SettingRow
           title={i18n.t('settings.biometricAuth')}
-          subtitle="Use fingerprint or face recognition to login"
+          subtitle={i18n.t('settings.biometricAuthSubtitle')}
           switchProps={{
             value: localSettings.biometricAuth,
             onValueChange: (value) => onSwitchChange('biometricAuth', value)
@@ -59,7 +59,7 @@ const PrivacySettings = ({ localSettings = {}, onSwitchChange, onFeatureComingSo
 
         <SettingRow
           title={i18n.t('settings.twoFactorAuth')}
-          subtitle="Add an extra layer of security to your account"
+          subtitle={i18n.t('settings.twoFactorAuthSubtitle')}
           switchProps={{
             value: localSettings.twoFactorAuth,
             onValueChange: (value) => onSwitchChange('twoFactorAuth', value)

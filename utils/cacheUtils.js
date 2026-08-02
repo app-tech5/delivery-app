@@ -381,7 +381,7 @@ export const loadSettingsWithSmartCache = async (
     } else {
       
       const defaultSettings = {
-        appName: 'Good Food Delivery',
+        appName: 'Good Food Pro Driver',
         currency: {
           value: 'EUR',
           label: 'Euro',

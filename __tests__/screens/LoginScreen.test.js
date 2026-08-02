@@ -37,7 +37,7 @@ jest.mock('../../i18n', () => ({
 
 jest.mock('../../config', () => ({
   config: {
-    APP_NAME: 'Good Food Driver',
+    APP_NAME: 'Good Food Pro Driver',
     DEMO_MODE: false,
     DEMO_EMAIL: 'driver@demo.com',
     DEMO_PASSWORD: 'driver123',
@@ -150,7 +150,7 @@ describe('LoginScreen', () => {
       <LoginScreen navigation={mockNavigation} />
     );
 
-    expect(getByText('Good Food Driver')).toBeTruthy();
+    expect(getByText('Good Food Pro Driver')).toBeTruthy();
     expect(getByText('Sign in to your account')).toBeTruthy();
     expect(getByTestId('text-input-Email')).toBeTruthy();
     expect(getByTestId('text-input-Password')).toBeTruthy();

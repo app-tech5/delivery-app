@@ -65,7 +65,6 @@ Then open the **Good Food Pro Driver** app already on the device/emulator (or pr
 | `EXPO_PUBLIC_DEMO_MODE` | Prefill demo login | `true` |
 | `EXPO_PUBLIC_DEMO_EMAIL` | Demo email | `driver@demo.com` |
 | `EXPO_PUBLIC_DEMO_PASSWORD` | Demo password | `driver123` |
-| `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` | Optional Places key (if you enable Google Places) | _(empty)_ |
 
 Runtime config lives in `config.js`.
 

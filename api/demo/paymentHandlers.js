@@ -46,7 +46,6 @@ function applyPaymentOverrides(methods = [], patch) {
   return list;
 }
 
-/** Fusionne les méthodes API avec les patches locaux (mode démo). */
 export async function mergeDemoPaymentMethods(apiMethods) {
   const state = await getDemoState();
   const merged = applyPaymentOverrides(apiMethods, getPatch(state));

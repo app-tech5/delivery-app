@@ -1,14 +1,14 @@
 # API layer – delivery-app (driver)
 
-HTTP client in `api.js` (+ `api/demo/` for demo-mode merges). Base URL: `config.API_BASE_URL` from `EXPO_PUBLIC_API_URL`.
+HTTP client in root `api.js` (+ `api/demo/` for demo-mode merges). Base URL: `config.API_BASE_URL` from `EXPO_PUBLIC_API_URL`.
 
-> Paths below match the current `api.js` sources. Compact list: [docs/endpoints.md](docs/endpoints.md).
+Compact list: [docs/endpoints.md](docs/endpoints.md).
 
 ## Architecture
 
 | File | Role |
 |------|------|
-| **api.js** | Singleton client: token/driver/user, `apiCall()`, auth, orders, payments, settings, notifications |
+| **api.js** | Singleton client: token/driver/user, `apiCall()`, auth, orders, payments, settings, notifications, Stripe Connect, uploads |
 | **config.js** | `API_BASE_URL`, demo credentials, timeouts |
 | **api/demo/** | Demo-mode write/read handlers when `EXPO_PUBLIC_DEMO_MODE` is on |
 
@@ -25,34 +25,40 @@ HTTP client in `api.js` (+ `api/demo/` for demo-mode merges). Base URL: `config.
 | Method | HTTP | Endpoint |
 |--------|------|----------|
 | `fetchDriverByUserId()` | GET | `/resource/drivers/byUserId` |
-| Update driver | PUT | `/resource/drivers/${driverId}` |
+| `getDriverProfile()` / `updateDriver` / `updateDriverProfile` | GET/PUT | `/resource/drivers…` |
+| `updateUser` | PUT | `/users/me` |
+| `uploadDriverDocument` | POST | upload helpers |
 
 ## Orders / deliveries
 
 | Method | HTTP | Endpoint |
 |--------|------|----------|
-| Available / preparing | GET | `/resource/orders?status=preparing` |
-| Driver orders | GET | `/resource/orders?…` (filtered) |
-| Update order | PUT | `/resource/orders/${orderId}` |
+| `getAvailableOrders()` | GET | `/resource/orders?status=preparing` (and related filters) |
+| `getDriverOrders()` | GET | `/resource/orders?…` (driver-filtered) |
+| `updateOrder(orderId, patch)` | PUT | `/resource/orders/${orderId}` |
 
-## Payments
-
-| Method | HTTP | Endpoint |
-|--------|------|----------|
-| List | GET | `/resource/paymentMethods/byUserId` |
-| Create / update / delete | POST/PUT/DELETE | `/resource/paymentMethods[/${id}]` |
-
-## Settings & support
+## Payments & Stripe Connect
 
 | Method | HTTP | Endpoint |
 |--------|------|----------|
-| App settings | GET | `/resource/app_settings` |
-| Currencies | GET | `/resource/currencies` |
-| Delivery settings | GET | `/resource/deliverysettings?…` |
-| FAQs / support | GET/POST | `/resource/customersupports` |
-| Notifications | GET/PUT | `/resource/notifications[/${id}]` |
-| Restaurants | GET | `/resource/restaurants` |
+| Payment methods CRUD | GET/POST/PUT/DELETE | `/resource/paymentMethods…` |
+| `startStripeConnectOnboarding` | POST | `/connect/onboarding` |
+| `getStripeConnectStatus` | GET | `/connect/status` |
+| `syncStripeConnectPayoutMethod` | POST | `/connect/sync` |
+
+## Settings, support, notifications, uploads
+
+| Method | HTTP | Endpoint |
+|--------|------|----------|
+| `getSettings()` | GET | `/resource/settings` |
+| `getAppConfig()` | GET | `/resource/app_settings` |
+| `listCurrencies()` | GET | `/resource/currencies` |
+| `getRestaurantDeliverySettings` | GET | `/resource/deliverysettings?…` |
+| FAQs / tickets | GET/POST | `/resource/customersupports…` |
+| Notifications | GET/PUT/DELETE | `/resource/notifications…` |
+| `uploadFile` / `uploadPublicFile` | POST | `/upload`, `/upload/public` |
+| Nearby restaurants | GET | `/resource/restaurants` (geo helpers) |
 
 ## Demo mode
 
-When `EXPO_PUBLIC_DEMO_MODE=true`, selected writes/reads go through `api/demo/` handlers so buyers can explore offline-ish flows against seeded demo data.
+When `EXPO_PUBLIC_DEMO_MODE=true`, selected writes/reads go through `api/demo/` handlers. Builtin demo login still uses the live API for auth (`driver@demo.com` / `driver123`).

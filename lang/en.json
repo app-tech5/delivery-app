@@ -223,14 +223,14 @@
     "demoSimulation": "Demo mode - simulation",
     "realTimeUpdate": "Real-time update"
   },
-  "history":{
+  "history": {
     "filters": {
-    "all": "All",
-    "today": "Today",
-    "week": "This week",
-    "month": "This month",
-    "last_month": "Last month"
-  }
+      "all": "All",
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "last_month": "Last month"
+    }
   },
   "driver": {
     "available": "Available",
@@ -354,7 +354,6 @@
     "startButton": "Start",
     "deliveredButton": "Delivered",
     "addressNotAvailable": "Address not available",
-    "orderPrefix": "Order #",
     "pleaseReconnectEarnings": "Please reconnect to view your earnings",
     "earningsTitle": "Earnings",
     "deliveryEarnings": "Trip earnings",
@@ -362,11 +361,9 @@
     "deliveriesCompletedToday": "Deliveries completed today",
     "averageEarningsPerDelivery": "Average earnings per delivery",
     "currentRating": "Current Rating",
-    "addressNotAvailable": "Address not available",
     "refreshStatsError": "Unable to refresh statistics",
     "earningsDetails": "Earnings Details",
     "todaysDeliveries": "Today's Deliveries",
-    "totalDeliveries": "Total Deliveries",
     "recentDeliveries": "Recent Deliveries",
     "delivered": "Delivered",
     "todayFilter": "Today",
@@ -382,7 +379,6 @@
     "transactionsTitle": "Transactions",
     "totalLabel": "Total",
     "countLabel": "Count",
-    "averageLabel": "Average",
     "daysAgo": "days ago",
     "noTransactionsForPeriod": "No transactions for this period",
     "deliveryDescription": "Delivery #",
@@ -510,7 +506,7 @@
     "loadError": "Unable to load support information",
     "noFaqs": "No FAQs available at the moment.",
     "contactUnavailable": "Support email is not configured. Please try again later.",
-    "emailSubject": "Good Food Driver — Support request",
+    "emailSubject": "Good Food Pro Driver — Support request",
     "emailError": "Unable to open your email app.",
     "authRequired": "Please sign in to submit a support request.",
     "describeIssue": "Describe your issue",
@@ -678,7 +674,26 @@
     "supportLinkSubtitle": "Get help and contact support",
     "dataStorage": "Data & Storage",
     "clearCacheSubtitle": "Free up storage space",
-    "clearDataSubtitle": "Delete all app data and logout"
+    "clearDataSubtitle": "Delete all app data and logout",
+    "orderAlertsSubtitle": "Get notified when new orders are available",
+    "paymentAlertsSubtitle": "Receive payment confirmations and updates",
+    "systemUpdatesSubtitle": "Important app updates and maintenance notices",
+    "marketingSubtitle": "Promotional offers and marketing communications",
+    "soundSubtitle": "Play notification sounds",
+    "vibrationSubtitle": "Vibrate on notifications",
+    "locationServicesSubtitle": "Allow access to location for delivery services",
+    "backgroundLocationSubtitle": "Continue tracking location in background",
+    "analyticsSubtitle": "Help improve the app by sharing usage data",
+    "changePasswordSubtitle": "Update your account password",
+    "biometricAuthSubtitle": "Use fingerprint or face recognition to login",
+    "twoFactorAuthSubtitle": "Add an extra layer of security to your account",
+    "phoneCallsUnsupported": "Phone calls are not supported on this device",
+    "logoutFailed": "Failed to logout",
+    "refreshReportsError": "Unable to refresh reports",
+    "reconnectProfile": "Please reconnect to view your profile",
+    "closeA11y": "Close",
+    "changePasswordFeature": "Change password",
+    "buildLabel": "Build {build}"
   },
   "driver_license": "Driver's License",
   "insurance": "Insurance",

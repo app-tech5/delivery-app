@@ -211,7 +211,7 @@ export async function handleDemoAuthWrite(client, endpoint, method, options = {}
 const LOCAL_DEMO_SETTINGS = [
   {
     _id: 'demo_local_settings',
-    appName: 'Good Food Delivery',
+    appName: 'Good Food Pro Driver',
     language: { code: 'fr', name: 'Français' },
     currency: { code: 'EUR', symbol: '€' },
   },

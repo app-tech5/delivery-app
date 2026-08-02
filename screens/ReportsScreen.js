@@ -46,7 +46,7 @@ export default function ReportsScreen() {
       await invalidateDeliveriesCache();
       await loadDriverOrders();
     } catch (error) {
-      Alert.alert('Error', 'Unable to refresh reports');
+      Alert.alert(i18n.t('common.error'), i18n.t('settings.refreshReportsError'));
     } finally {
       setRefreshing(false);
     }

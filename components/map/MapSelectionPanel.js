@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../global';
 import { useMapMarkerCallout } from './MapEntityMarker';
+import i18n from '../../i18n';
 
 export default function MapSelectionPanel({ resolveCallout }) {
   const { activeId, clearIfActive } = useMapMarkerCallout() || {};
@@ -32,7 +33,7 @@ export default function MapSelectionPanel({ resolveCallout }) {
         onPress={() => clearIfActive(activeId)}
         style={styles.closeButton}
         accessibilityRole="button"
-        accessibilityLabel="Close"
+        accessibilityLabel={i18n.t('settings.closeA11y')}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
         <Ionicons name="close" size={20} color={colors.text.secondary} />

@@ -49,7 +49,7 @@ export default function ProfileScreen() {
   } = useProfileDocuments(driver, setDriver);
 
   if (!isAuthenticated || !driver) {
-    return <ReconnectMessage message="Please reconnect to view your profile" />;
+    return <ReconnectMessage message={i18n.t('settings.reconnectProfile')} />;
   }
 
   const profileStats = buildProfileStats(driver, stats);
