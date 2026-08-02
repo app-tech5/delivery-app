@@ -11,7 +11,11 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "smoke": "bash scripts/buyer-smoke.sh",
+    "ci:hermes": "bash scripts/ci/hermes-compile-bundle.sh",
+    "test:hermes": "node scripts/hermes/run-all.js",
+    "test:hermes:smoke": "node scripts/hermes/smoke-login-home.js"
   },
   "keywords": [],
   "author": "",
@@ -72,7 +76,8 @@
     "eslint-plugin-react": "^7.37.5",
     "jest": "^29.7.0",
     "jest-expo": "^54.0.17",
-    "react-test-renderer": "19.1.0"
+    "react-test-renderer": "19.1.0",
+    "ws": "^8.21.0"
   },
   "jest": {
     "preset": "jest-expo",

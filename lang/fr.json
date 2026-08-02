@@ -1,7 +1,8 @@
 {
   "app": {
-    "name": "Good Food Driver",
-    "version": "1.1.0"
+    "name": "Good Food Pro Driver",
+    "version": "1.0.0",
+    "tagline": "Livraison rapide & fiable"
   },
   "navigation": {
     "home": "Accueil",
@@ -17,7 +18,7 @@
     "logout": "Déconnexion"
   },
   "auth": {
-    "welcome": "Bienvenue sur Good Food Driver",
+    "welcome": "Bienvenue sur Good Food Pro Driver",
     "email": "Email",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
@@ -192,7 +193,22 @@
     "noDeliveriesWithStatus": "Aucune livraison avec le statut \"{{status}}\"",
     "viewDetails": "Voir les détails",
     "refreshError": "Impossible de rafraîchir les livraisons",
-    "completedStatus": "Terminée"
+    "completedStatus": "Terminée",
+    "acceptDeliveryTitle": "Accepter la livraison",
+    "acceptDeliveryConfirm": "Voulez-vous vraiment accepter cette livraison ?",
+    "startDeliveryConfirm": "Voulez-vous vraiment démarrer cette livraison ?",
+    "completeDeliveryConfirm": "Confirmez-vous que cette livraison est terminée ?",
+    "acceptSuccess": "Livraison acceptée avec succès",
+    "updateSuccess": "Statut mis à jour avec succès",
+    "acceptError": "Impossible d'accepter la livraison",
+    "updateError": "Impossible de mettre à jour le statut",
+    "changeStatus": "Changer le statut",
+    "refreshHistoryError": "Impossible de rafraîchir l'historique",
+    "refreshReportsError": "Impossible de rafraîchir les rapports",
+    "logoutError": "Une erreur est survenue lors de la déconnexion",
+    "acceptButton": "Accepter",
+    "startButton": "Démarrer",
+    "refreshStatsError": "Impossible de rafraîchir les statistiques"
   },
   "payment": {
     "paymentMethodsTitle": "Modes de Paiement",

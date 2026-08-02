@@ -41,7 +41,7 @@ function CustomDrawerContent(props) {
               
             } catch (error) {
               console.error('Erreur lors de la déconnexion:', error);
-              Alert.alert('Erreur', 'Une erreur est survenue lors de la déconnexion');
+              Alert.alert(i18n.t('common.error'), i18n.t('reports.logoutError'));
             }
           },
         },
@@ -107,7 +107,6 @@ export default function DrawerNavigator() {
         drawerInactiveBackgroundColor: 'transparent',
       }}
     >
-      {}
       <Drawer.Screen
         name="Home"
         component={HomeScreen}
@@ -123,7 +122,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {}
       <Drawer.Screen
         name="Deliveries"
         component={DeliveriesStackNavigator}
@@ -139,7 +137,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {}
       <Drawer.Screen
         name="Earnings"
         component={EarningsScreen}
@@ -155,7 +152,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {}
       <Drawer.Screen
         name="Transactions"
         component={TransactionsScreen}
@@ -171,7 +167,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {}
       <Drawer.Screen
         name="History"
         component={HistoryScreen}
@@ -187,7 +182,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {}
       <Drawer.Screen
         name="Reports"
         component={ReportsScreen}
@@ -204,9 +198,7 @@ export default function DrawerNavigator() {
       />
 
       {}
-      {}
 
-      {}
       <Drawer.Screen
         name="Notifications"
         component={NotificationsScreen}
@@ -222,7 +214,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {}
       <Drawer.Screen
         name="Support"
         component={SupportScreen}
@@ -238,7 +229,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {}
       <Drawer.Screen
         name="Profile"
         component={ProfileStackNavigator}
@@ -254,7 +244,6 @@ export default function DrawerNavigator() {
         }}
       />
 
-      {}
       <Drawer.Screen
         name="OrderDetails"
         component={OrderDetailsScreen}
@@ -274,9 +263,7 @@ export default function DrawerNavigator() {
       />
 
       {}
-      {}
 
-      {}
       <Drawer.Screen
         name="Settings"
         component={SettingsStackNavigator}

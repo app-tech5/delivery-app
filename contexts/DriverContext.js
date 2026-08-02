@@ -5,6 +5,7 @@ import { useDriverAuth } from '../hooks/useDriverAuth';
 import { useDriverStats } from '../hooks/useDriverStats';
 import { useDriverOrders } from '../hooks/useDriverOrders';
 import { useDriverLocationWatch } from '../hooks/useDriverLocationWatch';
+import { installHermesE2eAuthHooks } from '../utils/hermesE2eHooks';
 
 const DriverContext = createContext();
 
@@ -28,6 +29,12 @@ export const DriverProvider = ({ children }) => {
     logout: authLogout,
     setDriver,
   } = useDriverAuth();
+
+  useEffect(() => {
+    if (__DEV__) {
+      installHermesE2eAuthHooks(login, authLogout);
+    }
+  }, [login, authLogout]);
 
   const hasCompletedOnboarding = !isLoading && isAuthenticated && !needsOnboarding;
 

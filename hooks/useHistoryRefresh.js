@@ -12,7 +12,7 @@ export const useHistoryRefresh = ({ invalidateDeliveriesCache, loadDriverOrders 
       await loadDriverOrders();
     } catch (error) {
       console.error('Erreur lors du rafraîchissement:', error);
-      Alert.alert('Erreur', 'Impossible de rafraîchir l\'historique');
+      Alert.alert(i18n.t('common.error'), i18n.t('reports.refreshHistoryError'));
     } finally {
       setRefreshing(false);
     }

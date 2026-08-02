@@ -26,7 +26,7 @@ export const useRefreshData = ({
       }
     } catch (error) {
       console.error('Erreur lors du rafraîchissement:', error);
-      Alert.alert('Error', errorMessage);
+      Alert.alert(i18n.t('common.error'), errorMessage);
     } finally {
       setRefreshing(false);
     }
@@ -45,7 +45,7 @@ export const useReportsRefresh = ({
   return useRefreshData({
     invalidateCaches: [invalidateDeliveriesCache],
     loadData: [loadDriverOrders],
-    errorMessage: 'Unable to refresh reports'
+    errorMessage: i18n.t('reports.refreshReportsError')
   });
 };
 
@@ -61,7 +61,7 @@ export const useHistoryRefresh = ({ invalidateDeliveriesCache, loadDriverOrders 
   return useRefreshData({
     invalidateCaches: [invalidateDeliveriesCache],
     loadData: [loadDriverOrders],
-    errorMessage: 'Impossible de rafraîchir l\'historique'
+    errorMessage: i18n.t('reports.refreshHistoryError')
   });
 };
 

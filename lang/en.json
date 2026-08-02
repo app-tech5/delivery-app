@@ -1,7 +1,8 @@
 {
   "app": {
-    "name": "Good Food Driver",
-    "version": "1.1.0"
+    "name": "Good Food Pro Driver",
+    "version": "1.0.0",
+    "tagline": "Fast & reliable delivery"
   },
   "navigation": {
     "home": "Home",
@@ -155,7 +156,7 @@
     "reportIssues": "Report any mechanical issues immediately"
   },
   "auth": {
-    "welcome": "Welcome to Good Food Driver",
+    "welcome": "Welcome to Good Food Pro Driver",
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
@@ -345,6 +346,10 @@
     "acceptError": "Unable to accept delivery",
     "updateError": "Unable to update status",
     "refreshError": "Unable to refresh deliveries",
+    "changeStatus": "Change Status",
+    "refreshHistoryError": "Unable to refresh history",
+    "refreshReportsError": "Unable to refresh reports",
+    "logoutError": "An error occurred while logging out",
     "acceptButton": "Accept",
     "startButton": "Start",
     "deliveredButton": "Delivered",

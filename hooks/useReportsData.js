@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 import { getDriverDeliveryEarnings } from '../utils/driverDeliveryFee';
+import i18n from '../i18n';
 
 export const useReportsData = (deliveries, stats, activePeriod) => {
   
   const periods = useMemo(() => [
-    { key: '7days', label: 'Last 7 Days', days: 7 },
-    { key: '30days', label: 'Last 30 Days', days: 30 },
-    { key: '90days', label: 'Last 90 Days', days: 90 },
+    { key: '7days', label: i18n.t('reports.last7Days'), days: 7 },
+    { key: '30days', label: i18n.t('reports.last30Days'), days: 30 },
+    { key: '90days', label: i18n.t('reports.last90Days'), days: 90 },
   ], []);
   
   const periodDeliveries = useMemo(() => {

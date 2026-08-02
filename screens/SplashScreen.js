@@ -24,8 +24,8 @@ export default function SplashScreen({ navigation }) {
             containerStyle={styles.iconContainer}
           />
           <ScreenHeader
-            title="Good Food Driver"
-            subtitle="Livraison rapide & fiable"
+            title={i18n.t('app.name')}
+            subtitle={i18n.t('app.tagline')}
             containerStyle={styles.screenHeader}
             contentStyle={styles.screenHeaderContent}
             titleStyle={styles.appName}

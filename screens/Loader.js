@@ -6,8 +6,10 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { colors } from '../global';
+import i18n from '../i18n';
 
-export default function Loader({ message = "Chargement..." }) {
+export default function Loader({ message }) {
+  const text = message || i18n.t('common.loading');
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -16,7 +18,7 @@ export default function Loader({ message = "Chargement..." }) {
           color={colors.primary}
           style={styles.indicator}
         />
-        <Text style={styles.message}>{message}</Text>
+        <Text style={styles.message}>{text}</Text>
       </View>
     </View>
   );
@@ -44,4 +46,3 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
-

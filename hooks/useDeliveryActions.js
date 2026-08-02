@@ -9,7 +9,7 @@ export const useDeliveryActions = () => {
   
   const handleStatusChange = async (orderId, newStatus, confirmMessage) => {
     Alert.alert(
-      'Change Status',
+      i18n.t('reports.changeStatus'),
       confirmMessage,
       [
         { text: i18n.t('common.cancel'), style: 'cancel' },
@@ -19,10 +19,10 @@ export const useDeliveryActions = () => {
             setLoading(true);
             try {
               await updateDeliveryStatus(orderId, newStatus);
-              Alert.alert('Success', i18n.t('reports.updateSuccess'));
+              Alert.alert(i18n.t('common.success'), i18n.t('reports.updateSuccess'));
             } catch (error) {
               console.error('Erreur lors de la mise à jour:', error);
-              Alert.alert('Error', i18n.t('reports.updateError'));
+              Alert.alert(i18n.t('common.error'), i18n.t('reports.updateError'));
             } finally {
               setLoading(false);
             }
@@ -44,10 +44,10 @@ export const useDeliveryActions = () => {
             setLoading(true);
             try {
               await acceptDelivery(orderId);
-              Alert.alert('Success', i18n.t('reports.acceptSuccess'));
+              Alert.alert(i18n.t('common.success'), i18n.t('reports.acceptSuccess'));
             } catch (error) {
               console.error('Erreur lors de l\'acceptation:', error);
-              Alert.alert('Error', i18n.t('reports.acceptError'));
+              Alert.alert(i18n.t('common.error'), i18n.t('reports.acceptError'));
             } finally {
               setLoading(false);
             }
