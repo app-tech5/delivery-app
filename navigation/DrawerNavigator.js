@@ -40,7 +40,6 @@ function CustomDrawerContent(props) {
               await logout();
               
             } catch (error) {
-              console.error('Erreur lors de la déconnexion:', error);
               Alert.alert(i18n.t('common.error'), i18n.t('reports.logoutError'));
             }
           },

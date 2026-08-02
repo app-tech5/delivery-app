@@ -47,7 +47,6 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
 
   const loadDriverOrders = async (status = null) => {
     if (!hasCompletedOnboarding || !driver?._id) {
-      console.log('❌ Driver non authentifié, impossible de charger les livraisons');
       return;
     }
 
@@ -75,24 +74,19 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
         (data, fromCache) => {
           applyDeliveries(data);
           if (fromCache) {
-            console.log('🔄 Livraisons chargées depuis le cache dans DriverContext');
           }
         },
         (data) => {
           applyDeliveries(data);
-          console.log('🔄 Livraisons mises à jour depuis l\'API dans DriverContext');
         },
         (loading) => {
           
-          console.log(`🔄 État de chargement des livraisons: ${loading}`);
         },
         (errorMsg) => {
           
-          console.error('Erreur chargement livraisons:', errorMsg);
         }
       );
     } catch (error) {
-      console.error('Error loading driver orders with smart cache:', error);
     }
   };
   
@@ -106,7 +100,6 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
       const response = await apiClient.updateDriverStatus(status, location);
       return response;
     } catch (error) {
-      console.error('Update status error:', error);
       throw error;
     }
   };
@@ -126,7 +119,6 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
       await loadDriverOrders(); 
       return response;
     } catch (error) {
-      console.error('Accept order error:', error);
       throw error;
     }
   };
@@ -148,7 +140,6 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
       await loadDriverOrders(); 
       return response;
     } catch (error) {
-      console.error('Update order status error:', error);
       throw error;
     }
   };
@@ -157,10 +148,8 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
     if (driver?._id) {
       try {
         await clearDeliveriesCache(driver._id);
-        console.log('🗑️ Cache des livraisons invalidé');
         await loadDriverOrders(); 
       } catch (error) {
-        console.error('Erreur lors de l\'invalidation du cache des livraisons:', error);
       }
     }
   };

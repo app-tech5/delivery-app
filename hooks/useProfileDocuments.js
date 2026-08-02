@@ -32,7 +32,6 @@ export function useProfileDocuments(driver, setDriver) {
       setCustomDocType('');
       Alert.alert(i18n.t('profile.uploadSuccess'));
     } catch (error) {
-      console.error('Document upload error:', error);
       Alert.alert(
         error.message === 'Document already added'
           ? i18n.t('profile.documentAlreadyAdded')

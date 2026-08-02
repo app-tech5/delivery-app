@@ -35,11 +35,9 @@ export const usePaymentMethods = (driver, hasCompletedOnboarding, enabled = true
         },
         () => {},
         (errorMsg) => {
-          console.error('Erreur chargement méthodes de paiement:', errorMsg);
         }
       );
     } catch (error) {
-      console.error('Error loading payment methods with smart cache:', error);
     } finally {
       setInitialLoading(false);
       setRefreshing(false);
@@ -53,7 +51,6 @@ export const usePaymentMethods = (driver, hasCompletedOnboarding, enabled = true
       await clearPaymentMethodsCache(driver._id);
       await loadPaymentMethods({ showRefresh: true });
     } catch (error) {
-      console.error('Erreur invalidation cache payment methods:', error);
       setRefreshing(false);
     }
   }, [canLoad, driver?._id, loadPaymentMethods]);

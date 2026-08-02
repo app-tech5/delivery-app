@@ -52,7 +52,6 @@ export const useSettingsManager = (canLoadSettings) => {
           setCurrencyOverride(JSON.parse(savedCurrency));
         }
       } catch (prefError) {
-        console.error('Error loading preferences:', prefError);
       }
     };
 
@@ -80,7 +79,6 @@ export const useSettingsManager = (canLoadSettings) => {
         },
         (errorMsg) => {
           setError(errorMsg);
-          console.error('Error loading settings:', errorMsg);
         }
       );
     } else {
@@ -102,7 +100,6 @@ export const useSettingsManager = (canLoadSettings) => {
       setError(null);
       saveSettingsToCache(appSettings);
     } catch (err) {
-      console.error('Error refreshing settings:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -116,7 +113,6 @@ export const useSettingsManager = (canLoadSettings) => {
       await clearSettingsCache();
       await refreshSettings();
     } catch (err) {
-      console.error('Error invalidating settings cache:', err);
     }
   };
 
@@ -142,7 +138,6 @@ export const useSettingsManager = (canLoadSettings) => {
         return list;
       }
     } catch (currencyError) {
-      console.error('Error fetching currencies:', currencyError);
     }
     return mapFallbackCurrencies();
   }, []);
@@ -159,7 +154,6 @@ export const useSettingsManager = (canLoadSettings) => {
         setCurrencyOverride(null);
         return { success: true };
       } catch (updateError) {
-        console.warn('Currency API update failed, using local override:', updateError);
       }
     }
 

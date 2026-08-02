@@ -14,7 +14,6 @@ export function useSettingsScreen(invalidateCache, logout) {
     try {
       await AsyncStorage.setItem(LOCAL_SETTINGS_KEY, JSON.stringify(next));
     } catch (error) {
-      console.error('Error saving local settings:', error);
     }
   }, []);
 
@@ -55,7 +54,6 @@ export function useSettingsScreen(invalidateCache, logout) {
       }
       Alert.alert(i18n.t('settings.clearCache'), i18n.t('settings.cacheCleared'));
     } catch (error) {
-      console.error('Clear cache error:', error);
       Alert.alert(i18n.t('errors.error'), i18n.t('errors.serverError'));
     }
   }, [invalidateCache]);
@@ -77,7 +75,6 @@ export function useSettingsScreen(invalidateCache, logout) {
                 await logout();
               }
             } catch (error) {
-              console.error('Clear data error:', error);
             }
           },
         },
@@ -89,7 +86,6 @@ export function useSettingsScreen(invalidateCache, logout) {
     try {
       await Linking.openURL(url);
     } catch (error) {
-      console.error('Open URL error:', error);
     }
   }, []);
 

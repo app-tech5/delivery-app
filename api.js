@@ -67,7 +67,6 @@ class ApiClient {
         this.driver = JSON.parse(driverData);
       }
     } catch (error) {
-      console.error('Error initializing driver from storage:', error);
     }
   }
   
@@ -134,7 +133,6 @@ class ApiClient {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout - check your connection');
       }
-      console.error(`API call failed: ${endpoint}`, error);
       throw error;
     }
   }
@@ -174,7 +172,6 @@ class ApiClient {
       if (error.name === 'AbortError') {
         throw new Error('Request timeout - check your connection');
       }
-      console.error(`API call failed: ${endpoint}`, error);
       throw error;
     }
   }
@@ -193,7 +190,6 @@ class ApiClient {
         try {
           this.driver = await this.fetchDriverByUserId();
         } catch (driverError) {
-          console.log('No driver profile yet:', driverError);
           this.driver = null;
         }
 
@@ -203,7 +199,6 @@ class ApiClient {
 
       throw new Error('Authentication failed');
     } catch (error) {
-      console.error('Driver login error:', error);
       throw error;
     }
   }
@@ -232,7 +227,6 @@ class ApiClient {
 
       throw new Error('Registration failed');
     } catch (error) {
-      console.error('Driver register error:', error);
       throw error;
     }
   }
@@ -294,10 +288,6 @@ class ApiClient {
       throw new Error('Missing driver or location');
     }
 
-    console.log(
-      `📍 [${source}] Envoi backend → lat: ${location.latitude}, lon: ${location.longitude}`
-    );
-
     const updatedDriver = await this.apiCall(`/resource/drivers/${driverId}`, {
       method: 'PUT',
       body: JSON.stringify({
@@ -336,7 +326,6 @@ class ApiClient {
       const list = Array.isArray(raw) ? raw : [];
       return list[0] || null;
     } catch (error) {
-      console.error('Error fetching restaurant delivery settings:', error);
       return null;
     }
   }
@@ -357,7 +346,6 @@ class ApiClient {
         this.driver?.rating || 0
       );
     } catch (error) {
-      console.error('Error calculating driver stats:', error);
       return {
         todayDeliveries: 0,
         totalEarnings: 0,
@@ -385,7 +373,6 @@ class ApiClient {
 
       return payoutMethods;
     } catch (error) {
-      console.error('Error fetching payment methods:', error);
       return [];
     }
   }
@@ -412,7 +399,6 @@ class ApiClient {
         }),
       });
     } catch (error) {
-      console.error('Error creating payment method:', error);
       throw error;
     }
   }
@@ -430,7 +416,6 @@ class ApiClient {
         }),
       });
     } catch (error) {
-      console.error('Error updating payment method:', error);
       throw error;
     }
   }
@@ -446,7 +431,6 @@ class ApiClient {
         method: 'DELETE',
       });
     } catch (error) {
-      console.error('Error deleting payment method:', error);
       throw error;
     }
   }
@@ -463,7 +447,6 @@ class ApiClient {
         body: JSON.stringify({ isDefault: true, purpose: 'payout' }),
       });
     } catch (error) {
-      console.error('Error setting default payment method:', error);
       throw error;
     }
   }
@@ -482,7 +465,6 @@ class ApiClient {
         body: JSON.stringify({ returnUrl, refreshUrl }),
       });
     } catch (error) {
-      console.error('Error starting Stripe Connect onboarding:', error);
       throw error;
     }
   }
@@ -495,7 +477,6 @@ class ApiClient {
 
       return await this.apiCall('/connect/status');
     } catch (error) {
-      console.error('Error fetching Stripe Connect status:', error);
       throw error;
     }
   }
@@ -509,7 +490,6 @@ class ApiClient {
       const result = await this.apiCall('/connect/sync', { method: 'POST' });
       return result.paymentMethod;
     } catch (error) {
-      console.error('Error syncing Stripe Connect payout method:', error);
       throw error;
     }
   }
@@ -523,7 +503,6 @@ class ApiClient {
         await AsyncStorage.setItem('userData', JSON.stringify(this.user));
       }
     } catch (error) {
-      console.error('Error saving to storage:', error);
     }
   }
   
@@ -539,7 +518,6 @@ class ApiClient {
         await AsyncStorage.setItem('driverData', JSON.stringify(this.driver));
       }
     } catch (error) {
-      console.error('Error saving driver to storage:', error);
     }
   }
 
@@ -709,7 +687,6 @@ class ApiClient {
       }
       return data || null;
     } catch (error) {
-      console.error('Error fetching app config:', error);
       return null;
     }
   }
@@ -795,7 +772,6 @@ class ApiClient {
 
       return nearbyRestaurants.sort((a, b) => a.distance - b.distance);
     } catch (error) {
-      console.error('Error fetching nearby restaurants:', error);
       return [];
     }
   }

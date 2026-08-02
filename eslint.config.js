@@ -50,7 +50,7 @@ module.exports = [
     },
     rules: {
       'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': 'error',
       'no-comments/disallowComments': 'error',
       'max-lines-per-function': ['warn', 50],
       complexity: ['warn', 10],

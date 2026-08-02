@@ -72,7 +72,6 @@ export default function OrderDetailsScreen() {
         }
       }
     } catch (err) {
-      console.error('Error loading order details:', err);
       setError(i18n.t('orderDetails.errorLoadingOrder'));
     } finally {
       setLoading(false);

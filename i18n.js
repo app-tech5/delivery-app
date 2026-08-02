@@ -18,7 +18,6 @@ try {
     deviceLanguage = Localization.locale.split('-')[0];
   }
 } catch (error) {
-  console.warn('Error detecting language:', error.message);
 }
 
 i18n.locale = i18n.translations[deviceLanguage] ? deviceLanguage : 'en';
@@ -27,7 +26,6 @@ export const changeLanguage = (language) => {
   if (i18n.translations[language]) {
     i18n.locale = language;
   } else {
-    console.warn(`Language '${language}' not supported. Available languages:`, Object.keys(i18n.translations));
   }
 };
 

@@ -57,7 +57,6 @@ const GeneralSettings = ({
         }))
       );
     } catch (error) {
-      console.error('Currency picker error:', error);
       Alert.alert(i18n.t('common.error'), i18n.t('settings.currencyLoadError'));
       setCurrencyModalVisible(false);
     } finally {

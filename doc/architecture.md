@@ -30,11 +30,8 @@ npm start         # Metro only (dev client must already be installed)
 npm test
 npm run lint
 npm run smoke
-npm run test:hermes:smoke
 ```
 
 **Not Expo Go** — requires `expo-dev-client` (see root README).
 
 Optional EAS: `eas.json` (bring your own Expo account).
-
-Hermes CDP login→home is run locally with `adb` + Metro against the buyer’s own API URL in `.env`.

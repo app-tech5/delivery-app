@@ -17,7 +17,6 @@ const StripeConnectPayoutCard = ({ onPayoutMethodsUpdated }) => {
       setStatus(nextStatus);
       return nextStatus;
     } catch (error) {
-      console.error('Stripe Connect status error:', error);
       return null;
     } finally {
       setLoading(false);

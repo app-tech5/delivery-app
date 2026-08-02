@@ -70,7 +70,6 @@ export const useDriverAuth = () => {
 
         setIsAuthenticated(true);
       } catch (error) {
-        console.error('Error initializing driver:', error);
         setNeedsOnboarding(true);
       } finally {
         setIsLoading(false);
@@ -93,7 +92,6 @@ export const useDriverAuth = () => {
 
       return response;
     } catch (error) {
-      console.error('Login error:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -113,7 +111,6 @@ export const useDriverAuth = () => {
 
       return response;
     } catch (error) {
-      console.error('Register error:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -128,7 +125,6 @@ export const useDriverAuth = () => {
       setNeedsOnboarding(false);
       return { success: true, driver: profile };
     } catch (error) {
-      console.error('Onboarding error:', error);
       return { success: false, message: error.message || 'Failed to create driver profile' };
     }
   };
@@ -141,7 +137,6 @@ export const useDriverAuth = () => {
       setIsAuthenticated(false);
       setNeedsOnboarding(false);
     } catch (error) {
-      console.error('Logout error:', error);
       throw error;
     }
   };

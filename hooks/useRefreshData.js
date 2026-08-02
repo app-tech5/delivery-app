@@ -25,7 +25,6 @@ export const useRefreshData = ({
         }
       }
     } catch (error) {
-      console.error('Erreur lors du rafraîchissement:', error);
       Alert.alert(i18n.t('common.error'), errorMessage);
     } finally {
       setRefreshing(false);

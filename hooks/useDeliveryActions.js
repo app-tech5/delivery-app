@@ -21,7 +21,6 @@ export const useDeliveryActions = () => {
               await updateDeliveryStatus(orderId, newStatus);
               Alert.alert(i18n.t('common.success'), i18n.t('reports.updateSuccess'));
             } catch (error) {
-              console.error('Erreur lors de la mise à jour:', error);
               Alert.alert(i18n.t('common.error'), i18n.t('reports.updateError'));
             } finally {
               setLoading(false);
@@ -46,7 +45,6 @@ export const useDeliveryActions = () => {
               await acceptDelivery(orderId);
               Alert.alert(i18n.t('common.success'), i18n.t('reports.acceptSuccess'));
             } catch (error) {
-              console.error('Erreur lors de l\'acceptation:', error);
               Alert.alert(i18n.t('common.error'), i18n.t('reports.acceptError'));
             } finally {
               setLoading(false);

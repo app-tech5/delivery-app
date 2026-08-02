@@ -14,7 +14,6 @@ export const useReportsRefresh = ({
       await invalidateDeliveriesCache();
       await loadDriverOrders();
     } catch (error) {
-      console.error('Erreur lors du rafraîchissement:', error);
       Alert.alert(i18n.t('common.error'), i18n.t('reports.refreshReportsError'));
     } finally {
       setRefreshing(false);

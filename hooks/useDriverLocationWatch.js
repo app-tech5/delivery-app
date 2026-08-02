@@ -60,7 +60,6 @@ export const useDriverLocationWatch = (driver, hasCompletedOnboarding, setDriver
           setDriver(updatedDriver);
         }
       } catch (error) {
-        console.error('Driver location watch error:', error);
       } finally {
         inFlightRef.current = false;
       }

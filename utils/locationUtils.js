@@ -94,7 +94,6 @@ export const startDriverBackgroundLocation = async (user = apiClient.user, drive
 
     const { status: foregroundStatus } = await Location.getForegroundPermissionsAsync();
     if (foregroundStatus !== 'granted') {
-      console.log('📍 [background-setup] Permission foreground manquante');
       return false;
     }
 
@@ -105,14 +104,10 @@ export const startDriverBackgroundLocation = async (user = apiClient.user, drive
     }
 
     if (backgroundStatus !== 'granted') {
-      console.log(
-        '📍 [background-setup] Permission "Toujours" refusée — activer dans Réglages > Localisation'
-      );
       return false;
     }
 
     if (!TaskManager.isTaskDefined(DRIVER_LOCATION_TASK)) {
-      console.log('📍 [background-setup] Task background non enregistrée');
       return false;
     }
 
@@ -123,10 +118,8 @@ export const startDriverBackgroundLocation = async (user = apiClient.user, drive
       foregroundService: getForegroundServiceConfig(),
     });
 
-    console.log('📍 [background-setup] Suivi background démarré');
     return true;
   } catch (error) {
-    console.log(`📍 [background-setup] Échec démarrage: ${error.message}`);
     return false;
   }
 };

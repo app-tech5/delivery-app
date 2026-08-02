@@ -61,7 +61,6 @@ export default function DeliveriesScreen() {
       await invalidateDeliveriesCache();
       await loadDriverOrders();
     } catch (error) {
-      console.error('Erreur lors du rafraîchissement:', error);
       Alert.alert(i18n.t('common.error'), i18n.t('reports.refreshError'));
     } finally {
       setRefreshing(false);

@@ -42,7 +42,6 @@ export const useDriverStatus = () => {
 
       await updateStatus(newStatus, null);
     } catch (error) {
-      console.error('❌ Erreur lors du changement de statut:', error);
       Alert.alert(i18n.t('errors.networkError'), i18n.t('driver.statusUpdateError'));
     } finally {
       statusUpdateRef.current = false;

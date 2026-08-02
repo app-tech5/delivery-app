@@ -10,7 +10,6 @@ let inFlight = false;
 
 TaskManager.defineTask(DRIVER_LOCATION_TASK, async ({ data, error }) => {
   if (error) {
-    console.error('Background location task error:', error);
     return;
   }
 
@@ -31,14 +30,12 @@ TaskManager.defineTask(DRIVER_LOCATION_TASK, async ({ data, error }) => {
     await apiClient.initializeFromStorage();
     const driverId = apiClient.driver?._id || apiClient.driver?.id;
     if (!driverId) {
-      console.log('📍 [background-setup] Pas de driver en session');
       return;
     }
 
     await apiClient.updateDriverLocation(coords, 'background');
     lastSentAt = Date.now();
   } catch (err) {
-    console.error('Background location update error:', err);
   } finally {
     inFlight = false;
   }

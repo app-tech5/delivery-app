@@ -39,7 +39,6 @@ export default function LoginScreen({ navigation }) {
         Alert.alert(i18n.t('auth.loginSuccessful'));
       }
     } catch (error) {
-      console.error('Login error:', error);
       const message = error.message === 'Driver profile not found'
         ? i18n.t('auth.driverNotFound')
         : (error.message || i18n.t('auth.loginFailedDefault'));

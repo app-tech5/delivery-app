@@ -28,11 +28,9 @@ export const useNearbyRestaurants = (driverLocation) => {
         },
         (errorMsg) => {
           
-          console.error('Erreur chargement restaurants proches:', errorMsg);
         }
       );
     } catch (error) {
-      console.error('Error loading nearby restaurants with smart cache:', error);
     }
   };
   

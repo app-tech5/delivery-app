@@ -39,7 +39,6 @@ export function useProfileEdit(driver, setDriver) {
       const url = await apiClient.uploadPublicFile(asset, PUBLIC_UPLOAD_FOLDERS.AVATARS);
       setEditData((prev) => ({ ...prev, image: url }));
     } catch (error) {
-      console.error('Photo upload error:', error);
       Alert.alert(i18n.t('profile.uploadError'));
     }
   };
@@ -86,7 +85,6 @@ export function useProfileEdit(driver, setDriver) {
       setEditData(EMPTY_PROFILE_EDIT_DATA);
       Alert.alert(i18n.t('profile.updateSuccess'));
     } catch (error) {
-      console.error('Profile update error:', error);
       Alert.alert(i18n.t('profile.updateError'));
     } finally {
       setSaving(false);

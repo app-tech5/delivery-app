@@ -72,7 +72,6 @@ export const openMapsNavigation = async ({
 
     Alert.alert(i18n.t('common.error'), i18n.t('orderDetails.mapsNotAvailable'));
   } catch (error) {
-    console.error('Failed to open maps navigation:', error);
     Alert.alert(i18n.t('common.error'), i18n.t('orderDetails.mapsNotAvailable'));
   }
 };

@@ -60,7 +60,6 @@ export const hasNearbyRestaurantsChanged = (oldRestaurants, newRestaurants) => {
 export const saveSettingsToCache = async (settings) => {
   try {
     if (!settings) {
-      console.warn('⚠️ Tentative de sauvegarde de settings invalides en cache');
       return;
     }
 
@@ -76,16 +75,13 @@ export const saveSettingsToCache = async (settings) => {
     await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
     await AsyncStorage.setItem(timestampKey, cacheData.timestamp.toString());
 
-    console.log(`💾 Settings sauvegardés en cache: ${settings.appName || 'App'}`);
   } catch (error) {
-    console.error('❌ Erreur lors de la sauvegarde des settings en cache:', error);
   }
 };
 
 export const saveDeliveriesToCache = async (deliveries, driverId) => {
   try {
     if (!deliveries || !Array.isArray(deliveries) || !driverId) {
-      console.warn('⚠️ Tentative de sauvegarde de livraisons invalides en cache');
       return;
     }
 
@@ -102,16 +98,13 @@ export const saveDeliveriesToCache = async (deliveries, driverId) => {
     await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
     await AsyncStorage.setItem(timestampKey, cacheData.timestamp.toString());
 
-    console.log(`💾 Livraisons sauvegardées en cache pour driver ${driverId}: ${deliveries.length} livraisons`);
   } catch (error) {
-    console.error('❌ Erreur lors de la sauvegarde des livraisons en cache:', error);
   }
 };
 
 export const saveDriverStatsToCache = async (stats, driverId) => {
   try {
     if (!stats || !driverId) {
-      console.warn('⚠️ Tentative de sauvegarde de stats invalides en cache');
       return;
     }
 
@@ -128,16 +121,13 @@ export const saveDriverStatsToCache = async (stats, driverId) => {
     await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
     await AsyncStorage.setItem(timestampKey, cacheData.timestamp.toString());
 
-    console.log(`💾 Stats sauvegardées en cache pour driver ${driverId}: ${stats.todayDeliveries || 0} livraisons aujourd'hui`);
   } catch (error) {
-    console.error('❌ Erreur lors de la sauvegarde des stats en cache:', error);
   }
 };
 
 export const saveNearbyRestaurantsToCache = async (restaurants, latitude, longitude, radius = 10) => {
   try {
     if (!restaurants || !Array.isArray(restaurants)) {
-      console.warn('⚠️ Tentative de sauvegarde de restaurants invalides en cache');
       return;
     }
 
@@ -155,7 +145,6 @@ export const saveNearbyRestaurantsToCache = async (restaurants, latitude, longit
     await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
     await AsyncStorage.setItem(timestampKey, cacheData.timestamp.toString());
   } catch (error) {
-    console.error('❌ Erreur lors de la sauvegarde des restaurants proches en cache:', error);
   }
 };
 
@@ -168,19 +157,16 @@ export const getSettingsFromCache = async () => {
     const timestamp = await AsyncStorage.getItem(timestampKey);
 
     if (!cachedData) {
-      console.log(`📭 Pas de settings en cache`);
       return null;
     }
 
     const parsedData = JSON.parse(cachedData);
     
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
-      console.log(`🔄 Version du cache des settings obsolète, suppression`);
       await clearSettingsCache();
       return null;
     }
 
-    console.log(`📖 Settings chargés depuis le cache: ${parsedData.settings.appName || 'App'}`);
     return {
       settings: parsedData.settings,
       timestamp: parsedData.timestamp,
@@ -188,7 +174,6 @@ export const getSettingsFromCache = async () => {
     };
 
   } catch (error) {
-    console.error('❌ Erreur lors de la lecture du cache des settings:', error);
     return null;
   }
 };
@@ -196,7 +181,6 @@ export const getSettingsFromCache = async () => {
 export const getDeliveriesFromCache = async (driverId) => {
   try {
     if (!driverId) {
-      console.log('❌ DriverId requis pour récupérer le cache des livraisons');
       return null;
     }
 
@@ -207,19 +191,16 @@ export const getDeliveriesFromCache = async (driverId) => {
     const timestamp = await AsyncStorage.getItem(timestampKey);
 
     if (!cachedData) {
-      console.log(`📭 Pas de livraisons en cache pour driver ${driverId}`);
       return null;
     }
 
     const parsedData = JSON.parse(cachedData);
     
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
-      console.log(`🔄 Version du cache des livraisons obsolète pour driver ${driverId}, suppression`);
       await clearDeliveriesCache(driverId);
       return null;
     }
 
-    console.log(`📖 Livraisons chargées depuis le cache pour driver ${driverId}: ${parsedData.deliveries.length} livraisons`);
     return {
       deliveries: parsedData.deliveries,
       timestamp: parsedData.timestamp,
@@ -227,7 +208,6 @@ export const getDeliveriesFromCache = async (driverId) => {
     };
 
   } catch (error) {
-    console.error('❌ Erreur lors de la lecture du cache des livraisons:', error);
     return null;
   }
 };
@@ -235,7 +215,6 @@ export const getDeliveriesFromCache = async (driverId) => {
 export const getDriverStatsFromCache = async (driverId) => {
   try {
     if (!driverId) {
-      console.log('❌ DriverId requis pour récupérer le cache des stats');
       return null;
     }
 
@@ -245,19 +224,16 @@ export const getDriverStatsFromCache = async (driverId) => {
     const cachedData = await AsyncStorage.getItem(cacheKey);
 
     if (!cachedData) {
-      console.log(`📭 Pas de stats en cache pour driver ${driverId}`);
       return null;
     }
 
     const parsedData = JSON.parse(cachedData);
     
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
-      console.log(`🔄 Version du cache des stats obsolète pour driver ${driverId}, suppression`);
       await clearDriverStatsCache(driverId);
       return null;
     }
 
-    console.log(`📖 Stats chargées depuis le cache pour driver ${driverId}: ${parsedData.stats.todayDeliveries || 0} livraisons aujourd'hui`);
     return {
       stats: parsedData.stats,
       timestamp: parsedData.timestamp,
@@ -265,7 +241,6 @@ export const getDriverStatsFromCache = async (driverId) => {
     };
 
   } catch (error) {
-    console.error('❌ Erreur lors de la lecture du cache des stats:', error);
     return null;
   }
 };
@@ -296,7 +271,6 @@ export const getNearbyRestaurantsFromCache = async (latitude, longitude, radius 
     };
 
   } catch (error) {
-    console.error('❌ Erreur lors de la lecture du cache des restaurants proches:', error);
     return null;
   }
 };
@@ -309,16 +283,13 @@ export const clearSettingsCache = async () => {
     await AsyncStorage.removeItem(cacheKey);
     await AsyncStorage.removeItem(timestampKey);
 
-    console.log(`🗑️ Cache des settings supprimé`);
   } catch (error) {
-    console.error('❌ Erreur lors de la suppression du cache des settings:', error);
   }
 };
 
 export const clearDeliveriesCache = async (driverId) => {
   try {
     if (!driverId) {
-      console.log('❌ DriverId requis pour supprimer le cache des livraisons');
       return;
     }
 
@@ -328,16 +299,13 @@ export const clearDeliveriesCache = async (driverId) => {
     await AsyncStorage.removeItem(cacheKey);
     await AsyncStorage.removeItem(timestampKey);
 
-    console.log(`🗑️ Cache des livraisons supprimé pour driver ${driverId}`);
   } catch (error) {
-    console.error('❌ Erreur lors de la suppression du cache des livraisons:', error);
   }
 };
 
 export const clearDriverStatsCache = async (driverId) => {
   try {
     if (!driverId) {
-      console.log('❌ DriverId requis pour supprimer le cache des stats');
       return;
     }
 
@@ -347,9 +315,7 @@ export const clearDriverStatsCache = async (driverId) => {
     await AsyncStorage.removeItem(cacheKey);
     await AsyncStorage.removeItem(timestampKey);
 
-    console.log(`🗑️ Cache des stats supprimé pour driver ${driverId}`);
   } catch (error) {
-    console.error('❌ Erreur lors de la suppression du cache des stats:', error);
   }
 };
 
@@ -362,7 +328,6 @@ export const clearNearbyRestaurantsCache = async (latitude, longitude, radius = 
     await AsyncStorage.removeItem(cacheKey);
     await AsyncStorage.removeItem(timestampKey);
   } catch (error) {
-    console.error('❌ Erreur lors de la suppression du cache des restaurants proches:', error);
   }
 };
 
@@ -374,58 +339,47 @@ export const loadSettingsWithSmartCache = async (
   onError
 ) => {
   try {
-    console.log(`🚀 Démarrage du chargement intelligent des settings`);
     
     onLoadingStateChange?.(true);
     const cachedData = await getSettingsFromCache();
 
     if (cachedData && cachedData.settings) {
-      console.log('⚡ Settings affichés depuis le cache');
       onDataLoaded(cachedData.settings, true); 
       onLoadingStateChange?.(false);
     } else {
-      console.log('📭 Pas de cache disponible, attente des données API');
       onLoadingStateChange?.(true);
     }
     
-    console.log('🌐 Fetch API en arrière-plan pour les settings...');
     const freshData = await apiFetcher();
 
     if (freshData) {
-      console.log(`📡 Settings API reçus`);
       
       const appSettings = Array.isArray(freshData) ? freshData[0] : freshData;
       
       const hasChanged = !cachedData || hasSettingsChanged(cachedData.settings, appSettings);
 
       if (hasChanged) {
-        console.log('🔄 Settings mis à jour, sauvegarde en cache et affichage');
         
         await saveSettingsToCache(appSettings);
         
         onDataUpdated(appSettings);
       } else {
-        console.log('✅ Settings identiques, pas de mise à jour nécessaire');
       }
     } else {
-      console.warn('⚠️ Données settings API invalides ou vides');
       onError?.('Données settings invalides');
     }
     
     onLoadingStateChange?.(false);
 
   } catch (error) {
-    console.error('❌ Erreur lors du chargement intelligent des settings:', error);
     onLoadingStateChange?.(false);
     onError?.(error.message);
     
     const fallbackCache = await getSettingsFromCache();
     if (fallbackCache && fallbackCache.settings) {
-      console.log('🔄 Erreur API, utilisation du cache comme fallback');
       onDataLoaded(fallbackCache.settings, true);
     } else {
       
-      console.log('🔄 Pas de cache disponible, utilisation des valeurs par défaut');
       const defaultSettings = {
         appName: 'Good Food Delivery',
         currency: {
@@ -454,62 +408,50 @@ export const loadDeliveriesWithSmartCache = async (
   onError
 ) => {
   if (!driverId) {
-    console.error('❌ DriverId requis pour le chargement des livraisons');
     onError?.('DriverId requis');
     return;
   }
 
   try {
-    console.log(`🚀 Démarrage du chargement intelligent des livraisons pour driver ${driverId}`);
     
     onLoadingStateChange?.(true);
     const cachedData = await getDeliveriesFromCache(driverId);
 
     if (cachedData && cachedData.deliveries) {
-      console.log('⚡ Livraisons affichées depuis le cache');
       onDataLoaded(cachedData.deliveries, true); 
       onLoadingStateChange?.(false);
     } else {
-      console.log('📭 Pas de cache disponible, attente des données API');
       onLoadingStateChange?.(true);
     }
     
-    console.log('🌐 Fetch API en arrière-plan pour les livraisons...');
     const freshData = await apiFetcher();
 
     if (freshData && Array.isArray(freshData)) {
-      console.log(`📡 Livraisons API reçues: ${freshData.length} livraisons`);
       
       const hasChanged = !cachedData || hasDeliveriesChanged(cachedData.deliveries, freshData);
 
       if (hasChanged) {
-        console.log('🔄 Livraisons mises à jour, sauvegarde en cache et affichage');
         
         await saveDeliveriesToCache(freshData, driverId);
         
         onDataUpdated(freshData);
       } else {
-        console.log('✅ Livraisons identiques, pas de mise à jour nécessaire');
       }
     } else {
-      console.warn('⚠️ Données livraisons API invalides ou vides');
       onError?.('Données livraisons invalides');
     }
     
     onLoadingStateChange?.(false);
 
   } catch (error) {
-    console.error('❌ Erreur lors du chargement intelligent des livraisons:', error);
     onLoadingStateChange?.(false);
     onError?.(error.message);
     
     const fallbackCache = await getDeliveriesFromCache(driverId);
     if (fallbackCache && fallbackCache.deliveries) {
-      console.log('🔄 Erreur API, utilisation du cache comme fallback');
       onDataLoaded(fallbackCache.deliveries, true);
     } else {
       
-      console.log('🔄 Pas de cache disponible, utilisation d\'un tableau vide');
       onDataLoaded([], false);
     }
   }
@@ -524,62 +466,50 @@ export const loadDriverStatsWithSmartCache = async (
   onError
 ) => {
   if (!driverId) {
-    console.error('❌ DriverId requis pour le chargement des stats');
     onError?.('DriverId requis');
     return;
   }
 
   try {
-    console.log(`🚀 Démarrage du chargement intelligent des stats pour driver ${driverId}`);
     
     onLoadingStateChange?.(true);
     const cachedData = await getDriverStatsFromCache(driverId);
 
     if (cachedData && cachedData.stats) {
-      console.log('⚡ Stats affichées depuis le cache');
       onDataLoaded(cachedData.stats, true); 
       onLoadingStateChange?.(false);
     } else {
-      console.log('📭 Pas de cache disponible, attente des données API');
       onLoadingStateChange?.(true);
     }
     
-    console.log('🌐 Fetch API en arrière-plan pour les stats...');
     const freshData = await apiFetcher();
 
     if (freshData) {
-      console.log(`📡 Stats API reçues`);
       
       const hasChanged = !cachedData || hasDriverStatsChanged(cachedData.stats, freshData);
 
       if (hasChanged) {
-        console.log('🔄 Stats mises à jour, sauvegarde en cache et affichage');
         
         await saveDriverStatsToCache(freshData, driverId);
         
         onDataUpdated(freshData);
       } else {
-        console.log('✅ Stats identiques, pas de mise à jour nécessaire');
       }
     } else {
-      console.warn('⚠️ Données stats API invalides ou vides');
       onError?.('Données stats invalides');
     }
     
     onLoadingStateChange?.(false);
 
   } catch (error) {
-    console.error('❌ Erreur lors du chargement intelligent des stats:', error);
     onLoadingStateChange?.(false);
     onError?.(error.message);
     
     const fallbackCache = await getDriverStatsFromCache(driverId);
     if (fallbackCache && fallbackCache.stats) {
-      console.log('🔄 Erreur API, utilisation du cache comme fallback');
       onDataLoaded(fallbackCache.stats, true);
     } else {
       
-      console.log('🔄 Pas de cache disponible, utilisation des stats par défaut');
       const defaultStats = {
         todayDeliveries: 0,
         totalEarnings: 0,
@@ -594,7 +524,6 @@ export const loadDriverStatsWithSmartCache = async (
 export const setPaymentMethodsCache = async (userId, paymentMethods) => {
   try {
     if (!userId) {
-      console.log('❌ UserId requis pour sauvegarder le cache des méthodes de paiement');
       return;
     }
 
@@ -610,16 +539,13 @@ export const setPaymentMethodsCache = async (userId, paymentMethods) => {
     await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
     await AsyncStorage.setItem(timestampKey, Date.now().toString());
 
-    console.log(`💾 Cache des méthodes de paiement sauvegardé pour user ${userId}: ${paymentMethods.length} méthodes`);
   } catch (error) {
-    console.error('❌ Erreur lors de la sauvegarde du cache des méthodes de paiement:', error);
   }
 };
 
 export const getPaymentMethodsFromCache = async (userId) => {
   try {
     if (!userId) {
-      console.log('❌ UserId requis pour récupérer le cache des méthodes de paiement');
       return null;
     }
 
@@ -629,19 +555,16 @@ export const getPaymentMethodsFromCache = async (userId) => {
     const cachedData = await AsyncStorage.getItem(cacheKey);
 
     if (!cachedData) {
-      console.log(`📭 Pas de méthodes de paiement en cache pour user ${userId}`);
       return null;
     }
 
     const parsedData = JSON.parse(cachedData);
     
     if (parsedData.version !== CACHE_CONFIG.VERSION) {
-      console.log(`🔄 Version du cache des méthodes de paiement obsolète pour user ${userId}, suppression`);
       await clearPaymentMethodsCache(userId);
       return null;
     }
 
-    console.log(`📖 Méthodes de paiement chargées depuis le cache pour user ${userId}: ${parsedData.paymentMethods.length} méthodes`);
     return {
       paymentMethods: parsedData.paymentMethods,
       timestamp: parsedData.timestamp,
@@ -649,7 +572,6 @@ export const getPaymentMethodsFromCache = async (userId) => {
     };
 
   } catch (error) {
-    console.error('❌ Erreur lors de la lecture du cache des méthodes de paiement:', error);
     return null;
   }
 };
@@ -657,7 +579,6 @@ export const getPaymentMethodsFromCache = async (userId) => {
 export const clearPaymentMethodsCache = async (userId) => {
   try {
     if (!userId) {
-      console.log('❌ UserId requis pour supprimer le cache des méthodes de paiement');
       return;
     }
 
@@ -667,9 +588,7 @@ export const clearPaymentMethodsCache = async (userId) => {
     await AsyncStorage.removeItem(cacheKey);
     await AsyncStorage.removeItem(timestampKey);
 
-    console.log(`🗑️ Cache des méthodes de paiement supprimé pour user ${userId}`);
   } catch (error) {
-    console.error('❌ Erreur lors de la suppression du cache des méthodes de paiement:', error);
   }
 };
 
@@ -701,9 +620,7 @@ export const clearAllLocalAppDataOnLogout = async () => {
     await clearDriverCache();
     clearDeliverySettingsCache();
 
-    console.log('🗑️ Stockage local vidé après déconnexion');
   } catch (error) {
-    console.error('❌ Erreur lors du vidage du stockage local:', error);
     throw error;
   }
 };
@@ -719,33 +636,28 @@ export const loadPaymentMethodsWithCache = async (
   onError
 ) => {
   if (!userId) {
-    console.error('❌ UserId requis pour le chargement des méthodes de paiement');
     onError?.('UserId requis');
     return;
   }
 
   try {
-    console.log(`🚀 Démarrage du chargement intelligent des méthodes de paiement pour user ${userId}`);
     
     onLoadingStateChange?.(true);
     const cachedData = await getPaymentMethodsFromCache(userId);
 
     if (cachedData) {
       
-      console.log('📱 Affichage des méthodes de paiement depuis le cache');
       onDataLoaded(cachedData.paymentMethods, true);
       
       const cacheAge = Date.now() - cachedData.timestamp;
       const CACHE_DURATION = 5 * 60 * 1000; 
 
       if (cacheAge < CACHE_DURATION) {
-        console.log(`⏰ Cache des méthodes de paiement récent (${Math.round(cacheAge / 1000)}s), pas de rafraîchissement`);
         onLoadingStateChange?.(false);
         return;
       }
     }
     
-    console.log('🌐 Fetch des méthodes de paiement depuis l\'API');
     const apiData = await apiFetcher();
     
     await setPaymentMethodsCache(userId, apiData);
@@ -754,30 +666,24 @@ export const loadPaymentMethodsWithCache = async (
       
       const hasChanged = JSON.stringify(cachedData.paymentMethods) !== JSON.stringify(apiData);
       if (hasChanged) {
-        console.log('🔄 Méthodes de paiement mises à jour, notification du changement');
         onDataUpdated?.(apiData);
       } else {
-        console.log('✅ Méthodes de paiement identiques, pas de mise à jour');
       }
     } else {
       
-      console.log('📱 Affichage des méthodes de paiement depuis l\'API (pas de cache)');
       onDataLoaded(apiData, false);
     }
 
     onLoadingStateChange?.(false);
 
   } catch (error) {
-    console.error('❌ Erreur lors du chargement intelligent des méthodes de paiement:', error);
     onError?.(error.message || 'Erreur de chargement');
     
     const fallbackCache = await getPaymentMethodsFromCache(userId);
     if (fallbackCache) {
-      console.log('🔄 Erreur API, utilisation du cache comme fallback');
       onDataLoaded(fallbackCache.paymentMethods, true);
     } else {
       
-      console.log('🔄 Pas de cache disponible, utilisation d\'un tableau vide');
       onDataLoaded([], false);
     }
 
@@ -796,7 +702,6 @@ export const loadNearbyRestaurantsWithSmartCache = async (
   onError
 ) => {
   if (!latitude || !longitude) {
-    console.error('❌ Latitude et longitude requises pour le chargement des restaurants proches');
     onError?.('Coordonnées requises');
     return;
   }
@@ -828,7 +733,6 @@ export const loadNearbyRestaurantsWithSmartCache = async (
     onLoadingStateChange?.(false);
 
   } catch (error) {
-    console.error('❌ Erreur lors du chargement intelligent des restaurants proches:', error);
     onLoadingStateChange?.(false);
     onError?.(error.message);
 

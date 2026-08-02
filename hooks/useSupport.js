@@ -31,7 +31,6 @@ export const useSupport = (currency, driver) => {
         setError(i18n.t('support.loadError'));
       }
     } catch (err) {
-      console.error('Error loading support info:', err);
       setError(i18n.t('support.loadError'));
     } finally {
       setLoading(false);
@@ -73,7 +72,6 @@ export const useSupport = (currency, driver) => {
         },
       ]);
     } catch (err) {
-      console.error('Error submitting support ticket:', err);
       Alert.alert(i18n.t('common.error'), i18n.t('support.reportError'));
     } finally {
       setSubmitting(false);
@@ -90,7 +88,6 @@ export const useSupport = (currency, driver) => {
         }
         await Linking.openURL(url);
       } catch (err) {
-        console.error('Error opening email:', err);
         Alert.alert(i18n.t('common.error'), i18n.t('support.emailError'));
       }
     }

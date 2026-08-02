@@ -19,7 +19,6 @@ export const useNotifications = (isAuthenticated, driver) => {
       const data = await apiClient.getNotifications();
       setNotifications(mapBackendNotifications(Array.isArray(data) ? data : []));
     } catch (error) {
-      console.error('Error loading notifications:', error);
       Alert.alert(i18n.t('common.error'), i18n.t('notifications.loadError'));
     }
   }, [isAuthenticated, driver]);
@@ -67,7 +66,6 @@ export const useNotifications = (isAuthenticated, driver) => {
     try {
       await apiClient.markNotificationRead(notificationId);
     } catch (error) {
-      console.error('Error marking notification as read:', error);
       await loadNotifications();
     }
   };
@@ -83,7 +81,6 @@ export const useNotifications = (isAuthenticated, driver) => {
     try {
       await Promise.all(unreadIds.map((id) => apiClient.markNotificationRead(id)));
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
       await loadNotifications();
     }
   };
@@ -105,7 +102,6 @@ export const useNotifications = (isAuthenticated, driver) => {
             try {
               await apiClient.deleteNotification(notificationId);
             } catch (error) {
-              console.error('Error deleting notification:', error);
               await loadNotifications();
             }
           },

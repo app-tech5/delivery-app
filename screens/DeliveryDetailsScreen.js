@@ -89,7 +89,6 @@ export default function DeliveryDetailsScreen() {
 
       await loadDriverOrders();
     } catch (err) {
-      console.error('Error loading order details:', err);
       setError(i18n.t('common.errorLoadingData'));
     } finally {
       setLoading(false);
@@ -126,7 +125,6 @@ export default function DeliveryDetailsScreen() {
     try {
       await loadDriverOrders();
     } catch (err) {
-      console.error('Error refreshing order details:', err);
     } finally {
       setRefreshing(false);
     }
