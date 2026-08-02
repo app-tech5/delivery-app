@@ -126,15 +126,12 @@ npm run lint-fix   # ESLint auto-fix
 npm test            # Jest
 npm run smoke       # Local: Node 20+, npm ci, Expo config, JS export
 npm run ci:hermes   # Local: hermesc on an existing export dir
-npm run test:hermes:smoke  # Hermes CDP login→home (Metro + debug app)
+npm run test:hermes:smoke  # Hermes CDP login→home (Metro + debug app + adb)
 ```
 
-CI (GitHub Actions):
-1. **Buyer smoke** — JS export artifact → Hermes bytecode check + live API curl (`/auth/delivery-login`)
-
-Hermes login→home CDP smoke is local (`adb` + Metro + `npm run test:hermes:smoke`), not CI.
-
 Optional EAS builds: configure your own Expo account, then use `eas.json`.
+
+Hermes login→home: run locally with your backend URL in `.env`, `adb`, Metro, then `npm run test:hermes:smoke`.
 
 ---
 

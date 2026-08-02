@@ -35,4 +35,6 @@ npm run test:hermes:smoke
 
 **Not Expo Go** — requires `expo-dev-client` (see root README).
 
-CI: Buyer smoke (JS export + hermesc + live API). Hermes CDP login→home is run locally with `adb` + Metro.
+Optional EAS: `eas.json` (bring your own Expo account).
+
+Hermes CDP login→home is run locally with `adb` + Metro against the buyer’s own API URL in `.env`.
