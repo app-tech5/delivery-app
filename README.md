@@ -129,10 +129,10 @@ npm run ci:hermes   # Local: hermesc on an existing export dir
 npm run test:hermes:smoke  # Hermes CDP login→home (Metro + debug app)
 ```
 
-CI (GitHub Actions) is **split**:
+CI (GitHub Actions):
 1. **Buyer smoke** — JS export artifact → Hermes bytecode check + live API curl (`/auth/delivery-login`)
-2. **E2E Hermes** — build debug APK **once** (artifact) → emulator + Metro + Hermes CDP login→home  
-   On a Hermes failure, re-run only the Hermes job with `reuse_run_id` (no APK rebuild).
+
+Hermes login→home CDP smoke is local (`adb` + Metro + `npm run test:hermes:smoke`), not CI.
 
 Optional EAS builds: configure your own Expo account, then use `eas.json`.
 
