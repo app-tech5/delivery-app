@@ -4,8 +4,8 @@ export const config = {
 
   GOOGLE_MAPS_API_KEY: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'YOUR_GOOGLE_MAPS_API_KEY',
 
-  APP_NAME: 'Good Food Driver',
-  VERSION: '1.1.0',
+  APP_NAME: 'Good Food Pro Driver',
+  VERSION: '1.0.0',
 
   DEMO_MODE: process.env.EXPO_PUBLIC_DEMO_MODE !== 'false',
 

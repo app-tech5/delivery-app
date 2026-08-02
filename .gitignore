@@ -1,1 +1,65 @@
-node_modules
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+
+# Dependencies & caches
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.npm/
+
+# Expo
+.expo/
+.expo-shared/
+web-build/
+dist/
+
+# Native build artifacts
+build/
+*.jsbundle
+*.ipa
+*.apk
+*.aab
+*.hprof
+*.keystore
+!debug.keystore
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+android/app/.cxx/
+android/local.properties
+*.iml
+.idea/
+
+# iOS
+ios/Pods/
+ios/build/
+ios/DerivedData/
+*.xcuserstate
+*.xccheckout
+xcuserdata/
+project.xcworkspace
+
+# Author / local tooling (not for buyers)
+.maestro/
+scripts/
+scripts/screenshots/
+.vscode/
+coverage/
+*.log
+
+# Local screenshot dumps
+/*.png
+
+# Misc
+*storybook.log
+storybook-static
+.buckd/
+buck-out/
