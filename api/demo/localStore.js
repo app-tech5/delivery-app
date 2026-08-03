@@ -12,6 +12,7 @@ const emptyState = () => ({
   supportTickets: [],
   profilePatch: null,
   paymentMethodsPatch: null,
+  subscriptionEnrollment: null,
 });
 
 export async function getDemoState() {

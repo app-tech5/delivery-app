@@ -2,6 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import ProfileScreen from '../screens/ProfileScreen';
 import VehicleDetailsScreen from '../screens/VehicleDetailsScreen';
+import SubscriptionsScreen from '../screens/SubscriptionsScreen';
 import i18n from '../i18n';
 
 const Stack = createStackNavigator();
@@ -27,7 +28,13 @@ export default function ProfileStackNavigator() {
           title: i18n.t('vehicle.vehicleDetailsTitle'),
         }}
       />
+      <Stack.Screen
+        name="Subscriptions"
+        component={SubscriptionsScreen}
+        options={{
+          title: i18n.t('subscription.title'),
+        }}
+      />
     </Stack.Navigator>
   );
 }
-

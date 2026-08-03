@@ -132,7 +132,10 @@ export default function ProfileScreen() {
           onUpload={uploadDocument}
         />
 
-        <ProfileActionsSection onLogout={() => confirmLogout(logout)} />
+        <ProfileActionsSection
+          onSubscriptions={() => navigation.navigate('Subscriptions')}
+          onLogout={() => confirmLogout(logout)}
+        />
 
         <View style={styles.bottomSpacer} />
       </ScrollView>

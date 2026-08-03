@@ -41,10 +41,27 @@ export function ProfileSaveButton({ onPress, saving }) {
   );
 }
 
-export default function ProfileActionsSection({ onLogout }) {
+export default function ProfileActionsSection({ onLogout, onSubscriptions }) {
   return (
     <View style={styles.section}>
       <Card containerStyle={styles.card}>
+        {onSubscriptions ? (
+          <>
+            <Pressable
+              style={({ pressed }) => [styles.actionRow, pressed && styles.actionPressed]}
+              onPress={onSubscriptions}
+              accessibilityRole="button"
+            >
+              <View style={[styles.iconWrap, styles.primaryIconWrap]}>
+                <MaterialIcons name="star" size={20} color={colors.primary} />
+              </View>
+              <Text style={styles.actionLabel}>{i18n.t('subscription.title')}</Text>
+              <MaterialIcons name="chevron-right" size={22} color={colors.text.secondary} />
+            </Pressable>
+            <View style={styles.divider} />
+          </>
+        ) : null}
+
         <Pressable
           style={({ pressed }) => [styles.actionRow, pressed && styles.actionPressed]}
           accessibilityRole="button"

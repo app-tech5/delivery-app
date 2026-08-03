@@ -37,6 +37,7 @@ import {
   getLocalDemoDriverProfile,
   handleDemoRead,
 } from './api/demo/authHandlers';
+import { handleDemoSubscription } from './api/demo/subscriptionHandlers';
 
 const isDemoMode = () => config.DEMO_MODE === true;
 
@@ -90,6 +91,11 @@ class ApiClient {
         const localWrite = await handleDemoAuthWrite(this, endpoint, method, options);
         if (localWrite !== null) {
           return localWrite;
+        }
+
+        const subscriptionDemo = await handleDemoSubscription(this, endpoint, method, options);
+        if (subscriptionDemo !== null) {
+          return subscriptionDemo;
         }
 
         if (method === 'GET') {
@@ -356,6 +362,33 @@ class ApiClient {
     return await this.apiCall(`/orders/${orderId}/chat`, {
       method: 'POST',
       body: JSON.stringify({ text }),
+    });
+  }
+
+  async listSubscriptionPlans(target) {
+    const query = target ? `?target=${encodeURIComponent(target)}` : '';
+    return await this.apiCall(`/subscriptions${query}`);
+  }
+
+  async getMySubscription() {
+    return await this.apiCall('/subscriptions/mine');
+  }
+
+  async getSubscriptionBenefits() {
+    return await this.apiCall('/subscriptions/mine/benefits');
+  }
+
+  async subscribeToPlan(planId) {
+    return await this.apiCall(`/subscriptions/${planId}/subscribe`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  }
+
+  async cancelMySubscription() {
+    return await this.apiCall('/subscriptions/mine/cancel', {
+      method: 'POST',
+      body: JSON.stringify({}),
     });
   }
 
@@ -842,6 +875,11 @@ export const {
   updateDeliveryStatus,
   getOrderChat,
   sendOrderChatMessage,
+  listSubscriptionPlans,
+  getMySubscription,
+  getSubscriptionBenefits,
+  subscribeToPlan,
+  cancelMySubscription,
   getDriverStats,
   getPaymentMethods,
   createPaymentMethod,
