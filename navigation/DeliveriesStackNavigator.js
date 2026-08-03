@@ -2,6 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import DeliveriesScreen from '../screens/DeliveriesScreen';
 import DeliveryDetailsScreen from '../screens/DeliveryDetailsScreen';
+import OrderChatScreen from '../screens/OrderChatScreen';
 import i18n from '../i18n';
 
 const Stack = createStackNavigator();
@@ -25,6 +26,13 @@ export default function DeliveriesStackNavigator() {
         component={DeliveryDetailsScreen}
         options={{
           title: i18n.t('navigation.deliveryDetails'),
+        }}
+      />
+      <Stack.Screen
+        name="OrderChat"
+        component={OrderChatScreen}
+        options={{
+          title: i18n.t('chat.title', 'Chat'),
         }}
       />
     </Stack.Navigator>

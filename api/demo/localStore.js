@@ -6,6 +6,7 @@ const emptyState = () => ({
   registeredDrivers: [],
   driverProfiles: {},
   orderPatches: {},
+  chatMessagesByOrder: {},
   notificationReadIds: [],
   notificationRemovedIds: [],
   supportTickets: [],

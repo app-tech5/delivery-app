@@ -347,7 +347,18 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
-  
+
+  async getOrderChat(orderId) {
+    return await this.apiCall(`/orders/${orderId}/chat`);
+  }
+
+  async sendOrderChatMessage(orderId, text) {
+    return await this.apiCall(`/orders/${orderId}/chat`, {
+      method: 'POST',
+      body: JSON.stringify({ text }),
+    });
+  }
+
   async getDriverStats() {
     try {
       const orders = await this.getDriverOrders();
@@ -829,6 +840,8 @@ export const {
   acceptDelivery,
   getDriverDeliveries,
   updateDeliveryStatus,
+  getOrderChat,
+  sendOrderChatMessage,
   getDriverStats,
   getPaymentMethods,
   createPaymentMethod,

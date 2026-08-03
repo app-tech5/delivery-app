@@ -678,5 +678,15 @@
   "driver_license": "Driver's License",
   "insurance": "Insurance",
   "identity_card": "Identity Card",
-  "viewDocument": "View Document"
+  "viewDocument": "View Document",
+  "chat": {
+    "title": "Chat",
+    "titleWith": "Chat with {{name}}",
+    "customer": "Customer",
+    "withCustomer": "Chat with customer",
+    "emptyTitle": "No messages yet",
+    "emptySub": "Say hello to coordinate the delivery.",
+    "placeholder": "Type a message…",
+    "send": "Send"
+  }
 }

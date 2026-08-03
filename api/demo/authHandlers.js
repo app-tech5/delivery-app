@@ -205,6 +205,38 @@ export async function handleDemoAuthWrite(client, endpoint, method, options = {}
     return { _id: orderId, id: orderId, ...body };
   }
 
+  const chatMatch = endpointPath.match(/^\/orders\/([^/]+)\/chat$/);
+  if (chatMatch && method === 'POST') {
+    if (!isLocalDemoToken(client.token)) {
+      return null;
+    }
+    const orderId = chatMatch[1];
+    const text = String(body.text || '').trim();
+    if (!text) {
+      throw new Error('Message text is required');
+    }
+    const msg = {
+      id: newId('demo_chat'),
+      order: orderId,
+      sender: String(client.user?.id || client.user?._id || 'demo_driver'),
+      senderName: client.user?.name || 'Driver',
+      senderRole: 'driver',
+      text,
+      createdAt: new Date().toISOString(),
+    };
+    await updateDemoState((current) => {
+      const prev = current.chatMessagesByOrder?.[orderId] || [];
+      return {
+        ...current,
+        chatMessagesByOrder: {
+          ...(current.chatMessagesByOrder || {}),
+          [orderId]: [...prev, msg],
+        },
+      };
+    });
+    return msg;
+  }
+
   return null;
 }
 
@@ -309,6 +341,15 @@ export async function handleDemoRead(client, endpoint, method) {
 
   if (endpointPath === '/resource/paymentMethods/byUserId') {
     return [];
+  }
+
+  const chatMatch = endpointPath.match(/^\/orders\/([^/]+)\/chat$/);
+  if (chatMatch) {
+    const orderId = chatMatch[1];
+    return {
+      orderId,
+      messages: state.chatMessagesByOrder?.[orderId] || [],
+    };
   }
 
   return null;

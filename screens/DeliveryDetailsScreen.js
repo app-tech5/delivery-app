@@ -214,6 +214,28 @@ export default function DeliveryDetailsScreen() {
           {}
           <OrderSummaryCard order={order} currency={currency} />
 
+          {order?.user && (
+            <View style={styles.actionsContainer}>
+              <Button
+                title={i18n.t('chat.withCustomer', 'Chat with customer')}
+                onPress={() =>
+                  navigation.navigate('OrderChat', {
+                    order,
+                    orderId: order._id || order.id,
+                    peerName: order.user?.name || i18n.t('chat.customer', 'Customer'),
+                  })
+                }
+                buttonStyle={styles.primaryButton}
+                icon={{
+                  name: 'chatbubble-ellipses',
+                  type: 'ionicon',
+                  size: 18,
+                  color: colors.white,
+                }}
+              />
+            </View>
+          )}
+
           {}
           {order.driver === driver?._id && order.status !== 'delivered' && order.status !== 'cancelled' && (
             <View style={styles.actionsContainer}>

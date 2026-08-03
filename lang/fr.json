@@ -494,5 +494,15 @@
     "callDriver": "Appeler le livreur",
     "noDriverAssigned": "Aucun livreur assigné",
     "vehicle": "Véhicule"
+  },
+  "chat": {
+    "title": "Chat",
+    "titleWith": "Chat avec {{name}}",
+    "customer": "Client",
+    "withCustomer": "Discuter avec le client",
+    "emptyTitle": "Aucun message",
+    "emptySub": "Dites bonjour pour coordonner la livraison.",
+    "placeholder": "Écrire un message…",
+    "send": "Envoyer"
   }
 }
