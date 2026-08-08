@@ -1,11 +1,8 @@
 name: Build and publish APK
 
+# Manual only — same as web demo: no auto APK on every push.
+# Publish APK explicitly: gh workflow run build-apk.yml --ref master
 on:
-  push:
-    branches: [master]
-    paths-ignore:
-      # Web demo is workflow_dispatch-only; don't rebuild APK when only that file changes
-      - '.github/workflows/build-web-demo.yml'
   workflow_dispatch:
 
 jobs:
