@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { config } from '../config';
@@ -6,6 +7,12 @@ import apiClient from '../api';
 import { isDemoDriverAccount } from './demoDriverUtils';
 import { getPointFromLocation } from './geoUtils';
 import { DRIVER_LOCATION_TASK } from '../tasks/driverLocationTask';
+
+const supportsBackgroundLocation =
+  Platform.OS !== 'web' &&
+  typeof Location.hasStartedLocationUpdatesAsync === 'function' &&
+  typeof Location.startLocationUpdatesAsync === 'function' &&
+  typeof Location.stopLocationUpdatesAsync === 'function';
 
 export const shouldUseDeviceLocation = (user = apiClient.user, driver = apiClient.driver) =>
   !isDemoDriverAccount(user, driver);
@@ -82,7 +89,7 @@ export const watchDriverLocation = async (
 };
 
 export const startDriverBackgroundLocation = async (user = apiClient.user, driver = apiClient.driver) => {
-  if (!shouldUseDeviceLocation(user, driver)) {
+  if (!supportsBackgroundLocation || !shouldUseDeviceLocation(user, driver)) {
     return false;
   }
 
@@ -132,9 +139,17 @@ export const startDriverBackgroundLocation = async (user = apiClient.user, drive
 };
 
 export const stopDriverBackgroundLocation = async () => {
-  const isRunning = await Location.hasStartedLocationUpdatesAsync(DRIVER_LOCATION_TASK);
-  if (isRunning) {
-    await Location.stopLocationUpdatesAsync(DRIVER_LOCATION_TASK);
+  if (!supportsBackgroundLocation) {
+    return;
+  }
+
+  try {
+    const isRunning = await Location.hasStartedLocationUpdatesAsync(DRIVER_LOCATION_TASK);
+    if (isRunning) {
+      await Location.stopLocationUpdatesAsync(DRIVER_LOCATION_TASK);
+    }
+  } catch (error) {
+    console.log(`📍 [background-setup] Échec arrêt: ${error.message}`);
   }
 };
 
