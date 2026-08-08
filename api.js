@@ -354,6 +354,26 @@ class ApiClient {
     });
   }
 
+  async acceptOrderBatch(orderId, { includeNearby = true } = {}) {
+    const driverId = this.driver?._id || this.driver?.id;
+    return await this.apiCall(`/logistics/orders/${orderId}/accept-batch`, {
+      method: 'POST',
+      body: JSON.stringify({ driverId, includeNearby }),
+    });
+  }
+
+  async getBatchSuggestions(orderId) {
+    return await this.apiCall(`/logistics/orders/${orderId}/batch-suggestions`);
+  }
+
+  async completeDeliveryWithProof(orderId, payload = {}) {
+    const driverId = this.driver?._id || this.driver?.id;
+    return await this.apiCall(`/logistics/orders/${orderId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify({ ...payload, driverId }),
+    });
+  }
+
   async getOrderChat(orderId) {
     return await this.apiCall(`/orders/${orderId}/chat`);
   }
@@ -865,38 +885,39 @@ const apiClient = new ApiClient();
 
 export default apiClient;
 
-export const {
-  driverLogin,
-  driverRegister,
-  updateDriverStatus,
-  getAvailableDeliveries,
-  acceptDelivery,
-  getDriverDeliveries,
-  updateDeliveryStatus,
-  getOrderChat,
-  sendOrderChatMessage,
-  listSubscriptionPlans,
-  getMySubscription,
-  getSubscriptionBenefits,
-  subscribeToPlan,
-  cancelMySubscription,
-  getDriverStats,
-  getPaymentMethods,
-  createPaymentMethod,
-  updatePaymentMethod,
-  deletePaymentMethod,
-  setDefaultPaymentMethod,
-  startStripeConnectOnboarding,
-  getStripeConnectStatus,
-  syncStripeConnectPayoutMethod,
-  logout,
-  getDriverProfile,
-  createDriverProfile,
-  updateUser,
-  updateDriverProfile,
-  updateDriver,
-  uploadDriverDocument,
-} = apiClient;
+// Named exports must keep `this` bound — destructuring methods from the instance
+// breaks apiCall/getHeaders (SubscriptionsScreen showed empty plans because of this).
+const bind = (fn) => (typeof fn === 'function' ? fn.bind(apiClient) : fn);
+export const driverLogin = bind(apiClient.driverLogin);
+export const driverRegister = bind(apiClient.driverRegister);
+export const updateDriverStatus = bind(apiClient.updateDriverStatus);
+export const getAvailableDeliveries = bind(apiClient.getAvailableDeliveries);
+export const acceptDelivery = bind(apiClient.acceptDelivery);
+export const getDriverDeliveries = bind(apiClient.getDriverDeliveries);
+export const updateDeliveryStatus = bind(apiClient.updateDeliveryStatus);
+export const getOrderChat = bind(apiClient.getOrderChat);
+export const sendOrderChatMessage = bind(apiClient.sendOrderChatMessage);
+export const listSubscriptionPlans = bind(apiClient.listSubscriptionPlans);
+export const getMySubscription = bind(apiClient.getMySubscription);
+export const getSubscriptionBenefits = bind(apiClient.getSubscriptionBenefits);
+export const subscribeToPlan = bind(apiClient.subscribeToPlan);
+export const cancelMySubscription = bind(apiClient.cancelMySubscription);
+export const getDriverStats = bind(apiClient.getDriverStats);
+export const getPaymentMethods = bind(apiClient.getPaymentMethods);
+export const createPaymentMethod = bind(apiClient.createPaymentMethod);
+export const updatePaymentMethod = bind(apiClient.updatePaymentMethod);
+export const deletePaymentMethod = bind(apiClient.deletePaymentMethod);
+export const setDefaultPaymentMethod = bind(apiClient.setDefaultPaymentMethod);
+export const startStripeConnectOnboarding = bind(apiClient.startStripeConnectOnboarding);
+export const getStripeConnectStatus = bind(apiClient.getStripeConnectStatus);
+export const syncStripeConnectPayoutMethod = bind(apiClient.syncStripeConnectPayoutMethod);
+export const logout = bind(apiClient.logout);
+export const getDriverProfile = bind(apiClient.getDriverProfile);
+export const createDriverProfile = bind(apiClient.createDriverProfile);
+export const updateUser = bind(apiClient.updateUser);
+export const updateDriverProfile = bind(apiClient.updateDriverProfile);
+export const updateDriver = bind(apiClient.updateDriver);
+export const uploadDriverDocument = bind(apiClient.uploadDriverDocument);
 
 export const getSettings = () => apiClient.getSettings();
 export const getAppConfig = () => apiClient.getAppConfig();

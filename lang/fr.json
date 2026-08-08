@@ -508,8 +508,8 @@
   "subscription": {
     "title": "Abonnement",
     "menuSubtitle": "Courses prioritaires et avantages",
-    "introTitle": "Driver Elite",
-    "introSub": "Accédez en priorité aux courses à forte valeur et au support prioritaire.",
+    "introTitle": "Plans livreur",
+    "introSub": "Choisissez un niveau — courses prioritaires, commission réduite et support plus rapide.",
     "activePlan": "Plan actif",
     "validUntil": "Valable jusqu'au {{date}}",
     "subscribe": "S'abonner",
@@ -525,5 +525,23 @@
     "cancelSuccess": "Abonnement résilié.",
     "cancelError": "Impossible de résilier l'abonnement.",
     "loadError": "Impossible de charger les plans d'abonnement."
+  },
+  "logistics": {
+    "batchBadge": "Groupage · {{count}} arrêts",
+    "batchAccepted": "Accepté avec {{count}} commande(s) proche(s) groupée(s)",
+    "podTitle": "Preuve de livraison",
+    "podSubtitle": "La livraison sans contact exige une photo et une signature près de l'adresse.",
+    "takePhoto": "Prendre une photo",
+    "retakePhoto": "Reprendre la photo",
+    "signHere": "Signature client / livreur",
+    "clearSignature": "Effacer",
+    "contactless": "Livraison sans contact",
+    "geofenceHint": "Restez à moins de {{meters}} m du point de dépôt",
+    "geofenceWarn": "Vous semblez à {{meters}} m — validation géofence souple",
+    "submit": "Terminer la livraison",
+    "photoRequired": "Photo obligatoire",
+    "signatureRequired": "Signature obligatoire",
+    "completeError": "Impossible de terminer la livraison",
+    "uploading": "Envoi de la preuve…"
   }
 }

@@ -16,6 +16,7 @@ import {
   ActiveDeliveries,
   RestaurantMap
 } from '../components';
+import ProofOfDeliveryModal from '../components/ProofOfDeliveryModal';
 
 import { getDriverLocation, getActiveDeliveries, getStatusColor } from '../utils';
 
@@ -31,7 +32,7 @@ function HomeScreen() {
   const { currency } = useSettings();
   
   const { isLoading, handleStatusChange } = useDriverStatus();
-  const { loading: deliveryActionLoading, handleMarkDelivered } = useDeliveryActions();
+  const { loading: deliveryActionLoading, handleMarkDelivered, podOrderId, closePodModal, onPodCompleted } = useDeliveryActions();
   
   const driverLocation = getDriverLocation(driver);
   
@@ -104,6 +105,12 @@ function HomeScreen() {
               restaurantsLoading={restaurantsLoading}
             />
           </ScrollView>
+          <ProofOfDeliveryModal
+            visible={Boolean(podOrderId)}
+            orderId={podOrderId}
+            onClose={closePodModal}
+            onCompleted={onPodCompleted}
+          />
         </ScreenLayout>
       )}
     </View>

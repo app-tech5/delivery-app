@@ -129,7 +129,7 @@ export const useSettingsManager = (canLoadSettings) => {
     if (!isLanguageSupported(languageCode)) {
       throw new Error('unsupported_language');
     }
-    applyLanguage(languageCode);
+    await applyLanguage(languageCode);
     await AsyncStorage.setItem(LOCALE_STORAGE_KEY, languageCode);
     setLocaleVersion((version) => version + 1);
     return { success: true };

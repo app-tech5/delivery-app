@@ -118,12 +118,8 @@ export const useDriverOrders = (driver, hasCompletedOnboarding) => {
     }
 
     try {
-      const response = await apiClient.updateOrder(orderId, {
-        driver: driver?._id,
-        status: 'out_for_delivery'
-      });
-      await apiClient.updateDriver({ currentOrder: orderId });
-      await loadDriverOrders(); 
+      const response = await apiClient.acceptOrderBatch(orderId, { includeNearby: true });
+      await loadDriverOrders();
       return response;
     } catch (error) {
       console.error('Accept order error:', error);

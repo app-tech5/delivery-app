@@ -9,12 +9,23 @@ const DeliveryCard = ({ order, currency, onOrderDelivered, isLoading }) => (
   <Card key={order._id} containerStyle={styles.deliveryCard}>
     <View style={styles.deliveryHeader}>
       <Text style={styles.deliveryId}>{i18n.t('orderDetails.orderNumber')}{order._id.slice(-6)}</Text>
-      <Text style={[
-        styles.deliveryStatus,
-        { color: getStatusColor(order.status) }
-      ]}>
-        {order.status === 'out_for_delivery' ? i18n.t('driver.onDelivery') : order.status}
-      </Text>
+      <View style={styles.headerRight}>
+        {order.batchId ? (
+          <Text style={styles.batchBadge}>
+            {i18n.t('logistics.batchBadge', {
+              count:
+                (typeof order.batchSize === 'number' && order.batchSize) ||
+                '•',
+            })}
+          </Text>
+        ) : null}
+        <Text style={[
+          styles.deliveryStatus,
+          { color: getStatusColor(order.status) }
+        ]}>
+          {order.status === 'out_for_delivery' ? i18n.t('driver.onDelivery') : order.status}
+        </Text>
+      </View>
     </View>
     <Text style={styles.deliveryAddress}>
       📍 {order.delivery?.address || i18n.t('errors.locationError')}
@@ -85,6 +96,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+  },
+  headerRight: {
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  batchBadge: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: colors.primary,
+    backgroundColor: '#fff5f3',
+    overflow: 'hidden',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
   },
   deliveryId: {
     fontSize: 16,

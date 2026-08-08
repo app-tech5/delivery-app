@@ -10,7 +10,7 @@ export const LANGUAGE_OPTIONS = [
   { key: 'en', label: 'English', flag: '🇺🇸' },
   { key: 'fr', label: 'Français', flag: '🇫🇷' },
   { key: 'es', label: 'Español', flag: '🇪🇸' },
-  { key: 'de', label: 'Deutsch', flag: '🇩🇪' }
+  { key: 'ar', label: 'العربية', flag: '🇸🇦' },
 ];
 
 export const CURRENCY_OPTIONS = [
