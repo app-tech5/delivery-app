@@ -38,7 +38,7 @@ describe('driverDeliveryStats', () => {
     expect(getOrderDate(deliveredCreatedToday).toDateString()).toBe(today.toDateString());
   });
 
-  it('counts delivered orders created today', () => {
+  it('counts delivered orders created today and lifetime earnings', () => {
     const stats = calculateDriverStatsFromDeliveries(
       [deliveredCreatedToday, deliveredCreatedYesterday, pickupOrder],
       4.8
@@ -46,6 +46,8 @@ describe('driverDeliveryStats', () => {
 
     expect(stats.todayDeliveries).toBe(1);
     expect(stats.completedOrders).toBe(2);
+    expect(stats.todayEarnings).toBeDefined();
+    expect(stats.totalEarnings).toBeGreaterThanOrEqual(stats.todayEarnings);
     expect(isDeliveredOnDate(deliveredCreatedToday)).toBe(true);
     expect(isDeliveredOnDate(deliveredCreatedYesterday)).toBe(false);
     expect(getDeliveredDeliveries([deliveredCreatedToday, pickupOrder])).toHaveLength(1);

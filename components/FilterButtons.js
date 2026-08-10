@@ -13,7 +13,7 @@ const FilterButtons = ({
   activeButtonStyle,
   textStyle,
   activeTextStyle,
-  iconType = 'material-community'
+  iconType = 'material'
 }) => {
   return (
     <View style={[styles.container, containerStyle]}>

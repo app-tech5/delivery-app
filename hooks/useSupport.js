@@ -3,7 +3,7 @@ import { Alert, Linking, Platform } from 'react-native';
 import i18n from '../i18n';
 import { config } from '../config';
 import apiClient from '../api';
-import { buildContactActions, mapSupportFaqs, getPlatformLabel } from '../utils/supportUtils';
+import { buildContactActions, getI18nSupportFaqs, getPlatformLabel } from '../utils/supportUtils';
 
 export const useSupport = (currency, driver) => {
   const [expandedFAQ, setExpandedFAQ] = useState(null);
@@ -19,17 +19,11 @@ export const useSupport = (currency, driver) => {
     setError(null);
 
     try {
-      const [configData, faqData] = await Promise.all([
-        apiClient.getAppConfig().catch(() => null),
-        apiClient.getSupportFaqs().catch(() => []),
-      ]);
+      const configData = await apiClient.getAppConfig().catch(() => null);
 
       setAppConfig(configData);
-      setFaqs(mapSupportFaqs(faqData));
-
-      if (!configData && faqData.length === 0) {
-        setError(i18n.t('support.loadError'));
-      }
+      // Driver app must not surface customer FAQ copy from /customersupports.
+      setFaqs(getI18nSupportFaqs());
     } catch (err) {
       console.error('Error loading support info:', err);
       setError(i18n.t('support.loadError'));

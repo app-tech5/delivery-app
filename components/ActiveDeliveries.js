@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card, Button } from 'react-native-elements';
 import { colors } from '../global';
-import { formatCurrency, getStatusColor, getDriverDeliveryEarnings } from '../utils';
+import { formatCurrency, getStatusColor, getDriverDeliveryEarnings, formatDeliveryAddress } from '../utils';
 import i18n from '../i18n';
 
 const DeliveryCard = ({ order, currency, onOrderDelivered, isLoading }) => (
@@ -28,7 +28,7 @@ const DeliveryCard = ({ order, currency, onOrderDelivered, isLoading }) => (
       </View>
     </View>
     <Text style={styles.deliveryAddress}>
-      📍 {order.delivery?.address || i18n.t('errors.locationError')}
+      📍 {formatDeliveryAddress(order.delivery?.address, i18n.t('errors.locationError'))}
     </Text>
     {order.user && (
       <Text style={styles.customerInfo}>

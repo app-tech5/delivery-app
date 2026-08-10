@@ -15,7 +15,7 @@ const DriverStats = ({ stats, currency }) => {
       containerStyle: { alignItems: 'center' }
     },
     {
-      value: formatCurrency(stats.totalEarnings || 0, currency),
+      value: formatCurrency(stats.todayEarnings ?? stats.totalEarnings ?? 0, currency),
       label: i18n.t('home.earnings'),
       containerStyle: { alignItems: 'center' }
     },

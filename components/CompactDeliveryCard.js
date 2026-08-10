@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { Card } from 'react-native-elements';
 import i18n from '../i18n';
-import { formatCurrency, formatDate, getDriverDeliveryEarnings } from '../utils';
+import { formatCurrency, formatDate, getDriverDeliveryEarnings, formatDeliveryAddress } from '../utils';
 import { deliveryCardStyles as styles } from '../styles/deliveryCardStyles';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
 import DeliveryActions from './DeliveryActions';
@@ -21,7 +21,7 @@ const CompactDeliveryCard = ({ delivery, currency, onAccept, onStartDelivery, on
       </View>
 
       <Text style={styles.compactAddress}>
-        📍 {delivery.delivery?.address || i18n.t('reports.addressNotAvailable')}
+        📍 {formatDeliveryAddress(delivery.delivery?.address, i18n.t('reports.addressNotAvailable'))}
       </Text>
 
       {delivery.user && (

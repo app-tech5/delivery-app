@@ -93,7 +93,7 @@ export default function DeliveriesScreen() {
   const emptyComponent = useMemo(() => (
     <EmptyState
       icon="package-variant-closed"
-      iconType="material-community"
+      iconType="material"
       title={activeFilter === 'all' ? i18n.t('reports.noDeliveries') : i18n.t('reports.noDeliveriesFiltered')}
       subtitle={activeFilter === 'all'
         ? i18n.t('reports.noDeliveriesAtAll')
@@ -121,7 +121,7 @@ export default function DeliveriesScreen() {
             filters={filters}
             activeFilter={activeFilter}
             onFilterPress={setActiveFilter}
-            iconType="material-community"
+            iconType="material"
           />
 
           <FlatList

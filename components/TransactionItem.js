@@ -14,7 +14,7 @@ const TransactionItem = ({ transaction, currency }) => {
         <View style={styles.transactionIcon}>
           <Icon
             name={getTransactionTypeIcon(transaction.type)}
-            type="material-community"
+            type="material"
             size={20}
             color={getTransactionTypeColor(transaction.type)}
           />

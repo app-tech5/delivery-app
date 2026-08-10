@@ -6,6 +6,7 @@ import i18n from '../i18n';
 import { Linking } from 'react-native';
 
 import { openMapsNavigation } from '../utils/navigationUtils';
+import { formatDeliveryAddress } from '../utils/addressUtils';
 import { useDriver } from '../contexts/DriverContext';
 import { isDemoDriverAccount } from '../utils/demoDriverUtils';
 import { getDriverCoordinatesPoint } from '../utils/locationUtils';
@@ -13,6 +14,10 @@ import apiClient from '../api';
 
 const CustomerInfoCard = ({ order }) => {
   const { driver } = useDriver();
+  const deliveryAddress = formatDeliveryAddress(
+    order.delivery?.address,
+    i18n.t('reports.addressNotAvailable')
+  );
   const handleCall = (phoneNumber) => {
     if (phoneNumber) {
       const url = `tel:${phoneNumber}`;
@@ -48,7 +53,7 @@ const CustomerInfoCard = ({ order }) => {
       {order.delivery?.type === 'delivery' && (
         <View style={styles.infoRow}>
           <Text style={styles.label}>{i18n.t('orderDetails.deliveryAddress')}:</Text>
-          <Text style={styles.value}>{order.delivery?.address || i18n.t('reports.addressNotAvailable')}</Text>
+          <Text style={styles.value}>{deliveryAddress}</Text>
         </View>
       )}
 
@@ -67,7 +72,7 @@ const CustomerInfoCard = ({ order }) => {
             title={i18n.t('orderDetails.navigateToCustomer')}
             onPress={() => openMapsNavigation({
               destination: {
-                address: order.delivery?.address,
+                address: deliveryAddress,
                 latitude: order.delivery?.latitude,
                 longitude: order.delivery?.longitude,
               },

@@ -27,8 +27,8 @@ export const buildProfileStats = (driver, stats) => ({
   totalDeliveries: stats.completedOrders || 0,
   totalEarnings: stats.totalEarnings || 0,
   averageRating: stats.rating || 0,
-  completionRate: stats.completedOrders && driver
-    ? Math.round((stats.completedOrders / (stats.completedOrders + 5)) * 100)
+  completionRate: typeof stats.completionRate === 'number'
+    ? stats.completionRate
     : 0,
   memberSince: driver?.createdAt
     ? new Date(driver.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })

@@ -38,18 +38,21 @@ export default function EarningsScreen() {
     loadDriverOrders,
   });
 
+  const todayEarnings = stats.todayEarnings ?? stats.totalEarnings ?? 0;
+
   const statCards = useMemo(() => ([
     {
-      value: formatCurrency(stats.totalEarnings, currency),
+      value: formatCurrency(todayEarnings, currency),
       label: i18n.t('reports.todayEarningsLabel'),
-      icon: { name: 'cash', type: 'material-community' },
+      // material icons only — material-community glyphs often break on web (empty □)
+      icon: { name: 'attach-money', type: 'material' },
       backgroundColor: colors.success,
-      trend: getTrendIcon(stats.totalEarnings, 10)
+      trend: getTrendIcon(todayEarnings, 10)
     },
     {
       value: stats.todayDeliveries || 0,
       label: i18n.t('reports.todaysDeliveries'),
-      icon: { name: 'truck-delivery', type: 'material-community' },
+      icon: { name: 'local-shipping', type: 'material' },
       backgroundColor: colors.primary,
       trend: getTrendIcon(stats.todayDeliveries, 2)
     },
@@ -63,11 +66,11 @@ export default function EarningsScreen() {
     {
       value: stats.completedOrders || 0,
       label: i18n.t('reports.totalDeliveries'),
-      icon: { name: 'package-variant-closed', type: 'material-community' },
+      icon: { name: 'inventory', type: 'material' },
       backgroundColor: colors.info,
-      trend: { name: 'timeline', color: colors.white }
+      trend: { name: 'trending-up', type: 'material', color: colors.white }
     }
-  ]), [stats, currency]);
+  ]), [stats, currency, todayEarnings]);
 
   const renderRecentDelivery = useCallback(({ item: delivery }) => (
     <View style={styles.recentItem}>

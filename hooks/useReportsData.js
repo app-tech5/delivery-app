@@ -49,8 +49,8 @@ export const useReportsData = (deliveries, stats, activePeriod) => {
     const worstDay = dailyArray.reduce((worst, day) =>
       day.revenue < worst.revenue ? day : worst, { revenue: Infinity });
     
-    const completionRate = deliveries.length > 0
-      ? (completedDeliveries.length / deliveries.length) * 100
+    const completionRate = periodDeliveries.length > 0
+      ? (completedDeliveries.length / periodDeliveries.length) * 100
       : 0;
 
     return {
@@ -61,7 +61,8 @@ export const useReportsData = (deliveries, stats, activePeriod) => {
       bestDay,
       worstDay: worstDay.revenue === Infinity ? { revenue: 0 } : worstDay,
       completionRate,
-      avgRating: stats.rating || 0
+      avgRating: stats.rating || 0,
+      periodOrders: periodDeliveries.length,
     };
   }, [periodDeliveries, deliveries, stats, activePeriod, periods]);
   

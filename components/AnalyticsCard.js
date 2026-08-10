@@ -5,7 +5,15 @@ import { colors } from '../global';
 import i18n from '../i18n';
 import { formatCurrency } from '../utils';
 
-const AnalyticsCard = ({ performanceStats }) => {
+const formatDeliveriesCount = (count) => {
+  const n = Number(count);
+  if (n === 1) {
+    return `1 ${i18n.t('reports.deliverySingular')}`;
+  }
+  return i18n.t('reports.deliveriesCount', { count });
+};
+
+const AnalyticsCard = ({ performanceStats, currency }) => {
   return (
     <View style={styles.analysisSection}>
       <Text style={styles.sectionTitle}>{i18n.t('reports.analytics')}</Text>
@@ -18,7 +26,9 @@ const AnalyticsCard = ({ performanceStats }) => {
               {i18n.t('reports.deliveriesCount', { count: performanceStats.avgDeliveriesPerDay.toFixed(1) })}
             </Text>
             <Text style={styles.analysisSubvalue}>
-              {i18n.t('reports.perDayAmount', { amount: formatCurrency(performanceStats.avgRevenuePerDay) })}
+              {i18n.t('reports.perDayAmount', {
+                amount: formatCurrency(performanceStats.avgRevenuePerDay, currency),
+              })}
             </Text>
           </View>
         </View>
@@ -27,10 +37,10 @@ const AnalyticsCard = ({ performanceStats }) => {
           <Text style={styles.analysisLabel}>{i18n.t('reports.bestDay')}</Text>
           <View style={styles.analysisValues}>
             <Text style={styles.analysisValue}>
-              {formatCurrency(performanceStats.bestDay.revenue)}
+              {formatCurrency(performanceStats.bestDay.revenue, currency)}
             </Text>
             <Text style={styles.analysisSubvalue}>
-              {i18n.t('reports.deliveriesCount', { count: performanceStats.bestDay.deliveries })}
+              {formatDeliveriesCount(performanceStats.bestDay.deliveries)}
             </Text>
           </View>
         </View>
@@ -39,10 +49,10 @@ const AnalyticsCard = ({ performanceStats }) => {
           <Text style={styles.analysisLabel}>{i18n.t('reports.worstDay')}</Text>
           <View style={styles.analysisValues}>
             <Text style={styles.analysisValue}>
-              {formatCurrency(performanceStats.worstDay.revenue)}
+              {formatCurrency(performanceStats.worstDay.revenue, currency)}
             </Text>
             <Text style={styles.analysisSubvalue}>
-              {i18n.t('reports.deliveriesCount', { count: performanceStats.worstDay.deliveries || 0 })}
+              {formatDeliveriesCount(performanceStats.worstDay.deliveries || 0)}
             </Text>
           </View>
         </View>

@@ -1,11 +1,16 @@
 import { formatCurrency, formatTime, formatOrderNumber } from './formatters';
 import { getDriverDeliveryEarnings } from './driverDeliveryFee';
+import { formatDeliveryAddress } from './addressUtils';
+import i18n from '../i18n';
 
 export const mapDeliveryToHistoryItem = (delivery, currency) => ({
   id: formatOrderNumber(delivery._id),
   time: formatTime(delivery.createdAt || delivery.updatedAt),
   amount: formatCurrency(getDriverDeliveryEarnings(delivery), currency),
-  address: delivery.delivery?.address || 'Adresse non disponible',
+  address: formatDeliveryAddress(
+    delivery.delivery?.address,
+    i18n.t('reports.addressNotAvailable')
+  ),
   customer: delivery.user?.name,
   restaurant: delivery.restaurant?.name,
   

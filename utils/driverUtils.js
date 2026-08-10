@@ -3,9 +3,12 @@ import { updateDriverCache, clearDriverCache } from './storageUtils';
 
 export const INITIAL_STATS = {
   todayDeliveries: 0,
+  todayEarnings: 0,
   totalEarnings: 0,
   rating: 0,
-  completedOrders: 0
+  completedOrders: 0,
+  cancelledOrders: 0,
+  completionRate: 0,
 };
 
 export const isDriverAuthenticated = (driver) => {

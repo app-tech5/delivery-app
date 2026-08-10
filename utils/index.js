@@ -41,6 +41,8 @@ export {
   buildDeliveryTransaction,
 } from './driverDeliveryStats';
 
+export { formatDeliveryAddress } from './addressUtils';
+
 export { buildMapsDirectionsUrl, openMapsNavigation } from './navigationUtils';
 
 export { getAccountEmail, isDemoDriverAccount } from './demoDriverUtils';

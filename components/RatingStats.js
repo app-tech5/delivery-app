@@ -19,21 +19,21 @@ const RatingStats = ({ stats, currency }) => {
     {
       value: stats.completedOrders || 0,
       label: i18n.t('reports.totalRatedDeliveries'),
-      icon: { name: 'package-variant-closed', type: 'material-community' },
+      icon: { name: 'inventory', type: 'material' },
       backgroundColor: colors.primary,
       trend: { name: 'timeline', color: colors.white }
     },
     {
       value: stats.todayDeliveries || 0,
       label: i18n.t('reports.todaysDeliveries'),
-      icon: { name: 'truck-delivery', type: 'material-community' },
+      icon: { name: 'local-shipping', type: 'material' },
       backgroundColor: colors.success,
       trend: { name: 'trending-up', color: colors.white }
     },
     {
       value: formatCurrency(stats.totalEarnings, currency),
       label: i18n.t('reports.earnings'),
-      icon: { name: 'cash', type: 'material-community' },
+      icon: { name: 'attach-money', type: 'material' },
       backgroundColor: colors.info
     }
   ];

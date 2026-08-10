@@ -15,7 +15,7 @@ const ReportsMetricsGrid = ({ performanceStats, trendStats, currency, deliveries
       <EnhancedStatCard
         value={formatCurrency(performanceStats.totalRevenue, currency)}
         label={i18n.t('reports.totalRevenue')}
-        icon={{ name: 'cash', type: 'material-community' }}
+        icon={{ name: 'attach-money', type: 'material' }}
         backgroundColor={colors.success}
         trend={trendStats ? getTrendIcon(trendStats.revenueChange, 5) : null}
       >
@@ -38,7 +38,7 @@ const ReportsMetricsGrid = ({ performanceStats, trendStats, currency, deliveries
       <EnhancedStatCard
         value={performanceStats.totalDeliveries}
         label={i18n.t('reports.totalDeliveries')}
-        icon={{ name: 'truck-delivery', type: 'material-community' }}
+        icon={{ name: 'local-shipping', type: 'material' }}
         backgroundColor={colors.primary}
         trend={trendStats ? getTrendIcon(trendStats.deliveriesChange, 5) : null}
       >
@@ -70,13 +70,13 @@ const ReportsMetricsGrid = ({ performanceStats, trendStats, currency, deliveries
       <EnhancedStatCard
         value={formatPercentage(performanceStats.completionRate)}
         label={i18n.t('reports.completionRate')}
-        icon={{ name: 'gauge', type: 'material-community' }}
+        icon={{ name: 'speed', type: 'material' }}
         backgroundColor={colors.info}
       >
         <Text style={styles.metricSubtext}>
           {i18n.t('reports.completedOfTotal', {
             completed: performanceStats.totalDeliveries,
-            total: deliveries.length,
+            total: performanceStats.periodOrders ?? deliveries.length,
           })}
         </Text>
       </EnhancedStatCard>

@@ -167,8 +167,8 @@ export default function DeliveryDetailsScreen() {
         <AuthGuard isAuthenticated={isAuthenticated} driver={driver} />
         <ScreenLayout title={deliveryTitle}>
           <EmptyState
-            icon="package-variant-closed"
-            iconType="material-community"
+            icon="inventory"
+            iconType="material"
             title={i18n.t('reports.noOrderFound')}
             subtitle={i18n.t('reports.noOrderFoundDesc')}
           />
@@ -268,8 +268,8 @@ export default function DeliveryDetailsScreen() {
                     )}
                     buttonStyle={styles.primaryButton}
                     icon={{
-                      name: 'truck-delivery',
-                      type: 'material-community',
+                      name: 'local-shipping',
+                      type: 'material',
                       size: 20,
                       color: colors.white
                     }}

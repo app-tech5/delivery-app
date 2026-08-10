@@ -24,8 +24,8 @@ export default function SplashScreen({ navigation }) {
             containerStyle={styles.iconContainer}
           />
           <ScreenHeader
-            title="Good Food Driver"
-            subtitle="Livraison rapide & fiable"
+            title={i18n.t('app.name')}
+            subtitle={i18n.t('auth.tagline')}
             containerStyle={styles.screenHeader}
             contentStyle={styles.screenHeaderContent}
             titleStyle={styles.appName}
@@ -117,8 +117,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    alignItems: "flex-end",
+    alignItems: "center",
     marginTop: 80,
-    marginRight: 20,
   }
 });

@@ -17,8 +17,9 @@ const DetailRow = ({ label, value, children }) => (
 const EarningsDetailsCard = ({ stats, currency }) => {
   if (!stats) return null;
 
+  const todayEarnings = stats.todayEarnings ?? stats.totalEarnings ?? 0;
   const averageEarnings = stats.todayDeliveries > 0
-    ? stats.totalEarnings / stats.todayDeliveries
+    ? todayEarnings / stats.todayDeliveries
     : 0;
 
   return (

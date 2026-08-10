@@ -47,6 +47,7 @@ export function getI18nSupportFaqs() {
 }
 
 export function mapSupportFaqs(items = []) {
+  const seen = new Set();
   return items
     .filter((item) => item.type === 'faq' && item.question && item.answer)
     .map((item) => ({
@@ -54,7 +55,13 @@ export function mapSupportFaqs(items = []) {
       question: item.question,
       answer: item.answer,
       category: item.faq_category,
-    }));
+    }))
+    .filter((faq) => {
+      const key = String(faq.question).trim().toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 }
 
 export function buildContactActions(appConfig) {

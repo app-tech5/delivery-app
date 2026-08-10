@@ -20,6 +20,7 @@ import {
   PerformanceScoreCard,
   AuthGuard,
 } from '../components';
+import { formatCurrency } from '../utils';
 
 export default function ReportsScreen() {
   const navigation = useNavigation();
@@ -66,7 +67,9 @@ export default function ReportsScreen() {
       {hasCompletedOnboarding && driver && (
         <ScreenLayout
           title={i18n.t('reports.title')}
-          subtitle={`${performanceStats.totalDeliveries} deliveries • ${performanceStats.totalRevenue?.toFixed(2) || '0.00'}${currency?.symbol || '€'}`}
+          subtitle={`${i18n.t('reports.deliveriesCount', {
+            count: performanceStats.totalDeliveries,
+          })} • ${formatCurrency(performanceStats.totalRevenue, currency)}`}
         >
           <PeriodSelector
             periods={periods}
@@ -91,7 +94,7 @@ export default function ReportsScreen() {
               deliveries={deliveries}
             />
 
-            <AnalyticsCard performanceStats={performanceStats} />
+            <AnalyticsCard performanceStats={performanceStats} currency={currency} />
 
             <PerformanceScoreCard performanceStats={performanceStats} />
 

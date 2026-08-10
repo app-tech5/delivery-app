@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { colors } from '../global';
-import { formatCurrency, formatOrderNumber, getDriverDeliveryEarnings } from '../utils';
+import { formatCurrency, formatOrderNumber, getDriverDeliveryEarnings, formatDeliveryAddress } from '../utils';
 import i18n from '../i18n';
 
 const RecentDeliveryCard = ({
@@ -16,7 +16,10 @@ const RecentDeliveryCard = ({
 
   const orderId = formatOrderNumber(delivery._id);
   const amount = formatCurrency(getDriverDeliveryEarnings(delivery), currency);
-  const address = delivery.delivery?.address || i18n.t('reports.addressNotAvailable');
+  const address = formatDeliveryAddress(
+    delivery.delivery?.address,
+    i18n.t('reports.addressNotAvailable')
+  );
   const customerName = delivery.user?.name;
   const date = showDate ? new Date(delivery.createdAt || delivery.updatedAt).toLocaleDateString(i18n.locale) : null;
 

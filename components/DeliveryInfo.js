@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import i18n from '../i18n';
+import { formatDeliveryAddress } from '../utils';
 import { deliveryCardStyles as styles } from '../styles/deliveryCardStyles';
 
 const DeliveryInfo = ({ delivery }) => (
   <View style={styles.details}>
     <Text style={styles.address}>
-      📍 {delivery.delivery?.address || i18n.t('reports.addressNotAvailable')}
+      📍 {formatDeliveryAddress(delivery.delivery?.address, i18n.t('reports.addressNotAvailable'))}
     </Text>
 
     {delivery.user && (

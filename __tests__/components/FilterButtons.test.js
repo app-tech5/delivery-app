@@ -13,8 +13,8 @@ jest.mock('react-native-elements', () => {
 });
 
 const filters = [
-  { key: 'all', label: 'All', icon: 'format-list-bulleted', iconType: 'material-community' },
-  { key: 'pending', label: 'Pending', icon: 'clock-outline', iconType: 'material-community' },
+  { key: 'all', label: 'All', icon: 'list', iconType: 'material' },
+  { key: 'pending', label: 'Pending', icon: 'schedule', iconType: 'material' },
 ];
 
 describe('FilterButtons', () => {
@@ -33,7 +33,7 @@ describe('FilterButtons', () => {
         filters={[{ key: 'today', label: 'Today', icon: 'calendar-today' }]}
         activeFilter="today"
         onFilterPress={jest.fn()}
-        iconType="material-community"
+        iconType="material"
       />
     );
 
