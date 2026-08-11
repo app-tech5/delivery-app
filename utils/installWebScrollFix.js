@@ -28,6 +28,9 @@ export function installWebScrollFix() {
     if (!el || el.nodeType !== 1) return true;
     if (el.dataset?.gfScrollOk === '1') return true;
     if (isDrawerLike(el)) return true;
+    // Don't unlock map surfaces (Leaflet / MapLibre / canvas)
+    if (el.querySelector?.('iframe, canvas, .leaflet-container, .maplibregl-map')) return true;
+    if (el.matches?.('iframe, canvas, .leaflet-container, .maplibregl-map')) return true;
     const st = window.getComputedStyle(el);
     if (st.overflowX === 'auto' || st.overflowX === 'scroll') return true;
     const r = el.getBoundingClientRect();
