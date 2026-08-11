@@ -2,11 +2,11 @@ import i18n from '../i18n';
 import { getDriverDeliveryEarnings } from './driverDeliveryFee';
 
 export const TIME_FILTERS = [
-  { key: 'all', label: i18n.t('history.filters.all'), icon: 'calendar' },
-  { key: 'today', label: i18n.t('history.filters.today'), icon: 'calendar-today' },
-  { key: 'week', label: i18n.t('history.filters.week'), icon: 'calendar-week' },
+  { key: 'all', label: i18n.t('history.filters.all'), icon: 'event' },
+  { key: 'today', label: i18n.t('history.filters.today'), icon: 'today' },
+  { key: 'week', label: i18n.t('history.filters.week'), icon: 'date-range' },
   { key: 'month', label: i18n.t('history.filters.month'), icon: 'calendar-month' },
-  { key: 'last_month', label: i18n.t('history.filters.last_month'), icon: 'calendar-month-outline' },
+  { key: 'last_month', label: i18n.t('history.filters.last_month'), icon: 'event-note' },
 ];
 
 export const formatDate = (date) => {
