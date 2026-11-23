@@ -17,7 +17,7 @@ jobs:
       EXPO_PUBLIC_DEMO_PASSWORD: ${{ vars.EXPO_PUBLIC_DEMO_PASSWORD }}
       WEB_DEMO_SLUG: driver
       VPS_WEB_DEMO_DIR: /var/www/html/demo/driver
-      PUBLIC_DEMO_URL: https://good-foods.digitaldienste.fr/demo/driver/index.html
+      PUBLIC_DEMO_URL: https://fromcm.com/demo/driver/index.html
     steps:
       - name: Checkout
         uses: actions/checkout@v4
